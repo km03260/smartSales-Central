@@ -1,0 +1,26 @@
+{
+  "name": "smartsales-central",
+  "version": "1.0.0",
+  "description": "SmartSales Central API - Licensing & Client Management",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "db:generate": "npx prisma generate",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.6.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jose": "^6.0.11",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.6.0"
+  }
+}

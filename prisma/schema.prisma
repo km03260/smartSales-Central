@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Entreprises clientes (acheteurs de SmartSales) ─────────────────────────
+
+model Company {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  name         String   @db.VarChar(200)
+  legalName    String   @db.VarChar(200)
+  contactEmail String   @db.VarChar(200)
+  contactPhone String   @default("") @db.VarChar(50)
+  address      String   @default("") @db.VarChar(500)
+  siret        String   @default("") @db.VarChar(20)
+  notes        String   @default("") @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  licenses     License[]
+  config       CompanyConfig?
+
+  @@map("companies")
+}
+
+// ─── Licences ───────────────────────────────────────────────────────────────
+
+model License {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  companyId      String   @db.VarChar(36)
+  licenseKey     String   @unique @db.VarChar(20) // SS-XXXX-XXXX-XXXX
+  syncServiceUrl String   @db.VarChar(500)
+  apiKey         String   @db.VarChar(200)
+  maxDevices     Int      @default(5)
+  features       Json     // ["orders","quotations","invoices","stats"]
+  plan           String   @default("professional") @db.VarChar(50)
+  startsAt       DateTime @default(now())
+  expiresAt      DateTime
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  devices        DeviceActivation[]
+  usageLogs      UsageLog[]
+
+  @@map("licenses")
+}
+
+// ─── Configuration branding & infos légales (remplace companyInfo.js) ───────
+
+model CompanyConfig {
+  id                    String  @id @default(uuid()) @db.VarChar(36)
+  companyId             String  @unique @db.VarChar(36)
+  logoUrl               String  @default("") @db.VarChar(500)
+  subtitle              String  @default("") @db.VarChar(200)
+  email                 String  @default("") @db.VarChar(200)
+  phone                 String  @default("") @db.VarChar(50)
+  website               String  @default("") @db.VarChar(200)
+  addressStreet         String  @default("") @db.VarChar(200)
+  addressZipCode        String  @default("") @db.VarChar(10)
+  addressCity           String  @default("") @db.VarChar(100)
+  addressCountry        String  @default("France") @db.VarChar(50)
+  siret                 String  @default("") @db.VarChar(20)
+  tva                   String  @default("") @db.VarChar(30)
+  capital               String  @default("") @db.VarChar(50)
+  rcs                   String  @default("") @db.VarChar(100)
+  ape                   String  @default("") @db.VarChar(10)
+  paymentTerms          String  @default("") @db.VarChar(200)
+  quotationValidityDays Int     @default(30)
+  tvaRate               Float   @default(0.20)
+  termsAndConditions    String  @default("") @db.Text
+
+  company               Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("company_configs")
+}
+
+// ─── Appareils activés par licence ──────────────────────────────────────────
+
+model DeviceActivation {
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  licenseId     String   @db.VarChar(36)
+  deviceId      String   @db.VarChar(100)
+  deviceName    String   @default("") @db.VarChar(200)
+  platform      String   @default("android") @db.VarChar(20)
+  activatedAt   DateTime @default(now())
+  lastHeartbeat DateTime @default(now())
+  isActive      Boolean  @default(true)
+
+  license       License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@unique([licenseId, deviceId])
+  @@map("device_activations")
+}
+
+// ─── Logs d'usage ───────────────────────────────────────────────────────────
+
+model UsageLog {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  licenseId String   @db.VarChar(36)
+  deviceId  String   @default("") @db.VarChar(100)
+  eventType String   @db.VarChar(50)
+  eventData Json
+  createdAt DateTime @default(now())
+
+  license   License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@map("usage_logs")
+}
+
+// ─── Utilisateurs admin (dashboard) ─────────────────────────────────────────
+
+model AdminUser {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  email        String   @unique @db.VarChar(200)
+  passwordHash String   @db.VarChar(200)
+  role         String   @default("admin") @db.VarChar(20)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+// ─── Demandes de contact (site vitrine) ─────────────────────────────────────
+
+model ContactRequest {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  name      String   @db.VarChar(200)
+  email     String   @db.VarChar(200)
+  company   String   @default("") @db.VarChar(200)
+  phone     String   @default("") @db.VarChar(50)
+  message   String   @db.Text
+  type      String   @default("info") @db.VarChar(20)
+  status    String   @default("new") @db.VarChar(20)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact_requests")
+}

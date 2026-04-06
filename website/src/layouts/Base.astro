@@ -1,0 +1,72 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Application mobile de prise de commandes pour les commerciaux itinérants" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-white text-gray-900 antialiased">
+    <!-- Header -->
+    <header class="border-b border-gray-100">
+      <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href="/" class="text-xl font-bold text-blue-600">SmartSales</a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="/fonctionnalites" class="text-sm text-gray-600 hover:text-gray-900">Fonctionnalites</a>
+          <a href="/tarifs" class="text-sm text-gray-600 hover:text-gray-900">Tarifs</a>
+          <a href="/contact" class="text-sm text-gray-600 hover:text-gray-900">Contact</a>
+        </div>
+        <a href="/contact" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          Demander une demo
+        </a>
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 border-t border-gray-200 mt-20">
+      <div class="max-w-6xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="font-bold text-gray-900 mb-3">SmartSales</h3>
+            <p class="text-sm text-gray-500">Application mobile de prise de commandes pour les commerciaux itinerants. Synchronisation temps reel avec votre ERP WaveSoft.</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-3">Liens</h3>
+            <ul class="space-y-2 text-sm text-gray-500">
+              <li><a href="/fonctionnalites" class="hover:text-gray-900">Fonctionnalites</a></li>
+              <li><a href="/tarifs" class="hover:text-gray-900">Tarifs</a></li>
+              <li><a href="/contact" class="hover:text-gray-900">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-3">Contact</h3>
+            <ul class="space-y-2 text-sm text-gray-500">
+              <li>contact@smartsales.fr</li>
+            </ul>
+          </div>
+        </div>
+        <div class="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-gray-400">
+          &copy; {new Date().getFullYear()} SmartSales. Tous droits reserves.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  @import "../styles/global.css";
+</style>

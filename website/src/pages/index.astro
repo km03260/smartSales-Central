@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="SmartSales - Prise de commandes mobile pour commerciaux">
+  <!-- Hero -->
+  <section class="max-w-6xl mx-auto px-6 py-20 text-center">
+    <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+      Compatible WaveSoft ERP
+    </div>
+    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
+      Vos commerciaux prennent<br/>
+      <span class="text-blue-600">commande sur le terrain</span>
+    </h1>
+    <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-8">
+      Application mobile de prise de commandes, devis et consultation du catalogue.
+      Fonctionne hors-ligne, synchronise en temps reel avec votre ERP.
+    </p>
+    <div class="flex gap-4 justify-center">
+      <a href="/contact" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+        Demander une demo
+      </a>
+      <a href="/fonctionnalites" class="bg-white text-gray-700 px-6 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition-colors">
+        Decouvrir les fonctionnalites
+      </a>
+    </div>
+  </section>
+
+  <!-- Key features -->
+  <section class="bg-gray-50 py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Tout ce dont vos commerciaux ont besoin</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { title: "Catalogue produits", desc: "Consultez votre catalogue complet avec photos, prix et disponibilites. Recherche instantanee et filtres par famille.", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" },
+          { title: "Commandes & devis", desc: "Creez des commandes et devis en quelques taps. Historique client, tarifs speciaux et conditions automatiques.", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
+          { title: "Mode hors-ligne", desc: "Travaillez sans connexion internet. Toutes les donnees sont stockees localement et synchronisees automatiquement.", icon: "M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829" },
+          { title: "Synchronisation ERP", desc: "Connecte directement a votre ERP WaveSoft. Clients, articles, prix et commandes synchronises en temps reel.", icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" },
+          { title: "PDF & emails", desc: "Generez des devis et bons de commande en PDF directement depuis l'app. Envoyez-les par email en un tap.", icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
+          { title: "Multi-utilisateurs", desc: "Chaque commercial a son espace avec ses clients et ses secteurs. Gestion des droits et visibilite par secteur.", icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" },
+        ].map(({ title, desc, icon }) => (
+          <div class="bg-white rounded-xl p-6 border border-gray-200">
+            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icon} />
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">{title}</h3>
+            <p class="text-sm text-gray-500">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="max-w-6xl mx-auto px-6 py-20 text-center">
+    <h2 class="text-3xl font-bold text-gray-900 mb-4">Pret a equipper vos commerciaux ?</h2>
+    <p class="text-lg text-gray-500 mb-8">Demandez une demonstration gratuite et decouvrez SmartSales en action.</p>
+    <a href="/contact" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+      Demander une demo gratuite
+    </a>
+  </section>
+</Base>

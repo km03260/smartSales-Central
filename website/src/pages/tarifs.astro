@@ -1,0 +1,103 @@
+---
+import Base from '../layouts/Base.astro';
+
+const plans = [
+  {
+    name: "Starter",
+    price: "49",
+    period: "/mois",
+    description: "Pour les petites equipes de 1 a 3 commerciaux",
+    features: [
+      "Jusqu'a 3 appareils",
+      "Catalogue produits",
+      "Prise de commandes",
+      "Mode hors-ligne",
+      "Synchronisation ERP",
+      "Support email",
+    ],
+    cta: "Choisir Starter",
+    highlighted: false,
+  },
+  {
+    name: "Professional",
+    price: "99",
+    period: "/mois",
+    description: "Pour les equipes commerciales en croissance",
+    features: [
+      "Jusqu'a 10 appareils",
+      "Tout Starter +",
+      "Devis & PDF",
+      "Tarifs clients speciaux",
+      "Historique factures & BL",
+      "Articles favoris & 20/80",
+      "Support prioritaire",
+    ],
+    cta: "Choisir Professional",
+    highlighted: true,
+  },
+  {
+    name: "Enterprise",
+    price: "Sur mesure",
+    period: "",
+    description: "Pour les grandes organisations",
+    features: [
+      "Appareils illimites",
+      "Tout Professional +",
+      "Multi-sites",
+      "Personnalisation avancee",
+      "Formation sur site",
+      "Support dedie",
+      "SLA garanti",
+    ],
+    cta: "Nous contacter",
+    highlighted: false,
+  },
+];
+---
+
+<Base title="Tarifs - SmartSales">
+  <section class="max-w-6xl mx-auto px-6 py-16">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4 text-center">Tarifs simples et transparents</h1>
+    <p class="text-lg text-gray-500 text-center mb-12 max-w-2xl mx-auto">
+      Choisissez le plan adapte a la taille de votre equipe commerciale. Tous les plans incluent la synchronisation ERP et le mode hors-ligne.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {plans.map((plan) => (
+        <div class={`rounded-xl p-8 ${plan.highlighted ? 'bg-blue-600 text-white ring-2 ring-blue-600' : 'bg-white border border-gray-200'}`}>
+          <h2 class={`text-xl font-bold mb-2 ${plan.highlighted ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h2>
+          <p class={`text-sm mb-4 ${plan.highlighted ? 'text-blue-100' : 'text-gray-500'}`}>{plan.description}</p>
+          <div class="mb-6">
+            <span class={`text-4xl font-bold ${plan.highlighted ? 'text-white' : 'text-gray-900'}`}>
+              {plan.price.includes('mesure') ? '' : ''}{plan.price}
+            </span>
+            {plan.period && <span class={`text-sm ${plan.highlighted ? 'text-blue-200' : 'text-gray-500'}`}>{plan.period}</span>}
+          </div>
+          <ul class="space-y-3 mb-8">
+            {plan.features.map((feature) => (
+              <li class="flex items-center gap-2 text-sm">
+                <svg class={`w-4 h-4 shrink-0 ${plan.highlighted ? 'text-blue-200' : 'text-blue-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class={plan.highlighted ? 'text-blue-50' : 'text-gray-600'}>{feature}</span>
+              </li>
+            ))}
+          </ul>
+          <a href="/contact" class={`block text-center py-2.5 rounded-lg font-medium text-sm transition-colors ${
+            plan.highlighted
+              ? 'bg-white text-blue-600 hover:bg-blue-50'
+              : 'bg-blue-600 text-white hover:bg-blue-700'
+          }`}>
+            {plan.cta}
+          </a>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-12 text-center">
+      <p class="text-sm text-gray-500">
+        Tous les prix sont HT. Engagement annuel. Installation et formation incluses pour les plans Professional et Enterprise.
+      </p>
+    </div>
+  </section>
+</Base>

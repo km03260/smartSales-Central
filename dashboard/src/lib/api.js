@@ -1,0 +1,56 @@
+const API_BASE = '/api';
+
+async function request(path, options = {}) {
+  const token = localStorage.getItem('admin_token');
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem('admin_token');
+    window.location.href = '/login';
+    throw new Error('Non autorisé');
+  }
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Erreur serveur');
+  return data;
+}
+
+export const api = {
+  // Auth
+  login: (body) => request('/admin/auth/login', { method: 'POST', body }),
+
+  // Companies
+  getCompanies: () => request('/admin/companies'),
+  getCompany: (id) => request(`/admin/companies/${id}`),
+  createCompany: (body) => request('/admin/companies', { method: 'POST', body }),
+  updateCompany: (id, body) => request(`/admin/companies/${id}`, { method: 'PUT', body }),
+  deleteCompany: (id) => request(`/admin/companies/${id}`, { method: 'DELETE' }),
+  updateCompanyConfig: (id, body) => request(`/admin/companies/${id}/config`, { method: 'PUT', body }),
+
+  // Licenses
+  getLicenses: () => request('/admin/licenses'),
+  getLicense: (id) => request(`/admin/licenses/${id}`),
+  createLicense: (body) => request('/admin/licenses', { method: 'POST', body }),
+  updateLicense: (id, body) => request(`/admin/licenses/${id}`, { method: 'PUT', body }),
+  revokeLicense: (id) => request(`/admin/licenses/${id}/revoke`, { method: 'POST' }),
+  renewLicense: (id, body) => request(`/admin/licenses/${id}/renew`, { method: 'POST', body }),
+  getLicenseDevices: (id) => request(`/admin/licenses/${id}/devices`),
+  deactivateDevice: (licenseId, deviceId) =>
+    request(`/admin/licenses/${licenseId}/devices/${deviceId}/deactivate`, { method: 'POST' }),
+
+  // Analytics
+  getOverview: () => request('/admin/analytics/overview'),
+  getUsage: (days = 30) => request(`/admin/analytics/usage?days=${days}`),
+
+  // Contacts
+  getContacts: () => request('/admin/contacts'),
+  updateContact: (id, body) => request(`/admin/contacts/${id}`, { method: 'PUT', body }),
+};
