@@ -22,7 +22,7 @@ router.post('/activate', async (req, res) => {
     // Trouver la licence par code d'activation
     const license = await prisma.license.findUnique({
       where: { licenseKey: activationCode.toUpperCase().trim() },
-      include: { company: { include: { config: true } } },
+      include: { app: true, company: { include: { config: true } } },
     });
 
     if (!license) {
@@ -71,7 +71,7 @@ router.post('/activate', async (req, res) => {
     });
 
     // Générer le JWT licence
-    const token = await signLicenseToken(license, license.company);
+    const token = await signLicenseToken(license, license.company, license.app?.code);
 
     // Préparer la config entreprise
     const config = license.company.config;
@@ -117,6 +117,8 @@ router.post('/activate', async (req, res) => {
     res.json({
       success: true,
       token,
+      appCode: license.app?.code,
+      appName: license.app?.name,
       companyConfig,
     });
   } catch (error) {
@@ -142,7 +144,7 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
 
     const license = await prisma.license.findUnique({
       where: { id: licenseId },
-      include: { company: true },
+      include: { app: true, company: true },
     });
 
     if (!license || !license.isActive) {
@@ -156,7 +158,7 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
     });
 
     // Générer un nouveau JWT (rafraîchi)
-    const token = await signLicenseToken(license, license.company);
+    const token = await signLicenseToken(license, license.company, license.app?.code);
 
     // Log
     await prisma.usageLog.create({

@@ -20,6 +20,18 @@ async function main() {
   });
   console.log(`Admin user: ${admin.email}`);
 
+  // ─── Applications ──────────────────────────────────────────────────────
+  const smartSales = await prisma.app.upsert({
+    where: { code: 'SS' },
+    update: {},
+    create: {
+      code: 'SS',
+      name: 'SmartSales',
+      description: 'Application mobile de prise de commandes pour les commerciaux itinérants',
+    },
+  });
+  console.log(`App: ${smartSales.name} (${smartSales.code})`);
+
   // ─── Maurer (premier client) ────────────────────────────────────────────
   const maurer = await prisma.company.upsert({
     where: { id: 'maurer-001' },
@@ -62,12 +74,12 @@ async function main() {
   });
   console.log('Company config: Maurer branding created');
 
-  // ─── Licence Maurer ─────────────────────────────────────────────────────
-  const licenseKey = generateLicenseKey();
+  // ─── Licence Maurer (SmartSales) ────────────────────────────────────────
   const license = await prisma.license.upsert({
     where: { licenseKey: 'SS-MAUR-INIT-0001' },
     update: {},
     create: {
+      appId: smartSales.id,
       companyId: maurer.id,
       licenseKey: 'SS-MAUR-INIT-0001',
       syncServiceUrl: 'https://213.56.180.33',

@@ -35,8 +35,14 @@ export const api = {
   deleteCompany: (id) => request(`/admin/companies/${id}`, { method: 'DELETE' }),
   updateCompanyConfig: (id, body) => request(`/admin/companies/${id}/config`, { method: 'PUT', body }),
 
+  // Apps
+  getApps: () => request('/admin/apps'),
+  createApp: (body) => request('/admin/apps', { method: 'POST', body }),
+  updateApp: (id, body) => request(`/admin/apps/${id}`, { method: 'PUT', body }),
+  deleteApp: (id) => request(`/admin/apps/${id}`, { method: 'DELETE' }),
+
   // Licenses
-  getLicenses: () => request('/admin/licenses'),
+  getLicenses: (appId) => request(`/admin/licenses${appId ? `?appId=${appId}` : ''}`),
   getLicense: (id) => request(`/admin/licenses/${id}`),
   createLicense: (body) => request('/admin/licenses', { method: 'POST', body }),
   updateLicense: (id, body) => request(`/admin/licenses/${id}`, { method: 'PUT', body }),

@@ -40,7 +40,14 @@ export default function LicenseDetail() {
       <div className="flex items-center gap-4 mb-6">
         <Link to="/licenses" className="text-gray-400 hover:text-gray-600"><ArrowLeft size={20} /></Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 font-mono">{license.licenseKey}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900 font-mono">{license.licenseKey}</h1>
+            {license.app && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                {license.app.name}
+              </span>
+            )}
+          </div>
           <p className="text-sm text-gray-500">{license.company?.name} &mdash; {license.company?.legalName}</p>
         </div>
       </div>

@@ -8,6 +8,7 @@ import adminAuthRouter from './routes/admin/auth.js';
 import adminCompaniesRouter from './routes/admin/companies.js';
 import adminLicensesRouter from './routes/admin/licenses.js';
 import adminAnalyticsRouter from './routes/admin/analytics.js';
+import adminAppsRouter from './routes/admin/apps.js';
 import adminAuth from './middleware/adminAuth.js';
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/contact', contactRouter);
 app.use('/api/admin/auth', adminAuthRouter);
 app.use('/api/admin/companies', adminAuth, adminCompaniesRouter);
 app.use('/api/admin/licenses', adminAuth, adminLicensesRouter);
+app.use('/api/admin/apps', adminAuth, adminAppsRouter);
 app.use('/api/admin/analytics', adminAuth, adminAnalyticsRouter);
 app.use('/api/admin/contacts', adminAuth, contactRouter);
 

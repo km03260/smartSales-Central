@@ -11,8 +11,11 @@ const prisma = new PrismaClient();
  */
 router.get('/', async (req, res) => {
   try {
+    const { appId } = req.query;
     const licenses = await prisma.license.findMany({
+      where: appId ? { appId } : undefined,
       include: {
+        app: { select: { id: true, code: true, name: true } },
         company: { select: { id: true, name: true, legalName: true } },
         _count: { select: { devices: { where: { isActive: true } } } },
       },
@@ -38,6 +41,7 @@ router.get('/:id', async (req, res) => {
     const license = await prisma.license.findUnique({
       where: { id: req.params.id },
       include: {
+        app: { select: { id: true, code: true, name: true } },
         company: true,
         devices: { orderBy: { lastHeartbeat: 'desc' } },
       },
@@ -60,10 +64,16 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { companyId, syncServiceUrl, apiKey, maxDevices, features, plan, expiresAt } = req.body;
+    const { appId, companyId, syncServiceUrl, apiKey, maxDevices, features, plan, expiresAt } = req.body;
 
-    if (!companyId || !syncServiceUrl || !apiKey || !expiresAt) {
-      return res.status(400).json({ error: 'companyId, syncServiceUrl, apiKey et expiresAt requis' });
+    if (!appId || !companyId || !syncServiceUrl || !apiKey || !expiresAt) {
+      return res.status(400).json({ error: 'appId, companyId, syncServiceUrl, apiKey et expiresAt requis' });
+    }
+
+    // Vérifier que l'app existe
+    const app = await prisma.app.findUnique({ where: { id: appId } });
+    if (!app) {
+      return res.status(404).json({ error: 'Application non trouvée' });
     }
 
     // Vérifier que l'entreprise existe
@@ -74,8 +84,9 @@ router.post('/', async (req, res) => {
 
     const license = await prisma.license.create({
       data: {
+        appId,
         companyId,
-        licenseKey: generateLicenseKey(),
+        licenseKey: generateLicenseKey(app.code),
         syncServiceUrl,
         apiKey,
         maxDevices: maxDevices || 5,
@@ -83,7 +94,7 @@ router.post('/', async (req, res) => {
         plan: plan || 'professional',
         expiresAt: new Date(expiresAt),
       },
-      include: { company: { select: { name: true } } },
+      include: { app: { select: { code: true, name: true } }, company: { select: { name: true } } },
     });
 
     res.status(201).json(license);

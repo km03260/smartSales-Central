@@ -6,16 +6,21 @@ import { Plus, KeyRound, ChevronRight } from 'lucide-react';
 export default function Licenses() {
   const [licenses, setLicenses] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const [apps, setApps] = useState([]);
+  const [filterAppId, setFilterAppId] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ companyId: '', syncServiceUrl: '', apiKey: '', maxDevices: 5, plan: 'professional', expiresAt: '' });
+  const [form, setForm] = useState({ appId: '', companyId: '', syncServiceUrl: '', apiKey: '', maxDevices: 5, plan: 'professional', expiresAt: '' });
   const [saving, setSaving] = useState(false);
 
-  const load = () => api.getLicenses().then(setLicenses).catch(console.error);
+  const load = () => api.getLicenses(filterAppId || undefined).then(setLicenses).catch(console.error);
 
   useEffect(() => {
     load();
     api.getCompanies().then(setCompanies).catch(console.error);
+    api.getApps().then(setApps).catch(console.error);
   }, []);
+
+  useEffect(() => { load(); }, [filterAppId]);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -49,10 +54,36 @@ export default function Licenses() {
         </button>
       </div>
 
+      {/* Filtre par app */}
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setFilterAppId('')}
+          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+            !filterAppId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}>
+          Toutes
+        </button>
+        {apps.map((a) => (
+          <button key={a.id} onClick={() => setFilterAppId(a.id)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              filterAppId === a.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}>
+            {a.name}
+          </button>
+        ))}
+      </div>
+
       {showForm && (
         <form onSubmit={handleCreate} className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Nouvelle licence</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Application *</label>
+              <select value={form.appId} onChange={(e) => setForm({ ...form, appId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Sélectionner...</option>
+                {apps.map((a) => <option key={a.id} value={a.id}>{a.name} ({a.code})</option>)}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Entreprise *</label>
               <select value={form.companyId} onChange={(e) => setForm({ ...form, companyId: e.target.value })}
@@ -111,6 +142,7 @@ export default function Licenses() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Clé</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">App</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Entreprise</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Plan</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Appareils</th>
@@ -125,6 +157,11 @@ export default function Licenses() {
                 return (
                   <tr key={l.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 font-mono text-sm">{l.licenseKey}</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                        {l.app?.code}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-sm">{l.company?.name}</td>
                     <td className="px-6 py-4 text-sm capitalize">{l.plan}</td>
                     <td className="px-6 py-4 text-sm">{l.activeDevices}/{l.maxDevices}</td>

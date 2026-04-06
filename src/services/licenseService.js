@@ -20,9 +20,10 @@ async function loadKeys() {
 }
 
 /**
- * Génère un code d'activation unique : SS-XXXX-XXXX-XXXX
+ * Génère un code d'activation unique : {appCode}-XXXX-XXXX-XXXX
+ * @param {string} appCode - Code de l'application (ex: "SS", "SE", "SA")
  */
-export function generateLicenseKey() {
+export function generateLicenseKey(appCode = 'SS') {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // pas de 0/O/1/I pour éviter confusion
   const segment = () => {
     let s = '';
@@ -31,18 +32,19 @@ export function generateLicenseKey() {
     }
     return s;
   };
-  return `SS-${segment()}-${segment()}-${segment()}`;
+  return `${appCode}-${segment()}-${segment()}-${segment()}`;
 }
 
 /**
  * Signe un JWT de licence contenant toute la config nécessaire à l'app mobile.
  */
-export async function signLicenseToken(license, company) {
+export async function signLicenseToken(license, company, appCode) {
   await loadKeys();
 
   const token = await new SignJWT({
     clientId: company.id,
     companyName: company.legalName,
+    appCode: appCode || 'SS',
     syncServiceUrl: license.syncServiceUrl,
     apiKey: license.apiKey,
     maxDevices: license.maxDevices,
