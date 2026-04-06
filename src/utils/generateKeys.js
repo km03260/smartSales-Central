@@ -2,6 +2,9 @@
  * Génère une paire de clés RSA (private.pem + public.pem) pour la signature des licences JWT.
  * Usage: node src/utils/generateKeys.js
  */
+import { webcrypto } from 'crypto';
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
+
 import { generateKeyPair, exportPKCS8, exportSPKI } from 'jose';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
