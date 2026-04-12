@@ -223,4 +223,40 @@ router.post('/:licenseId/devices/:deviceId/deactivate', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/admin/licenses/:id/block
+ * Bloque une licence (l'app mobile sera bloquée au prochain heartbeat).
+ */
+router.post('/:id/block', async (req, res) => {
+  try {
+    const license = await prisma.license.update({
+      where: { id: req.params.id },
+      data: { isBlocked: true },
+      include: { company: { select: { name: true } } },
+    });
+    res.json({ success: true, message: 'Licence bloquée', license });
+  } catch (error) {
+    console.error('[LICENSES:BLOCK]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * POST /api/admin/licenses/:id/unblock
+ * Débloque une licence.
+ */
+router.post('/:id/unblock', async (req, res) => {
+  try {
+    const license = await prisma.license.update({
+      where: { id: req.params.id },
+      data: { isBlocked: false },
+      include: { company: { select: { name: true } } },
+    });
+    res.json({ success: true, message: 'Licence débloquée', license });
+  } catch (error) {
+    console.error('[LICENSES:UNBLOCK]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 export default router;

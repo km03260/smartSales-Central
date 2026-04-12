@@ -25,6 +25,16 @@ export default function LicenseDetail() {
     load();
   };
 
+  const handleToggleBlock = async () => {
+    if (license.isBlocked) {
+      await api.unblockLicense(id);
+    } else {
+      if (!confirm('Bloquer cette licence ? L\'application sera bloquée au prochain heartbeat.')) return;
+      await api.blockLicense(id);
+    }
+    load();
+  };
+
   const handleDeactivateDevice = async (deviceId) => {
     if (!confirm('Désactiver cet appareil ?')) return;
     await api.deactivateDevice(id, deviceId);
@@ -72,7 +82,7 @@ export default function LicenseDetail() {
             ))}
             <div className="flex justify-between">
               <dt className="text-sm text-gray-500">Statut</dt>
-              <dd>
+              <dd className="flex gap-2">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                   !license.isActive ? 'bg-red-100 text-red-700' :
                   isExpired ? 'bg-red-100 text-red-700' :
@@ -80,6 +90,11 @@ export default function LicenseDetail() {
                 }`}>
                   {!license.isActive ? 'Révoquée' : isExpired ? 'Expirée' : 'Active'}
                 </span>
+                {license.isBlocked && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                    Bloquée
+                  </span>
+                )}
               </dd>
             </div>
           </dl>
@@ -89,6 +104,14 @@ export default function LicenseDetail() {
               <button onClick={handleRevoke}
                 className="flex items-center gap-2 text-red-600 hover:text-red-800 text-sm font-medium cursor-pointer">
                 <Ban size={16} /> Révoquer
+              </button>
+            )}
+            {license.isActive && (
+              <button onClick={handleToggleBlock}
+                className={`flex items-center gap-2 text-sm font-medium cursor-pointer ${
+                  license.isBlocked ? 'text-green-600 hover:text-green-800' : 'text-orange-600 hover:text-orange-800'
+                }`}>
+                {license.isBlocked ? 'Débloquer' : 'Bloquer'}
               </button>
             )}
             <div className="flex items-center gap-2 ml-auto">

@@ -33,6 +33,10 @@ router.post('/activate', async (req, res) => {
       return res.status(403).json({ error: 'Licence désactivée' });
     }
 
+    if (license.isBlocked) {
+      return res.status(403).json({ error: 'Licence bloquée. Contactez votre administrateur.' });
+    }
+
     if (new Date(license.expiresAt) < new Date()) {
       return res.status(403).json({ error: 'Licence expirée' });
     }
@@ -165,7 +169,7 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
       data: { licenseId, deviceId, eventType: 'heartbeat' },
     });
 
-    res.json({ success: true, token });
+    res.json({ success: true, token, isBlocked: license.isBlocked || false });
   } catch (error) {
     console.error('[HEARTBEAT]', error);
     res.status(500).json({ error: 'Erreur serveur' });

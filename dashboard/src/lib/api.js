@@ -48,6 +48,8 @@ export const api = {
   updateLicense: (id, body) => request(`/admin/licenses/${id}`, { method: 'PUT', body }),
   revokeLicense: (id) => request(`/admin/licenses/${id}/revoke`, { method: 'POST' }),
   renewLicense: (id, body) => request(`/admin/licenses/${id}/renew`, { method: 'POST', body }),
+  blockLicense: (id) => request(`/admin/licenses/${id}/block`, { method: 'POST' }),
+  unblockLicense: (id) => request(`/admin/licenses/${id}/unblock`, { method: 'POST' }),
   getLicenseDevices: (id) => request(`/admin/licenses/${id}/devices`),
   deactivateDevice: (licenseId, deviceId) =>
     request(`/admin/licenses/${licenseId}/devices/${deviceId}/deactivate`, { method: 'POST' }),

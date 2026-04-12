@@ -10,6 +10,7 @@ import adminLicensesRouter from './routes/admin/licenses.js';
 import adminAnalyticsRouter from './routes/admin/analytics.js';
 import adminAppsRouter from './routes/admin/apps.js';
 import adminAuth from './middleware/adminAuth.js';
+import { startCronJobs, checkExpiringLicenses } from './services/cronService.js';
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -37,8 +38,21 @@ app.use('/api/admin/apps', adminAuth, adminAppsRouter);
 app.use('/api/admin/analytics', adminAuth, adminAnalyticsRouter);
 app.use('/api/admin/contacts', adminAuth, contactRouter);
 
+// ─── Déclenchement manuel des alertes (admin) ──────────────────────────────
+app.post('/api/admin/alerts/check', adminAuth, async (req, res) => {
+  try {
+    await checkExpiringLicenses();
+    res.json({ success: true, message: 'Vérification des alertes lancée' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la vérification' });
+  }
+});
+
 // ─── Démarrage ──────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`SmartSales Central API running on port ${PORT}`);
   console.log(`Health: http://localhost:${PORT}/api/health`);
+
+  // Démarrer les cron jobs
+  startCronJobs();
 });

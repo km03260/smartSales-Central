@@ -50,6 +50,7 @@ export async function signLicenseToken(license, company, appCode) {
     maxDevices: license.maxDevices,
     features: license.features,
     plan: license.plan,
+    isBlocked: license.isBlocked || false,
   })
     .setProtectedHeader({ alg: 'RS256' })
     .setIssuedAt()

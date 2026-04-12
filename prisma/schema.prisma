@@ -58,6 +58,7 @@ model License {
   startsAt       DateTime @default(now())
   expiresAt      DateTime
   isActive       Boolean  @default(true)
+  isBlocked      Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -65,8 +66,24 @@ model License {
   company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   devices        DeviceActivation[]
   usageLogs      UsageLog[]
+  alerts         LicenseAlert[]
 
   @@map("licenses")
+}
+
+// ─── Alertes d'expiration envoyées ──────────────────────────────────────
+
+model LicenseAlert {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  licenseId String   @db.VarChar(36)
+  daysTag   Int      // 45, 30, 15, 7 ou 0 (jour d'expiration)
+  sentAt    DateTime @default(now())
+  sentTo    String   @db.VarChar(200) // email destinataire
+
+  license   License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@unique([licenseId, daysTag])
+  @@map("license_alerts")
 }
 
 // ─── Configuration branding & infos légales (remplace companyInfo.js) ───────
