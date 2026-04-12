@@ -8,7 +8,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.smartapps-api.rule=Host(`api.${DOMAIN}`)"
       - "traefik.http.routers.smartapps-api.entrypoints=websecure"
-      - "traefik.http.routers.smartapps-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.smartapps-api.tls.certresolver=myresolver"
       - "traefik.http.services.smartapps-api.loadbalancer.server.port=3500"
     networks:
       - traefik
@@ -22,7 +22,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.smartapps-dashboard.rule=Host(`admin.${DOMAIN}`)"
       - "traefik.http.routers.smartapps-dashboard.entrypoints=websecure"
-      - "traefik.http.routers.smartapps-dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.smartapps-dashboard.tls.certresolver=myresolver"
       - "traefik.http.services.smartapps-dashboard.loadbalancer.server.port=80"
     networks:
       - traefik
@@ -35,7 +35,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.smartapps-website.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
       - "traefik.http.routers.smartapps-website.entrypoints=websecure"
-      - "traefik.http.routers.smartapps-website.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.smartapps-website.tls.certresolver=myresolver"
       - "traefik.http.services.smartapps-website.loadbalancer.server.port=80"
     networks:
       - traefik

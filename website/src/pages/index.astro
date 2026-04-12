@@ -4,49 +4,115 @@ import Base from '../layouts/Base.astro';
 
 <Base title="SmartSales - Prise de commandes mobile pour commerciaux">
   <!-- Hero -->
-  <section class="max-w-6xl mx-auto px-6 py-20 text-center">
-    <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-      Compatible WaveSoft ERP
+  <section class="relative overflow-hidden">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-to-br from-blue-100 via-violet-50 to-transparent rounded-full blur-3xl opacity-60"></div>
+      <div class="absolute top-40 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-violet-100 to-transparent rounded-full blur-3xl opacity-40"></div>
     </div>
-    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
-      Vos commerciaux prennent<br/>
-      <span class="text-blue-600">commande sur le terrain</span>
-    </h1>
-    <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-8">
-      Application mobile de prise de commandes, devis et consultation du catalogue.
-      Fonctionne hors-ligne, synchronise en temps reel avec votre ERP.
-    </p>
-    <div class="flex gap-4 justify-center">
-      <a href="/contact" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-        Demander une demo
-      </a>
-      <a href="/fonctionnalites" class="bg-white text-gray-700 px-6 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition-colors">
-        Decouvrir les fonctionnalites
-      </a>
+
+    <div class="max-w-6xl mx-auto px-6 py-24 md:py-32 text-center">
+      <div class="animate-fade-in-up">
+        <div class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-8 border border-blue-100/50">
+          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Compatible WaveSoft ERP
+        </div>
+      </div>
+
+      <h1 class="animate-fade-in-up delay-100 text-5xl md:text-7xl font-extrabold text-gray-900 leading-[1.1] mb-6 tracking-tight">
+        Vos commerciaux prennent<br/>
+        <span class="text-gradient">commande sur le terrain</span>
+      </h1>
+
+      <p class="animate-fade-in-up delay-200 text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+        Application mobile de prise de commandes, devis et consultation du catalogue.
+        Fonctionne hors-ligne, synchronise en temps réel avec votre ERP.
+      </p>
+
+      <div class="animate-fade-in-up delay-300 flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/contact" class="bg-gradient-to-r from-blue-600 to-violet-600 text-white px-8 py-3.5 rounded-full font-semibold hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
+          Demander une démo gratuite
+        </a>
+        <a href="/fonctionnalites" class="group bg-white text-gray-700 px-8 py-3.5 rounded-full font-semibold border border-gray-200 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300">
+          Découvrir les fonctionnalités
+          <span class="inline-block ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats / Trust -->
+  <section class="border-y border-gray-100 bg-gray-50/50">
+    <div class="max-w-6xl mx-auto px-6 py-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        {[
+          { value: "99.9%", label: "Disponibilité" },
+          { value: "< 2s", label: "Sync. moyenne" },
+          { value: "100%", label: "Hors-ligne" },
+          { value: "24h", label: "Support réactif" },
+        ].map(({ value, label }) => (
+          <div>
+            <div class="text-3xl md:text-4xl font-extrabold text-gradient mb-1">{value}</div>
+            <div class="text-sm text-gray-500 font-medium">{label}</div>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
   <!-- Key features -->
-  <section class="bg-gray-50 py-20">
+  <section class="py-24">
     <div class="max-w-6xl mx-auto px-6">
-      <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Tout ce dont vos commerciaux ont besoin</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center mb-16">
+        <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Fonctionnalités</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Tout ce dont vos commerciaux ont besoin</h2>
+        <p class="text-lg text-gray-500 max-w-2xl mx-auto">Un outil complet pour booster la productivité de vos équipes terrain.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { title: "Catalogue produits", desc: "Consultez votre catalogue complet avec photos, prix et disponibilites. Recherche instantanee et filtres par famille.", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" },
-          { title: "Commandes & devis", desc: "Creez des commandes et devis en quelques taps. Historique client, tarifs speciaux et conditions automatiques.", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-          { title: "Mode hors-ligne", desc: "Travaillez sans connexion internet. Toutes les donnees sont stockees localement et synchronisees automatiquement.", icon: "M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829" },
-          { title: "Synchronisation ERP", desc: "Connecte directement a votre ERP WaveSoft. Clients, articles, prix et commandes synchronises en temps reel.", icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" },
-          { title: "PDF & emails", desc: "Generez des devis et bons de commande en PDF directement depuis l'app. Envoyez-les par email en un tap.", icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
-          { title: "Multi-utilisateurs", desc: "Chaque commercial a son espace avec ses clients et ses secteurs. Gestion des droits et visibilite par secteur.", icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" },
-        ].map(({ title, desc, icon }) => (
-          <div class="bg-white rounded-xl p-6 border border-gray-200">
-            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          { title: "Catalogue produits", desc: "Consultez votre catalogue complet avec photos, prix et disponibilités. Recherche instantanée et filtres par famille.", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4", color: "from-blue-500 to-blue-600" },
+          { title: "Commandes & devis", desc: "Créez des commandes et devis en quelques taps. Historique client, tarifs spéciaux et conditions automatiques.", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", color: "from-violet-500 to-violet-600" },
+          { title: "Mode hors-ligne", desc: "Travaillez sans connexion internet. Toutes les données sont stockées localement et synchronisées automatiquement.", icon: "M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829", color: "from-emerald-500 to-emerald-600" },
+          { title: "Synchronisation ERP", desc: "Connecté directement à votre ERP WaveSoft. Clients, articles, prix et commandes synchronisés en temps réel.", icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15", color: "from-orange-500 to-orange-600" },
+          { title: "PDF & emails", desc: "Générez des devis et bons de commande en PDF directement depuis l'app. Envoyez-les par email en un tap.", icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z", color: "from-pink-500 to-pink-600" },
+          { title: "Multi-utilisateurs", desc: "Chaque commercial a son espace avec ses clients et ses secteurs. Gestion des droits et visibilité par secteur.", icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z", color: "from-cyan-500 to-cyan-600" },
+        ].map(({ title, desc, icon, color }) => (
+          <div class="card-hover bg-white rounded-2xl p-7 border border-gray-100 shadow-sm">
+            <div class={`w-12 h-12 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center mb-5 shadow-lg`}>
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icon} />
               </svg>
             </div>
-            <h3 class="font-semibold text-gray-900 mb-2">{title}</h3>
-            <p class="text-sm text-gray-500">{desc}</p>
+            <h3 class="font-bold text-gray-900 mb-2 text-lg">{title}</h3>
+            <p class="text-sm text-gray-500 leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="bg-gradient-to-br from-gray-50 to-blue-50/30 py-24">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Simple</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Comment ça marche ?</h2>
+        <p class="text-lg text-gray-500 max-w-2xl mx-auto">Démarrez en 3 étapes simples</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { step: "1", title: "Installez l'app", desc: "Téléchargez SmartSales sur les tablettes et smartphones de vos commerciaux." },
+          { step: "2", title: "Connectez votre ERP", desc: "Reliez SmartSales à votre ERP WaveSoft via notre service de synchronisation sécurisé." },
+          { step: "3", title: "Vendez sur le terrain", desc: "Vos commerciaux prennent commandes et devis directement chez le client, même sans internet." },
+        ].map(({ step, title, desc }) => (
+          <div class="relative text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl text-white text-2xl font-extrabold mb-5 shadow-lg shadow-blue-500/20">
+              {step}
+            </div>
+            <h3 class="font-bold text-gray-900 mb-2 text-lg">{title}</h3>
+            <p class="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">{desc}</p>
           </div>
         ))}
       </div>
@@ -54,11 +120,26 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- CTA -->
-  <section class="max-w-6xl mx-auto px-6 py-20 text-center">
-    <h2 class="text-3xl font-bold text-gray-900 mb-4">Pret a equipper vos commerciaux ?</h2>
-    <p class="text-lg text-gray-500 mb-8">Demandez une demonstration gratuite et decouvrez SmartSales en action.</p>
-    <a href="/contact" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-      Demander une demo gratuite
-    </a>
+  <section class="py-24">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700 rounded-3xl p-12 md:p-16 text-center shadow-2xl shadow-blue-500/20">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="relative z-10">
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Prêt à équiper vos commerciaux ?</h2>
+          <p class="text-lg text-blue-100 mb-8 max-w-xl mx-auto">
+            Demandez une démonstration gratuite et découvrez SmartSales en action sur le terrain.
+          </p>
+          <a href="/contact" class="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-3.5 rounded-full font-semibold hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+            Demander une démo gratuite
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
   </section>
 </Base>

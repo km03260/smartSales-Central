@@ -1,93 +1,158 @@
 ---
 import Base from '../layouts/Base.astro';
+
+const features = [
+  {
+    title: "Catalogue produits intelligent",
+    desc: "Accédez à l'ensemble de votre catalogue en un instant, même hors connexion.",
+    items: [
+      "Consultation du catalogue complet avec photos et fiches produit",
+      "Recherche instantanée par référence, désignation ou famille",
+      "Filtres avancés par catégorie et sous-catégorie",
+      "Affichage des articles les plus commandés (analyse 20/80)",
+      "Gestion des articles favoris par commercial",
+    ],
+    icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
+    color: "from-blue-500 to-blue-600",
+  },
+  {
+    title: "Prise de commandes",
+    desc: "Créez des commandes professionnelles en quelques secondes depuis le terrain.",
+    items: [
+      "Création de commandes en quelques taps depuis le catalogue",
+      "Application automatique des tarifs clients et grilles tarifaires",
+      "Gestion des remises (pourcentage ou montant)",
+      "Historique des commandes par client",
+      "Transformation de devis en commande",
+    ],
+    icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+    color: "from-violet-500 to-violet-600",
+  },
+  {
+    title: "Devis professionnels",
+    desc: "Générez et envoyez des devis depuis l'application en un clin d'oeil.",
+    items: [
+      "Création de devis avec conditions commerciales",
+      "Génération de PDF professionnels avec logo et mentions légales",
+      "Envoi par email directement depuis l'application",
+      "Suivi des devis (en attente, accepté, refusé)",
+      "Durée de validité configurable",
+    ],
+    icon: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+    color: "from-emerald-500 to-emerald-600",
+  },
+  {
+    title: "Gestion clients",
+    desc: "Toutes les informations clients à portée de main pour vos commerciaux.",
+    items: [
+      "Fiche client complète (coordonnées, contacts, conditions)",
+      "Historique des factures, bons de livraison et commandes",
+      "Filtrage par secteur commercial",
+      "Encours et situation comptable",
+      "Contacts multiples par client",
+    ],
+    icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+    color: "from-orange-500 to-orange-600",
+  },
+  {
+    title: "Mode hors-ligne & synchronisation",
+    desc: "Travaillez partout, même sans réseau. La synchronisation fait le reste.",
+    items: [
+      "Fonctionnement complet sans connexion internet",
+      "Base de données locale sur l'appareil (SQLite)",
+      "Synchronisation automatique dès que la connexion revient",
+      "Synchronisation bidirectionnelle avec l'ERP WaveSoft",
+      "Détection automatique du réseau (local ou distant)",
+    ],
+    icon: "M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829",
+    color: "from-pink-500 to-pink-600",
+  },
+  {
+    title: "Intégration ERP WaveSoft",
+    desc: "Connecté nativement à WaveSoft, sans double saisie ni friction.",
+    items: [
+      "Connexion native avec WaveSoft via le service de synchronisation",
+      "Import automatique des clients, articles et tarifs",
+      "Export des commandes et devis vers WaveSoft (format EDI)",
+      "Synchronisation des factures et bons de livraison",
+      "Aucune double saisie : les données circulent dans les deux sens",
+    ],
+    icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15",
+    color: "from-cyan-500 to-cyan-600",
+  },
+];
 ---
 
-<Base title="Fonctionnalites - SmartSales">
-  <section class="max-w-6xl mx-auto px-6 py-16">
-    <h1 class="text-4xl font-bold text-gray-900 mb-4 text-center">Fonctionnalites</h1>
-    <p class="text-lg text-gray-500 text-center mb-16 max-w-2xl mx-auto">
-      SmartSales equipe vos commerciaux itinerants avec tous les outils necessaires pour vendre efficacement sur le terrain.
-    </p>
+<Base title="Fonctionnalités - SmartSales">
+  <!-- Header -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-to-br from-blue-100 via-violet-50 to-transparent rounded-full blur-3xl opacity-50"></div>
+    </div>
+    <div class="max-w-6xl mx-auto px-6 py-20 text-center">
+      <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Fonctionnalités</span>
+      <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Un outil complet pour le terrain</h1>
+      <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+        SmartSales équipe vos commerciaux itinérants avec tous les outils nécessaires pour vendre efficacement sur le terrain.
+      </p>
+    </div>
+  </section>
 
-    <div class="space-y-16">
-      {[
-        {
-          title: "Catalogue produits intelligent",
-          items: [
-            "Consultation du catalogue complet avec photos et fiches produit",
-            "Recherche instantanee par reference, designation ou famille",
-            "Filtres avances par categorie et sous-categorie",
-            "Affichage des articles les plus commandes (analyse 20/80)",
-            "Gestion des articles favoris par commercial",
-          ],
-        },
-        {
-          title: "Prise de commandes",
-          items: [
-            "Creation de commandes en quelques taps depuis le catalogue",
-            "Application automatique des tarifs clients et grilles tarifaires",
-            "Gestion des remises (pourcentage ou montant)",
-            "Historique des commandes par client",
-            "Transformation de devis en commande",
-          ],
-        },
-        {
-          title: "Devis professionnels",
-          items: [
-            "Creation de devis avec conditions commerciales",
-            "Generation de PDF professionnels avec logo et mentions legales",
-            "Envoi par email directement depuis l'application",
-            "Suivi des devis (en attente, accepte, refuse)",
-            "Duree de validite configurable",
-          ],
-        },
-        {
-          title: "Gestion clients",
-          items: [
-            "Fiche client complete (coordonnees, contacts, conditions)",
-            "Historique des factures, bons de livraison et commandes",
-            "Filtrage par secteur commercial",
-            "Encours et situation comptable",
-            "Contacts multiples par client",
-          ],
-        },
-        {
-          title: "Mode hors-ligne & synchronisation",
-          items: [
-            "Fonctionnement complet sans connexion internet",
-            "Base de donnees locale sur l'appareil (SQLite)",
-            "Synchronisation automatique des que la connexion revient",
-            "Synchronisation bidirectionnelle avec l'ERP WaveSoft",
-            "Detection automatique du reseau (local ou distant)",
-          ],
-        },
-        {
-          title: "Integration ERP WaveSoft",
-          items: [
-            "Connexion native avec WaveSoft via le service de synchronisation",
-            "Import automatique des clients, articles et tarifs",
-            "Export des commandes et devis vers WaveSoft (format EDI)",
-            "Synchronisation des factures et bons de livraison",
-            "Aucune double saisie : les donnees circulent dans les deux sens",
-          ],
-        },
-      ].map(({ title, items }) => (
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
-          </div>
-          <ul class="space-y-3">
-            {items.map((item) => (
-              <li class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+  <!-- Features list -->
+  <section class="max-w-6xl mx-auto px-6 pb-24">
+    <div class="space-y-8">
+      {features.map(({ title, desc, items, icon, color }, index) => (
+        <div class="card-hover bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-0">
+            <!-- Left: Title & description -->
+            <div class="md:col-span-2 p-8 flex flex-col justify-center bg-gradient-to-br from-gray-50/50 to-white">
+              <div class={`w-12 h-12 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center mb-4 shadow-lg`}>
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icon} />
                 </svg>
-                <span class="text-gray-600">{item}</span>
-              </li>
-            ))}
-          </ul>
+              </div>
+              <h2 class="text-xl font-bold text-gray-900 mb-2">{title}</h2>
+              <p class="text-sm text-gray-500 leading-relaxed">{desc}</p>
+            </div>
+            <!-- Right: Feature items -->
+            <div class="md:col-span-3 p-8 border-t md:border-t-0 md:border-l border-gray-100">
+              <ul class="space-y-3">
+                {items.map((item) => (
+                  <li class="flex items-start gap-3">
+                    <div class="mt-0.5 w-5 h-5 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                      <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span class="text-gray-600 text-sm">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="pb-24">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700 rounded-3xl p-12 text-center shadow-2xl shadow-blue-500/20">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="relative z-10">
+          <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-4">Convaincu ? Voyez-le en action</h2>
+          <p class="text-blue-100 mb-8 max-w-lg mx-auto">
+            Demandez une démonstration personnalisée pour voir comment SmartSales s'adapte à votre activité.
+          </p>
+          <a href="/contact" class="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-3.5 rounded-full font-semibold hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+            Demander une démo
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 </Base>

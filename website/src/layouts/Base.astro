@@ -14,56 +14,104 @@ const { title, description = "Application mobile de prise de commandes pour les 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>{title}</title>
   </head>
-  <body class="bg-white text-gray-900 antialiased">
+  <body class="bg-white text-gray-900 antialiased" style="font-family: 'Inter', system-ui, sans-serif;">
     <!-- Header -->
-    <header class="border-b border-gray-100">
+    <header class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/20">
       <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="/" class="text-xl font-bold text-blue-600">SmartSales</a>
+        <a href="/" class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <span class="text-xl font-bold text-gradient">SmartSales</span>
+        </a>
         <div class="hidden md:flex items-center gap-8">
-          <a href="/fonctionnalites" class="text-sm text-gray-600 hover:text-gray-900">Fonctionnalites</a>
-          <a href="/tarifs" class="text-sm text-gray-600 hover:text-gray-900">Tarifs</a>
-          <a href="/contact" class="text-sm text-gray-600 hover:text-gray-900">Contact</a>
+          <a href="/fonctionnalites" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Fonctionnalités</a>
+          <a href="/tarifs" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Tarifs</a>
+          <a href="/contact" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Contact</a>
         </div>
-        <a href="/contact" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-          Demander une demo
+        <a href="/contact" class="bg-gradient-to-r from-blue-600 to-violet-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
+          Demander une démo
         </a>
       </nav>
     </header>
+
+    <!-- Spacer for fixed header -->
+    <div class="h-16"></div>
 
     <main>
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-50 border-t border-gray-200 mt-20">
-      <div class="max-w-6xl mx-auto px-6 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 class="font-bold text-gray-900 mb-3">SmartSales</h3>
-            <p class="text-sm text-gray-500">Application mobile de prise de commandes pour les commerciaux itinerants. Synchronisation temps reel avec votre ERP WaveSoft.</p>
+    <footer class="bg-gradient-to-b from-gray-900 to-gray-950 text-white mt-20">
+      <div class="max-w-6xl mx-auto px-6 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-500 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <span class="text-xl font-bold">SmartSales</span>
+            </div>
+            <p class="text-gray-400 text-sm leading-relaxed max-w-md">
+              Application mobile de prise de commandes pour les commerciaux itinérants.
+              Synchronisation temps réel avec votre ERP WaveSoft. Gagnez en productivité sur le terrain.
+            </p>
+            <div class="flex gap-3 mt-6">
+              <span class="inline-flex items-center gap-1.5 bg-white/10 text-gray-300 px-3 py-1.5 rounded-full text-xs font-medium">
+                <svg class="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg>
+                Mode hors-ligne
+              </span>
+              <span class="inline-flex items-center gap-1.5 bg-white/10 text-gray-300 px-3 py-1.5 rounded-full text-xs font-medium">
+                <svg class="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg>
+                Compatible WaveSoft
+              </span>
+            </div>
           </div>
           <div>
-            <h3 class="font-bold text-gray-900 mb-3">Liens</h3>
-            <ul class="space-y-2 text-sm text-gray-500">
-              <li><a href="/fonctionnalites" class="hover:text-gray-900">Fonctionnalites</a></li>
-              <li><a href="/tarifs" class="hover:text-gray-900">Tarifs</a></li>
-              <li><a href="/contact" class="hover:text-gray-900">Contact</a></li>
+            <h3 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Produit</h3>
+            <ul class="space-y-3 text-sm text-gray-400">
+              <li><a href="/fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a></li>
+              <li><a href="/tarifs" class="hover:text-white transition-colors">Tarifs</a></li>
+              <li><a href="/contact" class="hover:text-white transition-colors">Demander une démo</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="font-bold text-gray-900 mb-3">Contact</h3>
-            <ul class="space-y-2 text-sm text-gray-500">
-              <li>contact@smartsales.fr</li>
+            <h3 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Contact</h3>
+            <ul class="space-y-3 text-sm text-gray-400">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                contact@smartsales.fr
+              </li>
             </ul>
           </div>
         </div>
-        <div class="border-t border-gray-200 mt-8 pt-8 text-center text-sm text-gray-400">
-          &copy; {new Date().getFullYear()} SmartSales. Tous droits reserves.
+        <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p class="text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} SmartSales. Tous droits réservés.
+          </p>
+          <p class="text-xs text-gray-600">
+            Fait avec passion en France
+          </p>
         </div>
       </div>
     </footer>
+
+    <!-- Mobile menu button (visible on small screens) -->
+    <script>
+      // Simple mobile menu toggle if needed in the future
+    </script>
   </body>
 </html>
 
