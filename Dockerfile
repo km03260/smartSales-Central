@@ -10,7 +10,8 @@ RUN npx prisma generate
 
 COPY src ./src/
 COPY keys ./keys/
+COPY start.sh ./
 
 EXPOSE 3500
 
-CMD ["node", "src/server.js"]
+CMD ["sh", "start.sh"]
