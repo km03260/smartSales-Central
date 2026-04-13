@@ -34,6 +34,19 @@ export const api = {
   updateCompany: (id, body) => request(`/admin/companies/${id}`, { method: 'PUT', body }),
   deleteCompany: (id) => request(`/admin/companies/${id}`, { method: 'DELETE' }),
   updateCompanyConfig: (id, body) => request(`/admin/companies/${id}/config`, { method: 'PUT', body }),
+  uploadLogo: async (companyId, file) => {
+    const token = localStorage.getItem('admin_token');
+    const formData = new FormData();
+    formData.append('logo', file);
+    const res = await fetch(`${API_BASE}/admin/companies/${companyId}/logo`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur upload');
+    return data;
+  },
 
   // Apps
   getApps: () => request('/admin/apps'),

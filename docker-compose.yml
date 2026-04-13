@@ -4,6 +4,8 @@ services:
     container_name: smartapps-api
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - uploads_data:/app/uploads
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.smartapps-api.rule=Host(`api.${DOMAIN}`)"
@@ -39,6 +41,9 @@ services:
       - "traefik.http.services.smartapps-website.loadbalancer.server.port=80"
     networks:
       - traefik
+
+volumes:
+  uploads_data:
 
 networks:
   traefik:

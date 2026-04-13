@@ -12,12 +12,19 @@ import adminAppsRouter from './routes/admin/apps.js';
 import adminAuth from './middleware/adminAuth.js';
 import { startCronJobs, checkExpiringLicenses } from './services/cronService.js';
 
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3500;
 
 // ─── Middleware global ──────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+
+// ─── Fichiers statiques (logos uploadés) ────────────────────────────────────
+app.use('/uploads', express.static(join(__dirname, '../uploads')));
 
 // ─── Health check ───────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
