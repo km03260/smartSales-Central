@@ -6,6 +6,12 @@ services:
     env_file: .env
     volumes:
       - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3500/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.smartapps-api.rule=Host(`api.${DOMAIN}`)"

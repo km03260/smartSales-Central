@@ -55,6 +55,15 @@ app.post('/api/admin/alerts/check', adminAuth, async (req, res) => {
   }
 });
 
+// ─── Gestion des erreurs non catchées ──────────────────────────────────────
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[FATAL] Unhandled rejection:', reason);
+});
+
 // ─── Démarrage ──────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`SmartSales Central API running on port ${PORT}`);
