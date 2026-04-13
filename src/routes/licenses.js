@@ -166,7 +166,7 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
 
     // Log
     await prisma.usageLog.create({
-      data: { licenseId, deviceId, eventType: 'heartbeat' },
+      data: { licenseId, deviceId, eventType: 'heartbeat', eventData: {} },
     });
 
     res.json({ success: true, token, isBlocked: license.isBlocked || false });

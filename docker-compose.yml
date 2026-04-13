@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.smartapps-website.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.smartapps-website.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.smartapps-website.entrypoints=websecure"
       - "traefik.http.routers.smartapps-website.tls.certresolver=myresolver"
       - "traefik.http.services.smartapps-website.loadbalancer.server.port=80"
