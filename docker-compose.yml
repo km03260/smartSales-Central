@@ -18,6 +18,7 @@ services:
       - "traefik.http.routers.smartapps-api.entrypoints=websecure"
       - "traefik.http.routers.smartapps-api.tls.certresolver=myresolver"
       - "traefik.http.services.smartapps-api.loadbalancer.server.port=3500"
+      - "traefik.docker.network=traefik"
     networks:
       - traefik
       - dbtesting
