@@ -64,7 +64,7 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { appId, companyId, syncServiceUrl, apiKey, maxDevices, features, plan, expiresAt } = req.body;
+    const { appId, companyId, syncServiceUrl, databaseName, apiKey, maxDevices, features, plan, expiresAt } = req.body;
 
     if (!appId || !companyId || !syncServiceUrl || !apiKey || !expiresAt) {
       return res.status(400).json({ error: 'appId, companyId, syncServiceUrl, apiKey et expiresAt requis' });
@@ -88,6 +88,7 @@ router.post('/', async (req, res) => {
         companyId,
         licenseKey: generateLicenseKey(app.code),
         syncServiceUrl,
+        databaseName: databaseName || '',
         apiKey,
         maxDevices: maxDevices || 5,
         features: features || ['orders', 'quotations', 'invoices'],
@@ -109,12 +110,13 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { syncServiceUrl, apiKey, maxDevices, features, plan, expiresAt, isActive } = req.body;
+    const { syncServiceUrl, databaseName, apiKey, maxDevices, features, plan, expiresAt, isActive } = req.body;
 
     const license = await prisma.license.update({
       where: { id: req.params.id },
       data: {
         ...(syncServiceUrl !== undefined && { syncServiceUrl }),
+        ...(databaseName !== undefined && { databaseName }),
         ...(apiKey !== undefined && { apiKey }),
         ...(maxDevices !== undefined && { maxDevices }),
         ...(features !== undefined && { features }),

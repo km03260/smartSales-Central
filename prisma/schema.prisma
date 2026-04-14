@@ -51,6 +51,7 @@ model License {
   companyId      String   @db.VarChar(36)
   licenseKey     String   @unique @db.VarChar(20) // {APP_CODE}-XXXX-XXXX-XXXX
   syncServiceUrl String   @db.VarChar(500)
+  databaseName   String   @default("") @db.VarChar(100) // Nom du dossier/base WaveSoft (ex: TESTS_MAURER)
   apiKey         String   @db.VarChar(200)
   maxDevices     Int      @default(5)
   features       Json     // ["orders","quotations","invoices","stats"]

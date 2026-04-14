@@ -83,6 +83,7 @@ async function main() {
       companyId: maurer.id,
       licenseKey: 'SS-MAUR-INIT-0001',
       syncServiceUrl: 'https://213.56.180.33',
+      databaseName: 'TESTS_MAURER',
       apiKey: '4FJ33pN5UsvlQGqIw6xnAYKIRtCAmSBR7lewyZmPhpJRskdRk8Q70N/6zw6aWCgN',
       maxDevices: 10,
       features: ['orders', 'quotations', 'invoices', 'delivery_notes', 'stats'],

@@ -6,11 +6,27 @@ import { ArrowLeft, Ban, RefreshCw, Smartphone, Save } from 'lucide-react';
 export default function LicenseDetail() {
   const { id } = useParams();
   const [license, setLicense] = useState(null);
+  const [editForm, setEditForm] = useState({ syncServiceUrl: '', databaseName: '', maxDevices: 5 });
   const [renewDate, setRenewDate] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const load = () => api.getLicense(id).then(setLicense).catch(console.error);
+  const load = () => api.getLicense(id).then((data) => {
+    setLicense(data);
+    setEditForm({ syncServiceUrl: data.syncServiceUrl, databaseName: data.databaseName || '', maxDevices: data.maxDevices });
+  }).catch(console.error);
   useEffect(() => { load(); }, [id]);
+
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    try {
+      await api.updateLicense(id, editForm);
+      load();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleRevoke = async () => {
     if (!confirm('Révoquer cette licence ? Tous les appareils seront désactivés.')) return;
@@ -69,8 +85,6 @@ export default function LicenseDetail() {
           <dl className="space-y-3">
             {[
               { label: 'Plan', value: license.plan, capitalize: true },
-              { label: 'URL SyncService', value: license.syncServiceUrl },
-              { label: 'Max appareils', value: license.maxDevices },
               { label: 'Features', value: Array.isArray(license.features) ? license.features.join(', ') : '' },
               { label: 'Début', value: new Date(license.startsAt).toLocaleDateString('fr-FR') },
               { label: 'Expiration', value: new Date(license.expiresAt).toLocaleDateString('fr-FR') },
@@ -80,6 +94,30 @@ export default function LicenseDetail() {
                 <dd className={`text-sm font-medium text-gray-900 ${capitalize ? 'capitalize' : ''}`}>{value}</dd>
               </div>
             ))}
+
+            {/* Champs éditables */}
+            <div className="pt-3 mt-3 border-t border-gray-100 space-y-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">URL SyncService</label>
+                <input value={editForm.syncServiceUrl} onChange={(e) => setEditForm({ ...editForm, syncServiceUrl: e.target.value })}
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Dossier (base WaveSoft)</label>
+                <input value={editForm.databaseName} onChange={(e) => setEditForm({ ...editForm, databaseName: e.target.value })}
+                  placeholder="TESTS_MAURER"
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Max appareils</label>
+                <input type="number" value={editForm.maxDevices} onChange={(e) => setEditForm({ ...editForm, maxDevices: Number(e.target.value) })}
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <button onClick={handleSaveEdit} disabled={saving}
+                className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer w-full justify-center">
+                <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
             <div className="flex justify-between">
               <dt className="text-sm text-gray-500">Statut</dt>
               <dd className="flex gap-2">
@@ -139,8 +177,9 @@ export default function LicenseDetail() {
                   <div className="flex items-center gap-3">
                     <Smartphone size={18} className={d.isActive ? 'text-blue-600' : 'text-gray-400'} />
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{d.deviceName || d.deviceId}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-sm font-medium text-gray-900">{d.deviceName || 'Appareil'}</div>
+                      <div className="text-xs text-gray-500 font-mono">{d.deviceId}</div>
+                      <div className="text-xs text-gray-400">
                         {d.platform} &mdash; Dernier contact : {new Date(d.lastHeartbeat).toLocaleString('fr-FR')}
                       </div>
                     </div>
