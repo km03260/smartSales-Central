@@ -46,6 +46,7 @@ export async function signLicenseToken(license, company, appCode) {
     companyName: company.legalName,
     appCode: appCode || 'SS',
     syncServiceUrl: license.syncServiceUrl,
+    syncServiceUrlLocal: license.syncServiceUrlLocal || '',
     databaseName: license.databaseName || '',
     apiKey: license.apiKey,
     maxDevices: license.maxDevices,

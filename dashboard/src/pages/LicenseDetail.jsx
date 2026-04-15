@@ -12,7 +12,7 @@ export default function LicenseDetail() {
 
   const load = () => api.getLicense(id).then((data) => {
     setLicense(data);
-    setEditForm({ syncServiceUrl: data.syncServiceUrl, databaseName: data.databaseName || '', maxDevices: data.maxDevices });
+    setEditForm({ syncServiceUrl: data.syncServiceUrl, syncServiceUrlLocal: data.syncServiceUrlLocal || '', databaseName: data.databaseName || '', maxDevices: data.maxDevices });
   }).catch(console.error);
   useEffect(() => { load(); }, [id]);
 
@@ -98,8 +98,14 @@ export default function LicenseDetail() {
             {/* Champs éditables */}
             <div className="pt-3 mt-3 border-t border-gray-100 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">URL SyncService</label>
+                <label className="block text-xs text-gray-500 mb-1">URL SyncService (publique)</label>
                 <input value={editForm.syncServiceUrl} onChange={(e) => setEditForm({ ...editForm, syncServiceUrl: e.target.value })}
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">URL SyncService (locale)</label>
+                <input value={editForm.syncServiceUrlLocal} onChange={(e) => setEditForm({ ...editForm, syncServiceUrlLocal: e.target.value })}
+                  placeholder="https://10.0.6.22"
                   className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>

@@ -9,7 +9,7 @@ export default function Licenses() {
   const [apps, setApps] = useState([]);
   const [filterAppId, setFilterAppId] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ appId: '', companyId: '', syncServiceUrl: '', databaseName: '', apiKey: '', maxDevices: 5, plan: 'professional', expiresAt: '' });
+  const [form, setForm] = useState({ appId: '', companyId: '', syncServiceUrl: '', syncServiceUrlLocal: '', databaseName: '', apiKey: '', maxDevices: 5, plan: 'professional', expiresAt: '' });
   const [saving, setSaving] = useState(false);
 
   const load = () => api.getLicenses(filterAppId || undefined).then(setLicenses).catch(console.error);
@@ -102,6 +102,12 @@ export default function Licenses() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Dossier (base WaveSoft)</label>
               <input value={form.databaseName} onChange={(e) => setForm({ ...form, databaseName: e.target.value })}
                 placeholder="TESTS_MAURER"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">URL SyncService locale</label>
+              <input value={form.syncServiceUrlLocal} onChange={(e) => setForm({ ...form, syncServiceUrlLocal: e.target.value })}
+                placeholder="https://10.0.6.22"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
