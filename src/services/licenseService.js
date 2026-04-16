@@ -37,18 +37,28 @@ export function generateLicenseKey(appCode = 'SS') {
 
 /**
  * Signe un JWT de licence contenant toute la config nécessaire à l'app mobile.
+ *
+ * Priorité des valeurs envoyées :
+ *  - syncServiceUrl / syncServiceUrlLocal / apiKey : si la licence est rattachée
+ *    à un SyncServiceDeployment, on prend les valeurs du déploiement. Sinon on
+ *    retombe sur les champs legacy de la licence.
+ *  - databaseName : toujours celui de la licence (= header X-Database). C'est
+ *    ce qui permet au SyncService de cibler la bonne base sur la bonne
+ *    instance SQL Server (résolu via la section "Databases" du appsettings.json).
  */
 export async function signLicenseToken(license, company, appCode) {
   await loadKeys();
+
+  const deployment = license.deployment || null;
 
   const token = await new SignJWT({
     clientId: company.id,
     companyName: company.legalName,
     appCode: appCode || 'SS',
-    syncServiceUrl: license.syncServiceUrl,
-    syncServiceUrlLocal: license.syncServiceUrlLocal || '',
+    syncServiceUrl: deployment?.publicUrl || license.syncServiceUrl,
+    syncServiceUrlLocal: deployment?.localUrl || license.syncServiceUrlLocal || '',
     databaseName: license.databaseName || '',
-    apiKey: license.apiKey,
+    apiKey: deployment?.apiKey || license.apiKey,
     maxDevices: license.maxDevices,
     features: license.features,
     plan: license.plan,

@@ -22,7 +22,11 @@ router.post('/activate', async (req, res) => {
     // Trouver la licence par code d'activation
     const license = await prisma.license.findUnique({
       where: { licenseKey: activationCode.toUpperCase().trim() },
-      include: { app: true, company: { include: { config: true } } },
+      include: {
+        app: true,
+        company: { include: { config: true } },
+        deployment: true,
+      },
     });
 
     if (!license) {
@@ -148,7 +152,7 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
 
     const license = await prisma.license.findUnique({
       where: { id: licenseId },
-      include: { app: true, company: true },
+      include: { app: true, company: true, deployment: true },
     });
 
     if (!license || !license.isActive) {
