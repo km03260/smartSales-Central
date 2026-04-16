@@ -104,6 +104,12 @@ model SyncServiceDeployment {
   certPath               String   @default("certificate.pfx") @db.VarChar(500)
   certPassword           String   @default("") @db.VarChar(200)
 
+  // Certificat auto-signé généré (optionnel)
+  certPfxBase64          String?  @db.LongText                    // PFX en base64 (null = pas encore généré)
+  certHostnames          String   @default("") @db.VarChar(1000)  // CSV des IPs/DNS couverts
+  certValidFrom          DateTime?
+  certValidUntil         DateTime?
+
   // WaveSoft EDI
   ediOutputFolder        String   @default("C:\\DATA_Wavesoft\\AutomateIE") @db.VarChar(500)
   ediSeparator           String   @default(";") @db.VarChar(5)

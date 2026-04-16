@@ -90,6 +90,28 @@ export const api = {
   createDeployment: (body) => request('/admin/deployments', { method: 'POST', body }),
   updateDeployment: (id, body) => request(`/admin/deployments/${id}`, { method: 'PUT', body }),
   deleteDeployment: (id) => request(`/admin/deployments/${id}`, { method: 'DELETE' }),
+  regenerateDeploymentApiKey: (id) => request(`/admin/deployments/${id}/regenerate-api-key`, { method: 'POST' }),
+  generateDeploymentCertificate: (id, body) =>
+    request(`/admin/deployments/${id}/generate-certificate`, { method: 'POST', body }),
+  downloadDeploymentCertificate: async (id) => {
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API_BASE}/admin/deployments/${id}/certificate`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Erreur téléchargement certificat');
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'certificate.pfx';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
   downloadDeploymentAppsettings: async (id) => {
     const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/admin/deployments/${id}/appsettings`, {

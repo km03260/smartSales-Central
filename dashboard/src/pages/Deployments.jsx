@@ -84,10 +84,15 @@ export default function Deployments() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Clé API (X-API-Key) *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Clé API (X-API-Key) <span className="text-gray-400 font-normal">— optionnelle</span>
+              </label>
               <input value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm" required />
-              <p className="text-xs text-gray-500 mt-1">Partagée par toutes les licences associées à ce déploiement.</p>
+                placeholder="Laisser vide pour générer automatiquement"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm" />
+              <p className="text-xs text-gray-500 mt-1">
+                Laissée vide, une clé aléatoire 256 bits est générée. Partagée par toutes les licences du déploiement.
+              </p>
             </div>
           </div>
           <div className="flex gap-3 mt-4">

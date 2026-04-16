@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { randomBytes } from 'crypto';
+import { generateSelfSignedPfx } from '../../services/certificateService.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -18,6 +20,13 @@ function pickDeployment(body) {
   return Object.fromEntries(
     Object.entries(body).filter(([k]) => DEPLOYMENT_FIELDS.includes(k))
   );
+}
+
+/**
+ * Génère une clé API aléatoire (64 caractères hex = 256 bits d'entropie).
+ */
+function generateApiKey() {
+  return randomBytes(32).toString('hex');
 }
 
 // ─── Construction de la connection string SQL Server ───────────────────────
@@ -161,6 +170,8 @@ router.get('/:id', async (req, res) => {
       },
     });
     if (!deployment) return res.status(404).json({ error: 'Déploiement non trouvé' });
+    // Ne pas transporter le PFX (plusieurs Ko) dans le GET classique — le download a sa propre route
+    delete deployment.certPfxBase64;
     res.json(deployment);
   } catch (error) {
     console.error('[DEPLOYMENTS:GET]', error);
@@ -170,7 +181,8 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/admin/deployments
- * Body: { companyId, name, publicUrl, apiKey, ... }
+ * Body: { companyId, name, publicUrl, apiKey?, ... }
+ * Si apiKey est omis/vide, une clé est générée automatiquement.
  */
 router.post('/', async (req, res) => {
   try {
@@ -181,9 +193,10 @@ router.post('/', async (req, res) => {
     if (!company) return res.status(404).json({ error: 'Entreprise non trouvée' });
 
     const data = pickDeployment(req.body);
-    if (!data.name || !data.publicUrl || !data.apiKey) {
-      return res.status(400).json({ error: 'name, publicUrl et apiKey requis' });
+    if (!data.name || !data.publicUrl) {
+      return res.status(400).json({ error: 'name et publicUrl requis' });
     }
+    if (!data.apiKey) data.apiKey = generateApiKey();
 
     const deployment = await prisma.syncServiceDeployment.create({
       data: { companyId, ...data },
@@ -191,6 +204,95 @@ router.post('/', async (req, res) => {
     res.status(201).json(deployment);
   } catch (error) {
     console.error('[DEPLOYMENTS:CREATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * POST /api/admin/deployments/:id/regenerate-api-key
+ * Regénère la clé API du déploiement.
+ * ⚠ Nécessite ensuite de retélécharger appsettings.json et de redémarrer le SyncService.
+ */
+router.post('/:id/regenerate-api-key', async (req, res) => {
+  try {
+    const apiKey = generateApiKey();
+    const deployment = await prisma.syncServiceDeployment.update({
+      where: { id: req.params.id },
+      data: { apiKey },
+    });
+    res.json({ apiKey: deployment.apiKey });
+  } catch (error) {
+    console.error('[DEPLOYMENTS:REGENERATE_API_KEY]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * POST /api/admin/deployments/:id/generate-certificate
+ * Body: { hostnames: string[], validityYears?: number }
+ * Génère un certificat auto-signé stocké en DB + met à jour certPath/certPassword.
+ */
+router.post('/:id/generate-certificate', async (req, res) => {
+  try {
+    const { hostnames, validityYears } = req.body;
+    if (!Array.isArray(hostnames) || hostnames.length === 0) {
+      return res.status(400).json({ error: 'hostnames (array non vide) requis' });
+    }
+
+    const cert = generateSelfSignedPfx({
+      hostnames,
+      validityYears: validityYears || 10,
+    });
+
+    const deployment = await prisma.syncServiceDeployment.update({
+      where: { id: req.params.id },
+      data: {
+        certPfxBase64: cert.pfxBase64,
+        certPassword: cert.password,
+        certPath: 'certificate.pfx',
+        certHostnames: cert.hostnames.join(','),
+        certValidFrom: cert.validFrom,
+        certValidUntil: cert.validUntil,
+      },
+      select: {
+        id: true,
+        certPath: true,
+        certHostnames: true,
+        certValidFrom: true,
+        certValidUntil: true,
+      },
+    });
+
+    res.json(deployment);
+  } catch (error) {
+    console.error('[DEPLOYMENTS:GENERATE_CERTIFICATE]', error);
+    res.status(500).json({ error: error.message || 'Erreur serveur' });
+  }
+});
+
+/**
+ * GET /api/admin/deployments/:id/certificate
+ * Télécharge le fichier .pfx du déploiement.
+ */
+router.get('/:id/certificate', async (req, res) => {
+  try {
+    const deployment = await prisma.syncServiceDeployment.findUnique({
+      where: { id: req.params.id },
+      select: { certPfxBase64: true, certPath: true },
+    });
+    if (!deployment) return res.status(404).json({ error: 'Déploiement non trouvé' });
+    if (!deployment.certPfxBase64) {
+      return res.status(404).json({ error: 'Aucun certificat généré pour ce déploiement' });
+    }
+
+    const pfxBuffer = Buffer.from(deployment.certPfxBase64, 'base64');
+    const filename = deployment.certPath || 'certificate.pfx';
+
+    res.setHeader('Content-Type', 'application/x-pkcs12');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(pfxBuffer);
+  } catch (error) {
+    console.error('[DEPLOYMENTS:DOWNLOAD_CERTIFICATE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
