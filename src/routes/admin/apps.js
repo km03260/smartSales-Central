@@ -18,6 +18,11 @@ function appDir(code) {
 }
 
 function buildPublicUrl(req, relativePath) {
+  // PUBLIC_API_URL doit pointer vers l'API accessible publiquement (ex: https://api.smartapps.fr)
+  // Nécessaire pour que les QR codes soient scannables depuis un téléphone.
+  const base = process.env.PUBLIC_API_URL;
+  if (base) return `${base.replace(/\/$/, '')}${relativePath}`;
+
   const protocol = req.headers['x-forwarded-proto'] || 'https';
   const host = req.headers['x-forwarded-host'] || req.headers.host;
   return `${protocol}://${host}${relativePath}`;
