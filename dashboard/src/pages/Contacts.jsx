@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Trash2 } from 'lucide-react';
 
 const statusLabels = { new: 'Nouveau', contacted: 'Contacté', closed: 'Fermé' };
 const statusColors = {
@@ -19,6 +19,17 @@ export default function Contacts() {
   const updateStatus = async (id, status) => {
     await api.updateContact(id, { status });
     load();
+  };
+
+  const deleteContact = async (id) => {
+    if (!confirm('Supprimer définitivement cette demande ?')) return;
+    try {
+      await api.deleteContact(id);
+      if (selected?.id === id) setSelected(null);
+      load();
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -65,17 +76,27 @@ export default function Contacts() {
                 {selected.company && <p className="font-medium">{selected.company}</p>}
               </div>
               <p className="text-sm text-gray-800 mb-4 whitespace-pre-wrap">{selected.message}</p>
-              <div className="flex gap-2">
-                {['new', 'contacted', 'closed'].map((s) => (
-                  <button key={s} onClick={() => updateStatus(selected.id, s)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                      selected.status === s
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}>
-                    {statusLabels[s]}
-                  </button>
-                ))}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex gap-2">
+                  {['new', 'contacted', 'closed'].map((s) => (
+                    <button key={s} onClick={() => updateStatus(selected.id, s)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                        selected.status === s
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}>
+                      {statusLabels[s]}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => deleteContact(selected.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                  title="Supprimer"
+                >
+                  <Trash2 size={14} />
+                  Supprimer
+                </button>
               </div>
             </div>
           ) : (

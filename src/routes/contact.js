@@ -87,4 +87,17 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/admin/contacts/:id
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    await prisma.contactRequest.delete({ where: { id: req.params.id } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[CONTACTS:DELETE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 export default router;

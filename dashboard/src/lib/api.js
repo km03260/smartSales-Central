@@ -90,4 +90,5 @@ export const api = {
   getContacts: () => request('/admin/contacts'),
   getContactsUnreadCount: () => request('/admin/contacts/unread-count'),
   updateContact: (id, body) => request(`/admin/contacts/${id}`, { method: 'PUT', body }),
+  deleteContact: (id) => request(`/admin/contacts/${id}`, { method: 'DELETE' }),
 };
