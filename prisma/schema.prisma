@@ -15,6 +15,9 @@ model App {
   name        String   @db.VarChar(100) // "SmartSales", "SmartExpeditions"
   description String   @default("") @db.VarChar(500)
   isActive    Boolean  @default(true)
+  apkFileName String   @default("") @db.VarChar(200)
+  apkVersion  String   @default("") @db.VarChar(50)
+  apkUpdatedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

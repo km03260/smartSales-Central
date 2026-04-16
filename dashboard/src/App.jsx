@@ -8,6 +8,7 @@ import CompanyDetail from './pages/CompanyDetail';
 import Licenses from './pages/Licenses';
 import LicenseDetail from './pages/LicenseDetail';
 import Contacts from './pages/Contacts';
+import Apps from './pages/Apps';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
             <Route index element={<Dashboard />} />
+            <Route path="apps" element={<Apps />} />
             <Route path="companies" element={<Companies />} />
             <Route path="companies/:id" element={<CompanyDetail />} />
             <Route path="licenses" element={<Licenses />} />

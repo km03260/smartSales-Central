@@ -1,9 +1,10 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
-import { LayoutDashboard, Building2, KeyRound, MessageSquare, LogOut, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Building2, KeyRound, MessageSquare, LogOut, BarChart3, Package } from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/apps', icon: Package, label: 'Applications' },
   { to: '/companies', icon: Building2, label: 'Entreprises' },
   { to: '/licenses', icon: KeyRound, label: 'Licences' },
   { to: '/contacts', icon: MessageSquare, label: 'Contacts' },
