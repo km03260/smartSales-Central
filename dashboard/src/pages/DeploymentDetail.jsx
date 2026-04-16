@@ -361,7 +361,8 @@ export default function DeploymentDetail() {
         ) : (
           <div className="space-y-4">
             {deployment.licenses.map((l) => {
-              const databases = l.databases || [];
+              const instances = l.instances || [];
+              const dbCount = instances.reduce((acc, i) => acc + (i.databases?.length || 0), 0);
               return (
                 <div key={l.id} className="border border-gray-200 rounded-lg overflow-hidden">
                   <div className="flex items-center justify-between bg-gray-50 px-4 py-2 border-b border-gray-200">
@@ -372,51 +373,51 @@ export default function DeploymentDetail() {
                           {l.app.name}
                         </span>
                       )}
-                      <span className="text-xs text-gray-500">{databases.length} base(s)</span>
+                      <span className="text-xs text-gray-500">{instances.length} instance(s) · {dbCount} base(s)</span>
                     </div>
                     <Link to={`/licenses/${l.id}`} className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1">
                       <KeyRound size={14} /> Ouvrir
                     </Link>
                   </div>
-                  {databases.length === 0 ? (
-                    <div className="px-4 py-3 text-sm text-gray-500">Aucune base</div>
+                  {instances.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-gray-500">Aucune instance</div>
                   ) : (
-                    <table className="w-full">
-                      <thead>
-                        <tr>
-                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2 w-8"></th>
-                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Base (X-Database)</th>
-                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Libellé</th>
-                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Tircode Divers</th>
-                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Instance SQL</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {databases.map((db) => (
-                          <tr key={db.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-2">
-                              {db.isDefault && (
-                                <span title="Base par défaut" className="text-yellow-500">★</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-2 text-sm font-mono text-gray-900">{db.name}</td>
-                            <td className="px-4 py-2 text-sm text-gray-700">{db.label || <span className="text-gray-400">—</span>}</td>
-                            <td className="px-4 py-2 text-sm font-mono text-gray-700">
-                              {db.clientsDiversTircode || <span className="text-gray-400">—</span>}
-                            </td>
-                            <td className="px-4 py-2 text-sm">
-                              {db.sqlHost ? (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-orange-100 text-orange-700 font-mono">
-                                  {db.sqlHost}
-                                </span>
-                              ) : (
-                                <span className="text-gray-400 text-xs">Hérité</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="divide-y divide-gray-100">
+                      {instances.map((inst) => (
+                        <div key={inst.id} className="px-4 py-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            {inst.isDefault && <span title="Instance par défaut" className="text-yellow-500 text-sm">★</span>}
+                            <span className="font-mono text-sm font-medium text-gray-900">{inst.key}</span>
+                            {inst.label && inst.label !== inst.key && (
+                              <span className="text-sm text-gray-600">— {inst.label}</span>
+                            )}
+                            {inst.sqlHost ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-orange-100 text-orange-700 font-mono">
+                                {inst.sqlHost}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400">SQL hérité</span>
+                            )}
+                          </div>
+                          {(inst.databases || []).length === 0 ? (
+                            <div className="text-xs text-gray-400 italic pl-5">aucune base</div>
+                          ) : (
+                            <ul className="pl-5 text-xs text-gray-700 space-y-0.5">
+                              {inst.databases.map((db) => (
+                                <li key={db.id} className="flex items-center gap-2">
+                                  {db.isDefault && <span className="text-yellow-500">★</span>}
+                                  <span className="font-mono">{db.name}</span>
+                                  {db.label && db.label !== db.name && <span className="text-gray-500">({db.label})</span>}
+                                  {db.clientsDiversTircode && (
+                                    <span className="text-gray-400">Tircode : <span className="font-mono">{db.clientsDiversTircode}</span></span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               );

@@ -26,7 +26,10 @@ router.post('/activate', async (req, res) => {
         app: true,
         company: { include: { config: true } },
         deployment: true,
-        databases: { orderBy: { createdAt: 'asc' } },
+        instances: {
+          include: { databases: { orderBy: { createdAt: 'asc' } } },
+          orderBy: { createdAt: 'asc' },
+        },
       },
     });
 
@@ -157,7 +160,10 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
         app: true,
         company: true,
         deployment: true,
-        databases: { orderBy: { createdAt: 'asc' } },
+        instances: {
+          include: { databases: { orderBy: { createdAt: 'asc' } } },
+          orderBy: { createdAt: 'asc' },
+        },
       },
     });
 

@@ -81,13 +81,22 @@ export const api = {
   getLicenseDevices: (id) => request(`/admin/licenses/${id}/devices`),
   deactivateDevice: (licenseId, deviceId) =>
     request(`/admin/licenses/${licenseId}/devices/${deviceId}/deactivate`, { method: 'POST' }),
-  // LicenseDatabase (N bases WaveSoft par licence)
-  getLicenseDatabases: (id) => request(`/admin/licenses/${id}/databases`),
-  createLicenseDatabase: (id, body) => request(`/admin/licenses/${id}/databases`, { method: 'POST', body }),
-  updateLicenseDatabase: (licenseId, databaseId, body) =>
-    request(`/admin/licenses/${licenseId}/databases/${databaseId}`, { method: 'PUT', body }),
-  deleteLicenseDatabase: (licenseId, databaseId) =>
-    request(`/admin/licenses/${licenseId}/databases/${databaseId}`, { method: 'DELETE' }),
+  // Instances SQL d'une licence
+  getLicenseInstances: (licenseId) => request(`/admin/licenses/${licenseId}/instances`),
+  createLicenseInstance: (licenseId, body) =>
+    request(`/admin/licenses/${licenseId}/instances`, { method: 'POST', body }),
+  updateLicenseInstance: (licenseId, instanceId, body) =>
+    request(`/admin/licenses/${licenseId}/instances/${instanceId}`, { method: 'PUT', body }),
+  deleteLicenseInstance: (licenseId, instanceId) =>
+    request(`/admin/licenses/${licenseId}/instances/${instanceId}`, { method: 'DELETE' }),
+
+  // Bases d'une instance
+  createLicenseDatabase: (licenseId, instanceId, body) =>
+    request(`/admin/licenses/${licenseId}/instances/${instanceId}/databases`, { method: 'POST', body }),
+  updateLicenseDatabase: (licenseId, instanceId, databaseId, body) =>
+    request(`/admin/licenses/${licenseId}/instances/${instanceId}/databases/${databaseId}`, { method: 'PUT', body }),
+  deleteLicenseDatabase: (licenseId, instanceId, databaseId) =>
+    request(`/admin/licenses/${licenseId}/instances/${instanceId}/databases/${databaseId}`, { method: 'DELETE' }),
 
   // Deployments (SyncService)
   getDeployments: (companyId) => request(`/admin/deployments${companyId ? `?companyId=${companyId}` : ''}`),

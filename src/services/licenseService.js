@@ -57,12 +57,23 @@ export async function signLicenseToken(license, company, appCode) {
     throw new Error('Licence sans déploiement — impossible de signer le JWT');
   }
 
-  const databases = (license.databases || []).map(d => ({
-    name: d.name,
-    label: d.label || d.name,
-    isDefault: !!d.isDefault,
+  // Aplatir les instances + bases pour le mobile.
+  // Payload allégé : pas de credentials SQL (ceux-ci restent côté serveur dans appsettings.json).
+  const instances = (license.instances || []).map(inst => ({
+    key: inst.key,
+    label: inst.label || inst.key,
+    isDefault: !!inst.isDefault,
+    databases: (inst.databases || []).map(d => ({
+      name: d.name,
+      label: d.label || d.name,
+      isDefault: !!d.isDefault,
+    })),
   }));
-  const defaultDb = databases.find(d => d.isDefault) || databases[0] || null;
+
+  const defaultInstance = instances.find(i => i.isDefault) || instances[0] || null;
+  const defaultDb = defaultInstance
+    ? (defaultInstance.databases.find(d => d.isDefault) || defaultInstance.databases[0] || null)
+    : null;
 
   const token = await new SignJWT({
     clientId: company.id,
@@ -70,8 +81,9 @@ export async function signLicenseToken(license, company, appCode) {
     appCode: appCode || 'SS',
     syncServiceUrl: deployment.publicUrl,
     syncServiceUrlLocal: deployment.localUrl || '',
-    databases,
-    databaseName: defaultDb?.name || '',
+    instances,
+    defaultInstanceKey: defaultInstance?.key || '',
+    defaultDatabaseName: defaultDb?.name || '',
     apiKey: deployment.apiKey,
     mobileAdminPassword: deployment.mobileAdminPassword || '',
     maxDevices: license.maxDevices,

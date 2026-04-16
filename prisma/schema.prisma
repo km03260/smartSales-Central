@@ -71,7 +71,7 @@ model License {
   devices        DeviceActivation[]
   usageLogs      UsageLog[]
   alerts         LicenseAlert[]
-  databases      LicenseDatabase[]
+  instances      LicenseSqlInstance[]
 
   @@unique([appId, companyId]) // 1 seule licence par (application × client)
   @@map("licenses")
@@ -130,23 +130,44 @@ model SyncServiceDeployment {
   @@map("sync_service_deployments")
 }
 
-// ─── Bases WaveSoft rattachées à une licence ───────────────────────────────
-// Une licence couvre 1..N bases. Chaque base peut résider sur une instance
-// SQL Server différente (overrides SQL optionnels) et a son propre Tircode
-// "Clients divers". Le mobile envoie le header X-Database = name.
+// ─── Instances SQL Server rattachées à une licence ────────────────────────
+// Une licence couvre 1..N instances (cas multi-serveurs). Chaque instance
+// regroupe les credentials SQL + ses bases. Le mobile envoie X-Instance = key.
 
-model LicenseDatabase {
+model LicenseSqlInstance {
   id                     String   @id @default(uuid()) @db.VarChar(36)
   licenseId              String   @db.VarChar(36)
 
-  name                   String   @db.VarChar(100)   // ex: TESTS_MAURER (header X-Database)
-  label                  String   @default("") @db.VarChar(200) // libellé affiché côté mobile
-  isDefault              Boolean  @default(false)    // base pré-sélectionnée après activation
+  key                    String   @db.VarChar(50)          // slug technique (header X-Instance, ex: SIEGE, FILIALE)
+  label                  String   @default("") @db.VarChar(200) // libellé affiché côté mobile (ex: "Siège", "Filiale Lyon")
+  isDefault              Boolean  @default(false)          // instance pré-sélectionnée après activation
 
-  // Override optionnel de la connexion SQL (null = hériter du Deployment)
+  // Credentials SQL (null = hériter du Deployment)
   sqlHost                String?  @db.VarChar(200)
   sqlUser                String?  @db.VarChar(100)
   sqlPassword            String?  @db.VarChar(200)
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  license                License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  databases              LicenseDatabase[]
+
+  @@unique([licenseId, key])
+  @@map("license_sql_instances")
+}
+
+// ─── Bases WaveSoft rattachées à une instance ─────────────────────────────
+// Chaque base est unique au sein d'une instance. Le mobile envoie X-Database = name.
+// 2 bases peuvent porter le même nom si elles sont dans 2 instances différentes.
+
+model LicenseDatabase {
+  id                     String   @id @default(uuid()) @db.VarChar(36)
+  instanceId             String   @db.VarChar(36)
+
+  name                   String   @db.VarChar(100)    // ex: PROD (header X-Database, nom SQL réel)
+  label                  String   @default("") @db.VarChar(200) // libellé affiché côté mobile
+  isDefault              Boolean  @default(false)     // base pré-sélectionnée au sein de l'instance
 
   // Tircode "Clients divers" spécifique à cette base
   clientsDiversTircode   String   @default("") @db.VarChar(50)
@@ -154,9 +175,9 @@ model LicenseDatabase {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  license                License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  instance               LicenseSqlInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
 
-  @@unique([licenseId, name])
+  @@unique([instanceId, name])
   @@map("license_databases")
 }
 

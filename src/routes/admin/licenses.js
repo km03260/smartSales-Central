@@ -44,7 +44,10 @@ router.get('/:id', async (req, res) => {
         app: { select: { id: true, code: true, name: true } },
         company: true,
         deployment: { select: { id: true, name: true, publicUrl: true } },
-        databases: { orderBy: { createdAt: 'asc' } },
+        instances: {
+          include: { databases: { orderBy: { createdAt: 'asc' } } },
+          orderBy: { createdAt: 'asc' },
+        },
         devices: { orderBy: { lastHeartbeat: 'desc' } },
       },
     });
@@ -62,19 +65,15 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/admin/licenses
- * Body: { appId, companyId, deploymentId, maxDevices?, features?, plan?, expiresAt,
- *         databases?: [{ name, label?, isDefault?, ... }] }
+ * Body: { appId, companyId, deploymentId, maxDevices?, features?, plan?, expiresAt }
  *
- * - Unicité : 1 seule licence par (appId, companyId).
- * - deploymentId obligatoire : URLs + apiKey héritées du déploiement.
- * - databases est optionnel : tu peux créer la licence nue puis ajouter les bases après.
+ * Les instances et bases s'ajoutent ensuite via les routes dédiées.
  */
 router.post('/', async (req, res) => {
   try {
     const {
       appId, companyId, deploymentId,
       maxDevices, features, plan, expiresAt,
-      databases,
     } = req.body;
 
     if (!appId || !companyId || !deploymentId || !expiresAt) {
@@ -93,7 +92,6 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Le déploiement appartient à une autre entreprise' });
     }
 
-    // Unicité (appId, companyId)
     const existing = await prisma.license.findUnique({
       where: { appId_companyId: { appId, companyId } },
     });
@@ -111,31 +109,17 @@ router.post('/', async (req, res) => {
         features: features || ['orders', 'quotations', 'invoices'],
         plan: plan || 'professional',
         expiresAt: new Date(expiresAt),
-        ...(Array.isArray(databases) && databases.length > 0 && {
-          databases: {
-            create: databases.map((d, i) => ({
-              name: d.name,
-              label: d.label || d.name,
-              isDefault: d.isDefault ?? (i === 0),
-              sqlHost: d.sqlHost || null,
-              sqlUser: d.sqlUser || null,
-              sqlPassword: d.sqlPassword || null,
-              clientsDiversTircode: d.clientsDiversTircode || '',
-            })),
-          },
-        }),
       },
       include: {
         app: { select: { code: true, name: true } },
         company: { select: { name: true } },
-        databases: true,
       },
     });
 
     res.status(201).json(license);
   } catch (error) {
     if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'Conflit d\'unicité (app+client ou base déjà existante)' });
+      return res.status(409).json({ error: 'Une licence existe déjà pour cette application et ce client' });
     }
     console.error('[LICENSES:CREATE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -310,81 +294,208 @@ router.post('/:id/unblock', async (req, res) => {
   }
 });
 
-// ─── Bases WaveSoft de la licence (N-1 avec License) ─────────────────────
-// Chaque base peut être sur une instance SQL différente (overrides SQL),
-// a son propre Tircode "Clients divers", et un flag isDefault (1 max par licence).
+// ─── Instances SQL & bases WaveSoft de la licence ─────────────────────────
+// Hiérarchie : License ─ N instances ─ N bases (par instance).
+// Chaque instance a ses credentials SQL propres (optionnels — sinon hérite du déploiement).
+// Unicité :
+//  - (licenseId, instance.key)   — slug instance unique au sein d'une licence
+//  - (instanceId, database.name) — nom de base unique au sein d'une instance
+//  - 1 seule instance isDefault par licence
+//  - 1 seule base isDefault par instance
 
+const INSTANCE_FIELDS = [
+  'key', 'label', 'isDefault',
+  'sqlHost', 'sqlUser', 'sqlPassword',
+];
 const DATABASE_FIELDS = [
   'name', 'label', 'isDefault',
-  'sqlHost', 'sqlUser', 'sqlPassword',
   'clientsDiversTircode',
 ];
 
+function pickInstance(body) {
+  return Object.fromEntries(
+    Object.entries(body).filter(([k]) => INSTANCE_FIELDS.includes(k))
+  );
+}
 function pickDatabase(body) {
   return Object.fromEntries(
     Object.entries(body).filter(([k]) => DATABASE_FIELDS.includes(k))
   );
 }
 
-/**
- * S'assure qu'il n'y ait qu'une seule base isDefault par licence.
- */
-async function enforceSingleDefault(licenseId, exceptDatabaseId = null) {
-  await prisma.licenseDatabase.updateMany({
+async function enforceSingleDefaultInstance(licenseId, exceptId = null) {
+  await prisma.licenseSqlInstance.updateMany({
     where: {
       licenseId,
       isDefault: true,
-      ...(exceptDatabaseId && { NOT: { id: exceptDatabaseId } }),
+      ...(exceptId && { NOT: { id: exceptId } }),
+    },
+    data: { isDefault: false },
+  });
+}
+
+async function enforceSingleDefaultDatabase(instanceId, exceptId = null) {
+  await prisma.licenseDatabase.updateMany({
+    where: {
+      instanceId,
+      isDefault: true,
+      ...(exceptId && { NOT: { id: exceptId } }),
     },
     data: { isDefault: false },
   });
 }
 
 /**
- * GET /api/admin/licenses/:id/databases
+ * GET /api/admin/licenses/:id/instances
  */
-router.get('/:id/databases', async (req, res) => {
+router.get('/:id/instances', async (req, res) => {
   try {
-    const databases = await prisma.licenseDatabase.findMany({
+    const instances = await prisma.licenseSqlInstance.findMany({
       where: { licenseId: req.params.id },
+      include: { databases: { orderBy: { createdAt: 'asc' } } },
       orderBy: { createdAt: 'asc' },
     });
-    res.json(databases);
+    res.json(instances);
   } catch (error) {
-    console.error('[LICENSES:DATABASES:LIST]', error);
+    console.error('[LICENSES:INSTANCES:LIST]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
 /**
- * POST /api/admin/licenses/:id/databases
- * Body: { name, label?, isDefault?, sqlHost?, sqlUser?, sqlPassword?, clientsDiversTircode? }
+ * POST /api/admin/licenses/:id/instances
+ * Body: { key, label?, isDefault?, sqlHost?, sqlUser?, sqlPassword? }
  */
-router.post('/:id/databases', async (req, res) => {
+router.post('/:id/instances', async (req, res) => {
   try {
     const licenseId = req.params.id;
     const license = await prisma.license.findUnique({ where: { id: licenseId } });
     if (!license) return res.status(404).json({ error: 'Licence non trouvée' });
 
-    const data = pickDatabase(req.body);
-    if (!data.name) return res.status(400).json({ error: 'name requis' });
+    const data = pickInstance(req.body);
+    if (!data.key) return res.status(400).json({ error: 'key requis' });
 
     // Premier ajout → forcer isDefault à true
-    const existingCount = await prisma.licenseDatabase.count({ where: { licenseId } });
-    if (existingCount === 0) data.isDefault = true;
+    const count = await prisma.licenseSqlInstance.count({ where: { licenseId } });
+    if (count === 0) data.isDefault = true;
 
-    const created = await prisma.licenseDatabase.create({
-      data: { licenseId, ...data, label: data.label || data.name },
+    const created = await prisma.licenseSqlInstance.create({
+      data: { licenseId, ...data, label: data.label || data.key },
     });
 
     if (created.isDefault) {
-      await enforceSingleDefault(licenseId, created.id);
+      await enforceSingleDefaultInstance(licenseId, created.id);
     }
 
     res.status(201).json(created);
   } catch (error) {
     if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'Une base porte déjà ce nom pour cette licence' });
+      return res.status(409).json({ error: 'Une instance porte déjà cette key pour cette licence' });
+    }
+    console.error('[LICENSES:INSTANCES:CREATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * PUT /api/admin/licenses/:licenseId/instances/:instanceId
+ */
+router.put('/:licenseId/instances/:instanceId', async (req, res) => {
+  try {
+    const { licenseId, instanceId } = req.params;
+    const data = pickInstance(req.body);
+
+    const existing = await prisma.licenseSqlInstance.findUnique({ where: { id: instanceId } });
+    if (!existing || existing.licenseId !== licenseId) {
+      return res.status(404).json({ error: 'Instance non trouvée' });
+    }
+
+    const updated = await prisma.licenseSqlInstance.update({
+      where: { id: instanceId },
+      data,
+    });
+
+    if (data.isDefault === true) {
+      await enforceSingleDefaultInstance(licenseId, instanceId);
+    }
+
+    res.json(updated);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Une instance porte déjà cette key' });
+    }
+    console.error('[LICENSES:INSTANCES:UPDATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * DELETE /api/admin/licenses/:licenseId/instances/:instanceId
+ * Supprime l'instance ET ses bases (cascade).
+ */
+router.delete('/:licenseId/instances/:instanceId', async (req, res) => {
+  try {
+    const { licenseId, instanceId } = req.params;
+    const existing = await prisma.licenseSqlInstance.findUnique({ where: { id: instanceId } });
+    if (!existing || existing.licenseId !== licenseId) {
+      return res.status(404).json({ error: 'Instance non trouvée' });
+    }
+
+    await prisma.licenseSqlInstance.delete({ where: { id: instanceId } });
+
+    // Si on vient de supprimer l'instance par défaut, en promouvoir une autre
+    if (existing.isDefault) {
+      const remaining = await prisma.licenseSqlInstance.findFirst({
+        where: { licenseId },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (remaining) {
+        await prisma.licenseSqlInstance.update({
+          where: { id: remaining.id },
+          data: { isDefault: true },
+        });
+      }
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[LICENSES:INSTANCES:DELETE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ─── Bases au sein d'une instance ───────────────────────────────────────
+
+/**
+ * POST /api/admin/licenses/:licenseId/instances/:instanceId/databases
+ * Body: { name, label?, isDefault?, clientsDiversTircode? }
+ */
+router.post('/:licenseId/instances/:instanceId/databases', async (req, res) => {
+  try {
+    const { licenseId, instanceId } = req.params;
+    const instance = await prisma.licenseSqlInstance.findUnique({ where: { id: instanceId } });
+    if (!instance || instance.licenseId !== licenseId) {
+      return res.status(404).json({ error: 'Instance non trouvée' });
+    }
+
+    const data = pickDatabase(req.body);
+    if (!data.name) return res.status(400).json({ error: 'name requis' });
+
+    const count = await prisma.licenseDatabase.count({ where: { instanceId } });
+    if (count === 0) data.isDefault = true;
+
+    const created = await prisma.licenseDatabase.create({
+      data: { instanceId, ...data, label: data.label || data.name },
+    });
+
+    if (created.isDefault) {
+      await enforceSingleDefaultDatabase(instanceId, created.id);
+    }
+
+    res.status(201).json(created);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Une base porte déjà ce nom pour cette instance' });
     }
     console.error('[LICENSES:DATABASES:CREATE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -392,30 +503,34 @@ router.post('/:id/databases', async (req, res) => {
 });
 
 /**
- * PUT /api/admin/licenses/:licenseId/databases/:databaseId
+ * PUT /api/admin/licenses/:licenseId/instances/:instanceId/databases/:databaseId
  */
-router.put('/:licenseId/databases/:databaseId', async (req, res) => {
+router.put('/:licenseId/instances/:instanceId/databases/:databaseId', async (req, res) => {
   try {
-    const { licenseId, databaseId } = req.params;
+    const { licenseId, instanceId, databaseId } = req.params;
     const data = pickDatabase(req.body);
+
+    const db = await prisma.licenseDatabase.findUnique({
+      where: { id: databaseId },
+      include: { instance: true },
+    });
+    if (!db || db.instanceId !== instanceId || db.instance.licenseId !== licenseId) {
+      return res.status(404).json({ error: 'Base non trouvée' });
+    }
 
     const updated = await prisma.licenseDatabase.update({
       where: { id: databaseId },
       data,
     });
 
-    if (updated.licenseId !== licenseId) {
-      return res.status(400).json({ error: 'La base ne fait pas partie de cette licence' });
-    }
-
     if (data.isDefault === true) {
-      await enforceSingleDefault(licenseId, databaseId);
+      await enforceSingleDefaultDatabase(instanceId, databaseId);
     }
 
     res.json(updated);
   } catch (error) {
     if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'Une base porte déjà ce nom pour cette licence' });
+      return res.status(409).json({ error: 'Une base porte déjà ce nom pour cette instance' });
     }
     console.error('[LICENSES:DATABASES:UPDATE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -423,23 +538,25 @@ router.put('/:licenseId/databases/:databaseId', async (req, res) => {
 });
 
 /**
- * DELETE /api/admin/licenses/:licenseId/databases/:databaseId
+ * DELETE /api/admin/licenses/:licenseId/instances/:instanceId/databases/:databaseId
  */
-router.delete('/:licenseId/databases/:databaseId', async (req, res) => {
+router.delete('/:licenseId/instances/:instanceId/databases/:databaseId', async (req, res) => {
   try {
-    const { licenseId, databaseId } = req.params;
+    const { licenseId, instanceId, databaseId } = req.params;
 
-    const db = await prisma.licenseDatabase.findUnique({ where: { id: databaseId } });
-    if (!db || db.licenseId !== licenseId) {
+    const db = await prisma.licenseDatabase.findUnique({
+      where: { id: databaseId },
+      include: { instance: true },
+    });
+    if (!db || db.instanceId !== instanceId || db.instance.licenseId !== licenseId) {
       return res.status(404).json({ error: 'Base non trouvée' });
     }
 
     await prisma.licenseDatabase.delete({ where: { id: databaseId } });
 
-    // Si on vient de supprimer la base par défaut, en promouvoir une autre
     if (db.isDefault) {
       const remaining = await prisma.licenseDatabase.findFirst({
-        where: { licenseId },
+        where: { instanceId },
         orderBy: { createdAt: 'asc' },
       });
       if (remaining) {
