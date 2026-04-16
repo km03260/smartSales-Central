@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import licensesRouter from './routes/licenses.js';
 import contactRouter from './routes/contact.js';
+import appsPublicRouter from './routes/apps.js';
 import adminAuthRouter from './routes/admin/auth.js';
 import adminCompaniesRouter from './routes/admin/companies.js';
 import adminLicensesRouter from './routes/admin/licenses.js';
@@ -36,6 +37,7 @@ app.use('/api/licenses', licensesRouter);
 
 // ─── Route publique (site vitrine) ──────────────────────────────────────────
 app.use('/api/contact', contactRouter);
+app.use('/api/apps', appsPublicRouter);
 
 // ─── Routes admin (dashboard, protégées par JWT) ────────────────────────────
 app.use('/api/admin/auth', adminAuthRouter);
