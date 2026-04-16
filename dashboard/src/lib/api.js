@@ -88,5 +88,6 @@ export const api = {
 
   // Contacts
   getContacts: () => request('/admin/contacts'),
+  getContactsUnreadCount: () => request('/admin/contacts/unread-count'),
   updateContact: (id, body) => request(`/admin/contacts/${id}`, { method: 'PUT', body }),
 };

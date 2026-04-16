@@ -82,3 +82,72 @@ export async function sendExpirationAlert({ to, companyName, appName, licenseKey
 
   console.log(`[EMAIL] Alert sent to ${to} — ${appName} expires in ${daysLeft} days`);
 }
+
+/**
+ * Notifie les admins qu'une nouvelle demande de contact a été reçue via le site vitrine.
+ */
+export async function sendContactNotification({ name, email, company, phone, message, type }) {
+  const to = process.env.CONTACT_NOTIFY_EMAIL;
+  if (!to) {
+    console.warn('[EMAIL] CONTACT_NOTIFY_EMAIL non défini — notification non envoyée');
+    return;
+  }
+
+  const typeLabel = { info: 'Informations', demo: 'Démonstration', support: 'Support', other: 'Autre' }[type] || type || 'info';
+  const subject = `[SmartSales] Nouvelle demande de contact — ${name}`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background-color: #1E40AF; padding: 24px; border-radius: 8px 8px 0 0;">
+        <h1 style="color: #FFFFFF; margin: 0; font-size: 20px;">Nouvelle demande de contact</h1>
+      </div>
+      <div style="padding: 24px; border: 1px solid #E5E7EB; border-top: none; border-radius: 0 0 8px 8px;">
+        <p>Une nouvelle demande a été reçue via le site vitrine SmartSales.</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <tr style="background-color: #F9FAFB;">
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB; font-weight: 600; width: 140px;">Type</td>
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB;">${typeLabel}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB; font-weight: 600;">Nom</td>
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB;">${name}</td>
+          </tr>
+          <tr style="background-color: #F9FAFB;">
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB; font-weight: 600;">Email</td>
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB;"><a href="mailto:${email}">${email}</a></td>
+          </tr>
+          ${phone ? `
+          <tr>
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB; font-weight: 600;">Téléphone</td>
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB;">${phone}</td>
+          </tr>` : ''}
+          ${company ? `
+          <tr style="background-color: #F9FAFB;">
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB; font-weight: 600;">Entreprise</td>
+            <td style="padding: 8px 12px; border: 1px solid #E5E7EB;">${company}</td>
+          </tr>` : ''}
+        </table>
+        <div style="background-color: #F9FAFB; padding: 16px; border-radius: 6px; margin-top: 20px;">
+          <div style="font-weight: 600; margin-bottom: 8px;">Message</div>
+          <div style="white-space: pre-wrap; color: #374151;">${message.replace(/</g, '&lt;')}</div>
+        </div>
+        <p style="color: #6B7280; font-size: 13px; margin-top: 20px;">
+          Retrouvez cette demande dans le dashboard admin.
+        </p>
+      </div>
+    </div>
+  `;
+
+  try {
+    await getTransporter().sendMail({
+      from: FROM(),
+      to,
+      replyTo: email,
+      subject,
+      html,
+    });
+    console.log(`[EMAIL] Contact notification sent to ${to} — from ${email}`);
+  } catch (err) {
+    console.error('[EMAIL] Contact notification failed:', err.message);
+  }
+}
