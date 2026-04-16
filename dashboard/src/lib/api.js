@@ -81,8 +81,13 @@ export const api = {
   getLicenseDevices: (id) => request(`/admin/licenses/${id}/devices`),
   deactivateDevice: (licenseId, deviceId) =>
     request(`/admin/licenses/${licenseId}/devices/${deviceId}/deactivate`, { method: 'POST' }),
-  getSyncConfig: (id) => request(`/admin/licenses/${id}/sync-config`),
-  updateSyncConfig: (id, body) => request(`/admin/licenses/${id}/sync-config`, { method: 'PUT', body }),
+  // LicenseDatabase (N bases WaveSoft par licence)
+  getLicenseDatabases: (id) => request(`/admin/licenses/${id}/databases`),
+  createLicenseDatabase: (id, body) => request(`/admin/licenses/${id}/databases`, { method: 'POST', body }),
+  updateLicenseDatabase: (licenseId, databaseId, body) =>
+    request(`/admin/licenses/${licenseId}/databases/${databaseId}`, { method: 'PUT', body }),
+  deleteLicenseDatabase: (licenseId, databaseId) =>
+    request(`/admin/licenses/${licenseId}/databases/${databaseId}`, { method: 'DELETE' }),
 
   // Deployments (SyncService)
   getDeployments: (companyId) => request(`/admin/deployments${companyId ? `?companyId=${companyId}` : ''}`),

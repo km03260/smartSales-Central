@@ -44,7 +44,7 @@ router.get('/:id', async (req, res) => {
         app: { select: { id: true, code: true, name: true } },
         company: true,
         deployment: { select: { id: true, name: true, publicUrl: true } },
-        syncConfig: true,
+        databases: { orderBy: { createdAt: 'asc' } },
         devices: { orderBy: { lastHeartbeat: 'desc' } },
       },
     });
@@ -62,35 +62,56 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/admin/licenses
- * Body: { appId, companyId, deploymentId?, syncServiceUrl, apiKey, databaseName, maxDevices?, features?, plan?, expiresAt }
+ * Body: { appId, companyId, deploymentId?, syncServiceUrl?, syncServiceUrlLocal?, apiKey?,
+ *         maxDevices?, features?, plan?, expiresAt, databases?: [{ name, label?, isDefault?, ... }] }
+ *
+ * - Unicité : 1 seule licence par (appId, companyId).
+ * - databases est optionnel : tu peux créer la licence nue puis ajouter les bases après.
  */
 router.post('/', async (req, res) => {
   try {
-    const { appId, companyId, deploymentId, syncServiceUrl, syncServiceUrlLocal, databaseName, apiKey, maxDevices, features, plan, expiresAt } = req.body;
+    const {
+      appId, companyId, deploymentId,
+      syncServiceUrl, syncServiceUrlLocal, apiKey,
+      maxDevices, features, plan, expiresAt,
+      databases,
+    } = req.body;
 
-    if (!appId || !companyId || !syncServiceUrl || !apiKey || !expiresAt) {
-      return res.status(400).json({ error: 'appId, companyId, syncServiceUrl, apiKey et expiresAt requis' });
+    if (!appId || !companyId || !expiresAt) {
+      return res.status(400).json({ error: 'appId, companyId et expiresAt requis' });
     }
 
     // Vérifier que l'app existe
     const app = await prisma.app.findUnique({ where: { id: appId } });
-    if (!app) {
-      return res.status(404).json({ error: 'Application non trouvée' });
-    }
+    if (!app) return res.status(404).json({ error: 'Application non trouvée' });
 
     // Vérifier que l'entreprise existe
     const company = await prisma.company.findUnique({ where: { id: companyId } });
-    if (!company) {
-      return res.status(404).json({ error: 'Entreprise non trouvée' });
+    if (!company) return res.status(404).json({ error: 'Entreprise non trouvée' });
+
+    // Vérifier unicité (appId, companyId)
+    const existing = await prisma.license.findUnique({
+      where: { appId_companyId: { appId, companyId } },
+    });
+    if (existing) {
+      return res.status(409).json({ error: 'Une licence existe déjà pour cette application et ce client' });
     }
 
-    // Vérifier que le déploiement existe et appartient à la même entreprise
+    let resolvedDeployment = null;
     if (deploymentId) {
-      const deployment = await prisma.syncServiceDeployment.findUnique({ where: { id: deploymentId } });
-      if (!deployment) return res.status(404).json({ error: 'Déploiement non trouvé' });
-      if (deployment.companyId !== companyId) {
+      resolvedDeployment = await prisma.syncServiceDeployment.findUnique({ where: { id: deploymentId } });
+      if (!resolvedDeployment) return res.status(404).json({ error: 'Déploiement non trouvé' });
+      if (resolvedDeployment.companyId !== companyId) {
         return res.status(400).json({ error: 'Le déploiement appartient à une autre entreprise' });
       }
+    }
+
+    // Valeurs finales : héritage depuis le déploiement si fourni, sinon valeurs body.
+    const finalSyncUrl = syncServiceUrl || resolvedDeployment?.publicUrl || '';
+    const finalSyncUrlLocal = syncServiceUrlLocal ?? resolvedDeployment?.localUrl ?? '';
+    const finalApiKey = apiKey || resolvedDeployment?.apiKey || '';
+    if (!finalSyncUrl || !finalApiKey) {
+      return res.status(400).json({ error: 'syncServiceUrl et apiKey requis (ou hérités via deploymentId)' });
     }
 
     const license = await prisma.license.create({
@@ -99,20 +120,39 @@ router.post('/', async (req, res) => {
         companyId,
         ...(deploymentId && { deploymentId }),
         licenseKey: generateLicenseKey(app.code),
-        syncServiceUrl,
-        syncServiceUrlLocal: syncServiceUrlLocal || '',
-        databaseName: databaseName || '',
-        apiKey,
+        syncServiceUrl: finalSyncUrl,
+        syncServiceUrlLocal: finalSyncUrlLocal,
+        apiKey: finalApiKey,
         maxDevices: maxDevices || 5,
         features: features || ['orders', 'quotations', 'invoices'],
         plan: plan || 'professional',
         expiresAt: new Date(expiresAt),
+        ...(Array.isArray(databases) && databases.length > 0 && {
+          databases: {
+            create: databases.map((d, i) => ({
+              name: d.name,
+              label: d.label || d.name,
+              isDefault: d.isDefault ?? (i === 0),
+              sqlHost: d.sqlHost || null,
+              sqlUser: d.sqlUser || null,
+              sqlPassword: d.sqlPassword || null,
+              clientsDiversTircode: d.clientsDiversTircode || '',
+            })),
+          },
+        }),
       },
-      include: { app: { select: { code: true, name: true } }, company: { select: { name: true } } },
+      include: {
+        app: { select: { code: true, name: true } },
+        company: { select: { name: true } },
+        databases: true,
+      },
     });
 
     res.status(201).json(license);
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Conflit d\'unicité (app+client ou base déjà existante)' });
+    }
     console.error('[LICENSES:CREATE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
@@ -120,12 +160,12 @@ router.post('/', async (req, res) => {
 
 /**
  * PUT /api/admin/licenses/:id
+ * Les bases (databases) se gèrent via les routes /databases dédiées ci-dessous.
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { deploymentId, syncServiceUrl, syncServiceUrlLocal, databaseName, apiKey, maxDevices, features, plan, expiresAt, isActive } = req.body;
+    const { deploymentId, syncServiceUrl, syncServiceUrlLocal, apiKey, maxDevices, features, plan, expiresAt, isActive } = req.body;
 
-    // Si deploymentId est fourni (non null), vérifier la cohérence d'entreprise
     if (deploymentId) {
       const current = await prisma.license.findUnique({ where: { id: req.params.id }, select: { companyId: true } });
       const deployment = await prisma.syncServiceDeployment.findUnique({ where: { id: deploymentId } });
@@ -141,7 +181,6 @@ router.put('/:id', async (req, res) => {
         ...(deploymentId !== undefined && { deploymentId: deploymentId || null }),
         ...(syncServiceUrl !== undefined && { syncServiceUrl }),
         ...(syncServiceUrlLocal !== undefined && { syncServiceUrlLocal }),
-        ...(databaseName !== undefined && { databaseName }),
         ...(apiKey !== undefined && { apiKey }),
         ...(maxDevices !== undefined && { maxDevices }),
         ...(features !== undefined && { features }),
@@ -286,59 +325,149 @@ router.post('/:id/unblock', async (req, res) => {
   }
 });
 
-// ─── Overrides par licence (= par base WaveSoft) ──────────────────────────
-// Ne contient que ce qui diffère d'une base à l'autre au sein d'un même
-// déploiement : Tircode "Clients divers" et override SQL optionnel (si la
-// base tourne sur une instance SQL différente du déploiement par défaut).
+// ─── Bases WaveSoft de la licence (N-1 avec License) ─────────────────────
+// Chaque base peut être sur une instance SQL différente (overrides SQL),
+// a son propre Tircode "Clients divers", et un flag isDefault (1 max par licence).
 
-const SYNC_CONFIG_FIELDS = [
+const DATABASE_FIELDS = [
+  'name', 'label', 'isDefault',
   'sqlHost', 'sqlUser', 'sqlPassword',
   'clientsDiversTircode',
 ];
 
-function pickSyncConfig(body) {
+function pickDatabase(body) {
   return Object.fromEntries(
-    Object.entries(body).filter(([k]) => SYNC_CONFIG_FIELDS.includes(k))
+    Object.entries(body).filter(([k]) => DATABASE_FIELDS.includes(k))
   );
 }
 
 /**
- * GET /api/admin/licenses/:id/sync-config
+ * S'assure qu'il n'y ait qu'une seule base isDefault par licence.
  */
-router.get('/:id/sync-config', async (req, res) => {
+async function enforceSingleDefault(licenseId, exceptDatabaseId = null) {
+  await prisma.licenseDatabase.updateMany({
+    where: {
+      licenseId,
+      isDefault: true,
+      ...(exceptDatabaseId && { NOT: { id: exceptDatabaseId } }),
+    },
+    data: { isDefault: false },
+  });
+}
+
+/**
+ * GET /api/admin/licenses/:id/databases
+ */
+router.get('/:id/databases', async (req, res) => {
   try {
-    const license = await prisma.license.findUnique({
-      where: { id: req.params.id },
-      include: { syncConfig: true },
+    const databases = await prisma.licenseDatabase.findMany({
+      where: { licenseId: req.params.id },
+      orderBy: { createdAt: 'asc' },
     });
-    if (!license) return res.status(404).json({ error: 'Licence non trouvée' });
-    res.json(license.syncConfig || null);
+    res.json(databases);
   } catch (error) {
-    console.error('[LICENSES:SYNC_CONFIG:GET]', error);
+    console.error('[LICENSES:DATABASES:LIST]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
 /**
- * PUT /api/admin/licenses/:id/sync-config
- * Upsert des overrides par base.
+ * POST /api/admin/licenses/:id/databases
+ * Body: { name, label?, isDefault?, sqlHost?, sqlUser?, sqlPassword?, clientsDiversTircode? }
  */
-router.put('/:id/sync-config', async (req, res) => {
+router.post('/:id/databases', async (req, res) => {
   try {
     const licenseId = req.params.id;
     const license = await prisma.license.findUnique({ where: { id: licenseId } });
     if (!license) return res.status(404).json({ error: 'Licence non trouvée' });
 
-    const data = pickSyncConfig(req.body);
+    const data = pickDatabase(req.body);
+    if (!data.name) return res.status(400).json({ error: 'name requis' });
 
-    const config = await prisma.syncServiceConfig.upsert({
-      where: { licenseId },
-      create: { licenseId, ...data },
-      update: data,
+    // Premier ajout → forcer isDefault à true
+    const existingCount = await prisma.licenseDatabase.count({ where: { licenseId } });
+    if (existingCount === 0) data.isDefault = true;
+
+    const created = await prisma.licenseDatabase.create({
+      data: { licenseId, ...data, label: data.label || data.name },
     });
-    res.json(config);
+
+    if (created.isDefault) {
+      await enforceSingleDefault(licenseId, created.id);
+    }
+
+    res.status(201).json(created);
   } catch (error) {
-    console.error('[LICENSES:SYNC_CONFIG:UPDATE]', error);
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Une base porte déjà ce nom pour cette licence' });
+    }
+    console.error('[LICENSES:DATABASES:CREATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * PUT /api/admin/licenses/:licenseId/databases/:databaseId
+ */
+router.put('/:licenseId/databases/:databaseId', async (req, res) => {
+  try {
+    const { licenseId, databaseId } = req.params;
+    const data = pickDatabase(req.body);
+
+    const updated = await prisma.licenseDatabase.update({
+      where: { id: databaseId },
+      data,
+    });
+
+    if (updated.licenseId !== licenseId) {
+      return res.status(400).json({ error: 'La base ne fait pas partie de cette licence' });
+    }
+
+    if (data.isDefault === true) {
+      await enforceSingleDefault(licenseId, databaseId);
+    }
+
+    res.json(updated);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Une base porte déjà ce nom pour cette licence' });
+    }
+    console.error('[LICENSES:DATABASES:UPDATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * DELETE /api/admin/licenses/:licenseId/databases/:databaseId
+ */
+router.delete('/:licenseId/databases/:databaseId', async (req, res) => {
+  try {
+    const { licenseId, databaseId } = req.params;
+
+    const db = await prisma.licenseDatabase.findUnique({ where: { id: databaseId } });
+    if (!db || db.licenseId !== licenseId) {
+      return res.status(404).json({ error: 'Base non trouvée' });
+    }
+
+    await prisma.licenseDatabase.delete({ where: { id: databaseId } });
+
+    // Si on vient de supprimer la base par défaut, en promouvoir une autre
+    if (db.isDefault) {
+      const remaining = await prisma.licenseDatabase.findFirst({
+        where: { licenseId },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (remaining) {
+        await prisma.licenseDatabase.update({
+          where: { id: remaining.id },
+          data: { isDefault: true },
+        });
+      }
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[LICENSES:DATABASES:DELETE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });

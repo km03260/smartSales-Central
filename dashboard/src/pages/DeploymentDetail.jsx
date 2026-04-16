@@ -346,46 +346,69 @@ export default function DeploymentDetail() {
             Aucune licence associée. Attache des licences à ce déploiement depuis le détail d'une licence.
           </p>
         ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Licence</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Base WaveSoft</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Tircode Clients divers</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Override SQL ?</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {deployment.licenses.map((l) => {
-                const c = l.syncConfig || {};
-                const hasSqlOverride = !!(c.sqlHost || c.sqlUser || c.sqlPassword);
-                return (
-                  <tr key={l.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 text-sm font-mono text-gray-700">{l.licenseKey}</td>
-                    <td className="px-4 py-2 text-sm text-gray-700">{l.databaseName || <span className="text-gray-400">—</span>}</td>
-                    <td className="px-4 py-2 text-sm font-mono text-gray-700">
-                      {c.clientsDiversTircode || <span className="text-gray-400">—</span>}
-                    </td>
-                    <td className="px-4 py-2 text-sm text-gray-700">
-                      {hasSqlOverride ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
-                          Oui
+          <div className="space-y-4">
+            {deployment.licenses.map((l) => {
+              const databases = l.databases || [];
+              return (
+                <div key={l.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between bg-gray-50 px-4 py-2 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-sm font-medium text-gray-900">{l.licenseKey}</span>
+                      {l.app && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                          {l.app.name}
                         </span>
-                      ) : (
-                        <span className="text-gray-400">Hérite du déploiement</span>
                       )}
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      <Link to={`/licenses/${l.id}`} className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1 justify-end">
-                        <KeyRound size={14} /> Ouvrir
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <span className="text-xs text-gray-500">{databases.length} base(s)</span>
+                    </div>
+                    <Link to={`/licenses/${l.id}`} className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1">
+                      <KeyRound size={14} /> Ouvrir
+                    </Link>
+                  </div>
+                  {databases.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-gray-500">Aucune base</div>
+                  ) : (
+                    <table className="w-full">
+                      <thead>
+                        <tr>
+                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2 w-8"></th>
+                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Base (X-Database)</th>
+                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Libellé</th>
+                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Tircode Divers</th>
+                          <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2">Instance SQL</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {databases.map((db) => (
+                          <tr key={db.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-2">
+                              {db.isDefault && (
+                                <span title="Base par défaut" className="text-yellow-500">★</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 text-sm font-mono text-gray-900">{db.name}</td>
+                            <td className="px-4 py-2 text-sm text-gray-700">{db.label || <span className="text-gray-400">—</span>}</td>
+                            <td className="px-4 py-2 text-sm font-mono text-gray-700">
+                              {db.clientsDiversTircode || <span className="text-gray-400">—</span>}
+                            </td>
+                            <td className="px-4 py-2 text-sm">
+                              {db.sqlHost ? (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-orange-100 text-orange-700 font-mono">
+                                  {db.sqlHost}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400 text-xs">Hérité</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 

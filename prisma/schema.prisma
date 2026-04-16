@@ -55,11 +55,10 @@ model License {
   companyId      String   @db.VarChar(36)
   deploymentId   String?  @db.VarChar(36)                   // Déploiement SyncService partagé (optionnel)
   licenseKey     String   @unique @db.VarChar(20)           // {APP_CODE}-XXXX-XXXX-XXXX
-  syncServiceUrl      String   @db.VarChar(500)             // URL publique (ex: https://213.56.180.33)
-  syncServiceUrlLocal String   @default("") @db.VarChar(500) // URL locale (ex: https://10.0.6.22)
-  databaseName        String   @default("") @db.VarChar(100) // Nom du dossier/base WaveSoft (ex: TESTS_MAURER) = header X-Database
-  apiKey         String   @db.VarChar(200)
-  maxDevices     Int      @default(5)
+  syncServiceUrl      String   @db.VarChar(500)             // URL publique (ex: https://213.56.180.33) — legacy, hérité du déploiement
+  syncServiceUrlLocal String   @default("") @db.VarChar(500) // URL locale — legacy, hérité du déploiement
+  apiKey         String   @db.VarChar(200)                  // legacy, hérité du déploiement
+  maxDevices     Int      @default(5)                       // Global à la licence (toutes bases confondues)
   features       Json     // ["orders","quotations","invoices","stats"]
   plan           String   @default("professional") @db.VarChar(50)
   startsAt       DateTime @default(now())
@@ -75,8 +74,9 @@ model License {
   devices        DeviceActivation[]
   usageLogs      UsageLog[]
   alerts         LicenseAlert[]
-  syncConfig     SyncServiceConfig?
+  databases      LicenseDatabase[]
 
+  @@unique([appId, companyId]) // 1 seule licence par (application × client)
   @@map("licenses")
 }
 
@@ -129,14 +129,18 @@ model SyncServiceDeployment {
   @@map("sync_service_deployments")
 }
 
-// ─── Overrides par licence (= par base WaveSoft) ───────────────────────────
-// Contient uniquement ce qui peut différer d'une base à l'autre au sein
-// d'un même déploiement : Tircode "Clients divers" et override optionnel
-// de la connexion SQL Server (pour bases sur une instance différente).
+// ─── Bases WaveSoft rattachées à une licence ───────────────────────────────
+// Une licence couvre 1..N bases. Chaque base peut résider sur une instance
+// SQL Server différente (overrides SQL optionnels) et a son propre Tircode
+// "Clients divers". Le mobile envoie le header X-Database = name.
 
-model SyncServiceConfig {
+model LicenseDatabase {
   id                     String   @id @default(uuid()) @db.VarChar(36)
-  licenseId              String   @unique @db.VarChar(36)
+  licenseId              String   @db.VarChar(36)
+
+  name                   String   @db.VarChar(100)   // ex: TESTS_MAURER (header X-Database)
+  label                  String   @default("") @db.VarChar(200) // libellé affiché côté mobile
+  isDefault              Boolean  @default(false)    // base pré-sélectionnée après activation
 
   // Override optionnel de la connexion SQL (null = hériter du Deployment)
   sqlHost                String?  @db.VarChar(200)
@@ -151,7 +155,8 @@ model SyncServiceConfig {
 
   license                License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
 
-  @@map("sync_service_configs")
+  @@unique([licenseId, name])
+  @@map("license_databases")
 }
 
 // ─── Alertes d'expiration envoyées ──────────────────────────────────────

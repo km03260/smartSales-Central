@@ -26,6 +26,7 @@ router.post('/activate', async (req, res) => {
         app: true,
         company: { include: { config: true } },
         deployment: true,
+        databases: { orderBy: { createdAt: 'asc' } },
       },
     });
 
@@ -152,7 +153,12 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
 
     const license = await prisma.license.findUnique({
       where: { id: licenseId },
-      include: { app: true, company: true, deployment: true },
+      include: {
+        app: true,
+        company: true,
+        deployment: true,
+        databases: { orderBy: { createdAt: 'asc' } },
+      },
     });
 
     if (!license || !license.isActive) {

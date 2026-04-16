@@ -53,31 +53,33 @@ function buildAppsettings(deployment) {
     trust: deployment.trustServerCertificate,
   });
 
-  // Map par base : on y met les overrides SQL et le Tircode par licence
+  // Map par base : une entrée par LicenseDatabase de chaque licence rattachée.
+  // On met toujours le Tircode même vide (null) pour que la base apparaisse dans la section,
+  // et on override la ConnectionString uniquement si une instance SQL différente est configurée.
   const Databases = {};
   for (const license of deployment.licenses || []) {
-    if (!license.databaseName) continue;
-    const cfg = license.syncConfig || {};
-    const entry = {};
+    for (const db of license.databases || []) {
+      if (!db.name) continue;
+      const entry = {};
 
-    // Override SQL : si sqlHost override, on reconstruit la connection string complète
-    const hasSqlOverride = cfg.sqlHost || cfg.sqlUser || cfg.sqlPassword;
-    if (hasSqlOverride) {
-      entry.ConnectionString = buildConnectionString({
-        host: cfg.sqlHost || deployment.sqlHost,
-        database: license.databaseName,
-        user: cfg.sqlUser || deployment.sqlUser,
-        password: cfg.sqlPassword || deployment.sqlPassword,
-        trust: deployment.trustServerCertificate,
-      });
-    }
+      const hasSqlOverride = db.sqlHost || db.sqlUser || db.sqlPassword;
+      if (hasSqlOverride) {
+        entry.ConnectionString = buildConnectionString({
+          host: db.sqlHost || deployment.sqlHost,
+          database: db.name,
+          user: db.sqlUser || deployment.sqlUser,
+          password: db.sqlPassword || deployment.sqlPassword,
+          trust: deployment.trustServerCertificate,
+        });
+      }
 
-    if (cfg.clientsDiversTircode) {
-      entry.ClientsDiversTircode = cfg.clientsDiversTircode;
-    }
+      if (db.clientsDiversTircode) {
+        entry.ClientsDiversTircode = db.clientsDiversTircode;
+      }
 
-    if (Object.keys(entry).length > 0) {
-      Databases[license.databaseName] = entry;
+      if (Object.keys(entry).length > 0) {
+        Databases[db.name] = entry;
+      }
     }
   }
 
@@ -163,7 +165,7 @@ router.get('/:id', async (req, res) => {
         licenses: {
           include: {
             app: { select: { code: true, name: true } },
-            syncConfig: true,
+            databases: { orderBy: { createdAt: 'asc' } },
           },
           orderBy: { createdAt: 'asc' },
         },
@@ -337,7 +339,7 @@ router.get('/:id/appsettings', async (req, res) => {
       where: { id: req.params.id },
       include: {
         licenses: {
-          include: { syncConfig: true },
+          include: { databases: true },
         },
       },
     });

@@ -42,14 +42,23 @@ export function generateLicenseKey(appCode = 'SS') {
  *  - syncServiceUrl / syncServiceUrlLocal / apiKey : si la licence est rattachée
  *    à un SyncServiceDeployment, on prend les valeurs du déploiement. Sinon on
  *    retombe sur les champs legacy de la licence.
- *  - databaseName : toujours celui de la licence (= header X-Database). C'est
- *    ce qui permet au SyncService de cibler la bonne base sur la bonne
- *    instance SQL Server (résolu via la section "Databases" du appsettings.json).
+ *  - databases : tableau des bases WaveSoft accessibles à cette licence.
+ *    Chacune contient { name, label, isDefault }. Le mobile utilise la base
+ *    isDefault par défaut, l'utilisateur peut en changer via les Préférences.
+ *  - databaseName : mis pour rétro-compat : nom de la base par défaut (= header
+ *    X-Database initial). Résolu par le SyncService via la section "Databases"
+ *    du appsettings.json.
  */
 export async function signLicenseToken(license, company, appCode) {
   await loadKeys();
 
   const deployment = license.deployment || null;
+  const databases = (license.databases || []).map(d => ({
+    name: d.name,
+    label: d.label || d.name,
+    isDefault: !!d.isDefault,
+  }));
+  const defaultDb = databases.find(d => d.isDefault) || databases[0] || null;
 
   const token = await new SignJWT({
     clientId: company.id,
@@ -57,7 +66,8 @@ export async function signLicenseToken(license, company, appCode) {
     appCode: appCode || 'SS',
     syncServiceUrl: deployment?.publicUrl || license.syncServiceUrl,
     syncServiceUrlLocal: deployment?.localUrl || license.syncServiceUrlLocal || '',
-    databaseName: license.databaseName || '',
+    databases,
+    databaseName: defaultDb?.name || '',
     apiKey: deployment?.apiKey || license.apiKey,
     maxDevices: license.maxDevices,
     features: license.features,
