@@ -7,6 +7,8 @@ import Companies from './pages/Companies';
 import CompanyDetail from './pages/CompanyDetail';
 import Licenses from './pages/Licenses';
 import LicenseDetail from './pages/LicenseDetail';
+import Deployments from './pages/Deployments';
+import DeploymentDetail from './pages/DeploymentDetail';
 import Contacts from './pages/Contacts';
 import Apps from './pages/Apps';
 
@@ -28,6 +30,8 @@ export default function App() {
             <Route path="companies/:id" element={<CompanyDetail />} />
             <Route path="licenses" element={<Licenses />} />
             <Route path="licenses/:id" element={<LicenseDetail />} />
+            <Route path="deployments" element={<Deployments />} />
+            <Route path="deployments/:id" element={<DeploymentDetail />} />
             <Route path="contacts" element={<Contacts />} />
           </Route>
         </Routes>

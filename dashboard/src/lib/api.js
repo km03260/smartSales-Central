@@ -81,6 +81,31 @@ export const api = {
   getLicenseDevices: (id) => request(`/admin/licenses/${id}/devices`),
   deactivateDevice: (licenseId, deviceId) =>
     request(`/admin/licenses/${licenseId}/devices/${deviceId}/deactivate`, { method: 'POST' }),
+  getSyncConfig: (id) => request(`/admin/licenses/${id}/sync-config`),
+  updateSyncConfig: (id, body) => request(`/admin/licenses/${id}/sync-config`, { method: 'PUT', body }),
+
+  // Deployments (SyncService)
+  getDeployments: (companyId) => request(`/admin/deployments${companyId ? `?companyId=${companyId}` : ''}`),
+  getDeployment: (id) => request(`/admin/deployments/${id}`),
+  createDeployment: (body) => request('/admin/deployments', { method: 'POST', body }),
+  updateDeployment: (id, body) => request(`/admin/deployments/${id}`, { method: 'PUT', body }),
+  deleteDeployment: (id) => request(`/admin/deployments/${id}`, { method: 'DELETE' }),
+  downloadDeploymentAppsettings: async (id) => {
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API_BASE}/admin/deployments/${id}/appsettings`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error('Erreur téléchargement appsettings.json');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'appsettings.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
 
   // Analytics
   getOverview: () => request('/admin/analytics/overview'),

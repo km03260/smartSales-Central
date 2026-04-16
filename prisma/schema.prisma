@@ -42,6 +42,7 @@ model Company {
 
   licenses     License[]
   config       CompanyConfig?
+  deployments  SyncServiceDeployment[]
 
   @@map("companies")
 }
@@ -52,10 +53,11 @@ model License {
   id             String   @id @default(uuid()) @db.VarChar(36)
   appId          String   @db.VarChar(36)
   companyId      String   @db.VarChar(36)
-  licenseKey     String   @unique @db.VarChar(20) // {APP_CODE}-XXXX-XXXX-XXXX
-  syncServiceUrl      String   @db.VarChar(500)           // URL publique (ex: https://213.56.180.33)
+  deploymentId   String?  @db.VarChar(36)                   // Déploiement SyncService partagé (optionnel)
+  licenseKey     String   @unique @db.VarChar(20)           // {APP_CODE}-XXXX-XXXX-XXXX
+  syncServiceUrl      String   @db.VarChar(500)             // URL publique (ex: https://213.56.180.33)
   syncServiceUrlLocal String   @default("") @db.VarChar(500) // URL locale (ex: https://10.0.6.22)
-  databaseName        String   @default("") @db.VarChar(100) // Nom du dossier/base WaveSoft (ex: TESTS_MAURER)
+  databaseName        String   @default("") @db.VarChar(100) // Nom du dossier/base WaveSoft (ex: TESTS_MAURER) = header X-Database
   apiKey         String   @db.VarChar(200)
   maxDevices     Int      @default(5)
   features       Json     // ["orders","quotations","invoices","stats"]
@@ -69,11 +71,81 @@ model License {
 
   app            App               @relation(fields: [appId], references: [id], onDelete: Cascade)
   company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  deployment     SyncServiceDeployment? @relation(fields: [deploymentId], references: [id], onDelete: SetNull)
   devices        DeviceActivation[]
   usageLogs      UsageLog[]
   alerts         LicenseAlert[]
+  syncConfig     SyncServiceConfig?
 
   @@map("licenses")
+}
+
+// ─── Déploiement SyncService (1 installation Windows physique) ─────────────
+// Regroupe plusieurs licences qui partagent le même service Windows.
+// Contient la configuration "partagée" (HTTPS, Kestrel, EDI, sync settings,
+// connexion SQL par défaut, clé API).
+
+model SyncServiceDeployment {
+  id                     String   @id @default(uuid()) @db.VarChar(36)
+  companyId              String   @db.VarChar(36)
+  name                   String   @db.VarChar(200)            // ex: "Serveur principal Maurer"
+  publicUrl              String   @db.VarChar(500)            // ex: https://213.56.180.33
+  localUrl               String   @default("") @db.VarChar(500)
+  apiKey                 String   @db.VarChar(200)            // partagée par toutes les licences du déploiement
+
+  // Connexion SQL Server par défaut (utilisée si pas d'override par licence)
+  sqlHost                String   @default("") @db.VarChar(200)
+  sqlUser                String   @default("") @db.VarChar(100)
+  sqlPassword            String   @default("") @db.VarChar(200)
+  trustServerCertificate Boolean  @default(true)
+
+  // Kestrel HTTPS
+  kestrelUrl             String   @default("https://*:443") @db.VarChar(200)
+  certPath               String   @default("certificate.pfx") @db.VarChar(500)
+  certPassword           String   @default("") @db.VarChar(200)
+
+  // WaveSoft EDI
+  ediOutputFolder        String   @default("C:\\DATA_Wavesoft\\AutomateIE") @db.VarChar(500)
+  ediSeparator           String   @default(";") @db.VarChar(5)
+
+  // Sync settings
+  batchSize              Int      @default(1000)
+  timeoutSeconds         Int      @default(300)
+  retryAttempts          Int      @default(3)
+  histoPiece             Int      @default(-1)
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  company                Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  licenses               License[]
+
+  @@map("sync_service_deployments")
+}
+
+// ─── Overrides par licence (= par base WaveSoft) ───────────────────────────
+// Contient uniquement ce qui peut différer d'une base à l'autre au sein
+// d'un même déploiement : Tircode "Clients divers" et override optionnel
+// de la connexion SQL Server (pour bases sur une instance différente).
+
+model SyncServiceConfig {
+  id                     String   @id @default(uuid()) @db.VarChar(36)
+  licenseId              String   @unique @db.VarChar(36)
+
+  // Override optionnel de la connexion SQL (null = hériter du Deployment)
+  sqlHost                String?  @db.VarChar(200)
+  sqlUser                String?  @db.VarChar(100)
+  sqlPassword            String?  @db.VarChar(200)
+
+  // Tircode "Clients divers" spécifique à cette base
+  clientsDiversTircode   String   @default("") @db.VarChar(50)
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  license                License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@map("sync_service_configs")
 }
 
 // ─── Alertes d'expiration envoyées ──────────────────────────────────────
