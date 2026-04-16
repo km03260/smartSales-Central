@@ -73,6 +73,7 @@ export async function signLicenseToken(license, company, appCode) {
     databases,
     databaseName: defaultDb?.name || '',
     apiKey: deployment.apiKey,
+    mobileAdminPassword: deployment.mobileAdminPassword || '',
     maxDevices: license.maxDevices,
     features: license.features,
     plan: license.plan,

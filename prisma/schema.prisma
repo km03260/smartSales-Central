@@ -117,6 +117,10 @@ model SyncServiceDeployment {
   retryAttempts          Int      @default(3)
   histoPiece             Int      @default(-1)
 
+  // Mot de passe admin mobile (protège le changement de base dans Préférences)
+  // Vide = pas de protection. Propagé aux apps via le JWT de licence.
+  mobileAdminPassword    String   @default("") @db.VarChar(100)
+
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 

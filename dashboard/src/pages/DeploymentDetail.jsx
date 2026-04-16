@@ -9,6 +9,7 @@ const DEPLOYMENT_FIELDS = [
   'kestrelUrl', 'certPath', 'certPassword',
   'ediOutputFolder', 'ediSeparator',
   'batchSize', 'timeoutSeconds', 'retryAttempts', 'histoPiece',
+  'mobileAdminPassword',
 ];
 
 export default function DeploymentDetail() {
@@ -195,6 +196,18 @@ export default function DeploymentDetail() {
                 <RefreshCw size={12} /> Regénérer
               </button>
             </div>
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">
+              Mot de passe admin mobile <span className="text-gray-400 font-normal">— optionnel</span>
+            </label>
+            <input {...bind('mobileAdminPassword')}
+              placeholder="Laisser vide pour désactiver la protection"
+              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm font-mono" />
+            <p className="text-xs text-gray-500 mt-1">
+              Protège le changement de dossier de travail dans l'app mobile (Préférences).
+              Propagé aux apps dans le JWT de licence. Vide = changement libre.
+            </p>
           </div>
 
           {/* SQL Server par défaut */}

@@ -14,6 +14,7 @@ const DEPLOYMENT_FIELDS = [
   'kestrelUrl', 'certPath', 'certPassword',
   'ediOutputFolder', 'ediSeparator',
   'batchSize', 'timeoutSeconds', 'retryAttempts', 'histoPiece',
+  'mobileAdminPassword',
 ];
 
 function pickDeployment(body) {
