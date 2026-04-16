@@ -78,10 +78,15 @@ export default function Deployments() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL locale</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                URL locale <span className="text-gray-400 font-normal">— optionnelle</span>
+              </label>
               <input value={form.localUrl} onChange={(e) => setForm({ ...form, localUrl: e.target.value })}
                 placeholder="https://10.0.6.22"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+              <p className="text-xs text-gray-500 mt-1">
+                IP interne du SyncService. Le mobile l'essaie en premier (2s timeout) sur le réseau local, sinon fallback sur l'URL publique.
+              </p>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">

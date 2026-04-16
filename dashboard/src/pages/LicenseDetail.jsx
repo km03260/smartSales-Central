@@ -11,8 +11,6 @@ export default function LicenseDetail() {
   const [license, setLicense] = useState(null);
   const [editForm, setEditForm] = useState({
     deploymentId: '',
-    syncServiceUrl: '',
-    syncServiceUrlLocal: '',
     maxDevices: 5,
   });
   const [renewDate, setRenewDate] = useState('');
@@ -29,8 +27,6 @@ export default function LicenseDetail() {
     setLicense(data);
     setEditForm({
       deploymentId: data.deploymentId || '',
-      syncServiceUrl: data.syncServiceUrl,
-      syncServiceUrlLocal: data.syncServiceUrlLocal || '',
       maxDevices: data.maxDevices,
     });
     if (data.companyId) {
@@ -188,11 +184,12 @@ export default function LicenseDetail() {
 
             <div className="pt-3 mt-3 border-t border-gray-100 space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Déploiement SyncService</label>
+                <label className="block text-xs text-gray-500 mb-1">Déploiement SyncService *</label>
                 <select value={editForm.deploymentId}
                   onChange={(e) => setEditForm({ ...editForm, deploymentId: e.target.value })}
-                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">-- Aucun --</option>
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required>
+                  <option value="">-- Sélectionner --</option>
                   {deployments.map((d) => (
                     <option key={d.id} value={d.id}>{d.name} ({d.publicUrl})</option>
                   ))}
@@ -200,20 +197,9 @@ export default function LicenseDetail() {
                 {license.deployment && (
                   <Link to={`/deployments/${license.deployment.id}`}
                     className="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center gap-1">
-                    <Server size={12} /> Ouvrir le déploiement
+                    <Server size={12} /> Ouvrir le déploiement ({license.deployment.publicUrl})
                   </Link>
                 )}
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">URL SyncService (publique)</label>
-                <input value={editForm.syncServiceUrl} onChange={(e) => setEditForm({ ...editForm, syncServiceUrl: e.target.value })}
-                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">URL SyncService (locale)</label>
-                <input value={editForm.syncServiceUrlLocal} onChange={(e) => setEditForm({ ...editForm, syncServiceUrlLocal: e.target.value })}
-                  placeholder="https://10.0.6.22"
-                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Max appareils (global toutes bases)</label>

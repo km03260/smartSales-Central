@@ -7,9 +7,13 @@ export default function Licenses() {
   const [licenses, setLicenses] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [apps, setApps] = useState([]);
+  const [deployments, setDeployments] = useState([]);
   const [filterAppId, setFilterAppId] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ appId: '', companyId: '', syncServiceUrl: '', syncServiceUrlLocal: '', databaseName: '', apiKey: '', maxDevices: 5, plan: 'professional', expiresAt: '' });
+  const [form, setForm] = useState({
+    appId: '', companyId: '', deploymentId: '',
+    maxDevices: 5, plan: 'professional', expiresAt: '',
+  });
   const [saving, setSaving] = useState(false);
 
   const load = () => api.getLicenses(filterAppId || undefined).then(setLicenses).catch(console.error);
@@ -19,6 +23,17 @@ export default function Licenses() {
     api.getCompanies().then(setCompanies).catch(console.error);
     api.getApps().then(setApps).catch(console.error);
   }, []);
+
+  // Recharger les déploiements de la company sélectionnée et reset le deploymentId
+  useEffect(() => {
+    if (form.companyId) {
+      api.getDeployments(form.companyId).then(setDeployments).catch(console.error);
+    } else {
+      setDeployments([]);
+    }
+    setForm((f) => ({ ...f, deploymentId: '' }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.companyId]);
 
   useEffect(() => { load(); }, [filterAppId]);
 
@@ -92,33 +107,26 @@ export default function Licenses() {
                 {companies.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.legalName})</option>)}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL SyncService *</label>
-              <input value={form.syncServiceUrl} onChange={(e) => setForm({ ...form, syncServiceUrl: e.target.value })}
-                placeholder="https://213.56.180.33"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Dossier (base WaveSoft)</label>
-              <input value={form.databaseName} onChange={(e) => setForm({ ...form, databaseName: e.target.value })}
-                placeholder="TESTS_MAURER"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">URL SyncService locale</label>
-              <input value={form.syncServiceUrlLocal} onChange={(e) => setForm({ ...form, syncServiceUrlLocal: e.target.value })}
-                placeholder="https://10.0.6.22"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Clé API SyncService <span className="text-gray-400 font-normal">— optionnelle</span>
-              </label>
-              <input value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
-                placeholder="Laisser vide pour générer automatiquement"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Déploiement SyncService *</label>
+              <select value={form.deploymentId}
+                onChange={(e) => setForm({ ...form, deploymentId: e.target.value })}
+                disabled={!form.companyId}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                required>
+                <option value="">
+                  {form.companyId ? 'Sélectionner un déploiement...' : 'Choisis d\'abord une entreprise'}
+                </option>
+                {deployments.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name} ({d.publicUrl})</option>
+                ))}
+              </select>
               <p className="text-xs text-gray-500 mt-1">
-                Si vide, héritée du déploiement sélectionné, ou générée aléatoirement (256 bits).
+                URLs (publique / locale) et clé API sont héritées du déploiement.
+                {form.companyId && deployments.length === 0 && (
+                  <> <span className="text-orange-600">Aucun déploiement pour cette entreprise —
+                    <Link to="/deployments" className="underline ml-1">en créer un</Link>.</span></>
+                )}
               </p>
             </div>
             <div>

@@ -53,11 +53,8 @@ model License {
   id             String   @id @default(uuid()) @db.VarChar(36)
   appId          String   @db.VarChar(36)
   companyId      String   @db.VarChar(36)
-  deploymentId   String?  @db.VarChar(36)                   // Déploiement SyncService partagé (optionnel)
+  deploymentId   String   @db.VarChar(36)                   // Déploiement SyncService (obligatoire — URLs/apiKey héritées)
   licenseKey     String   @unique @db.VarChar(20)           // {APP_CODE}-XXXX-XXXX-XXXX
-  syncServiceUrl      String   @db.VarChar(500)             // URL publique (ex: https://213.56.180.33) — legacy, hérité du déploiement
-  syncServiceUrlLocal String   @default("") @db.VarChar(500) // URL locale — legacy, hérité du déploiement
-  apiKey         String   @db.VarChar(200)                  // legacy, hérité du déploiement
   maxDevices     Int      @default(5)                       // Global à la licence (toutes bases confondues)
   features       Json     // ["orders","quotations","invoices","stats"]
   plan           String   @default("professional") @db.VarChar(50)
@@ -70,7 +67,7 @@ model License {
 
   app            App               @relation(fields: [appId], references: [id], onDelete: Cascade)
   company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  deployment     SyncServiceDeployment? @relation(fields: [deploymentId], references: [id], onDelete: SetNull)
+  deployment     SyncServiceDeployment @relation(fields: [deploymentId], references: [id], onDelete: Restrict)
   devices        DeviceActivation[]
   usageLogs      UsageLog[]
   alerts         LicenseAlert[]

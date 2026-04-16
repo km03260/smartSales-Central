@@ -52,7 +52,11 @@ export function generateLicenseKey(appCode = 'SS') {
 export async function signLicenseToken(license, company, appCode) {
   await loadKeys();
 
-  const deployment = license.deployment || null;
+  const deployment = license.deployment;
+  if (!deployment) {
+    throw new Error('Licence sans déploiement — impossible de signer le JWT');
+  }
+
   const databases = (license.databases || []).map(d => ({
     name: d.name,
     label: d.label || d.name,
@@ -64,11 +68,11 @@ export async function signLicenseToken(license, company, appCode) {
     clientId: company.id,
     companyName: company.legalName,
     appCode: appCode || 'SS',
-    syncServiceUrl: deployment?.publicUrl || license.syncServiceUrl,
-    syncServiceUrlLocal: deployment?.localUrl || license.syncServiceUrlLocal || '',
+    syncServiceUrl: deployment.publicUrl,
+    syncServiceUrlLocal: deployment.localUrl || '',
     databases,
     databaseName: defaultDb?.name || '',
-    apiKey: deployment?.apiKey || license.apiKey,
+    apiKey: deployment.apiKey,
     maxDevices: license.maxDevices,
     features: license.features,
     plan: license.plan,

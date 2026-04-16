@@ -1,14 +1,9 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { randomBytes } from 'crypto';
 import { generateLicenseKey } from '../../services/licenseService.js';
 
 const router = Router();
 const prisma = new PrismaClient();
-
-function generateApiKey() {
-  return randomBytes(32).toString('hex');
-}
 
 /**
  * GET /api/admin/licenses
@@ -67,34 +62,38 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/admin/licenses
- * Body: { appId, companyId, deploymentId?, syncServiceUrl?, syncServiceUrlLocal?, apiKey?,
- *         maxDevices?, features?, plan?, expiresAt, databases?: [{ name, label?, isDefault?, ... }] }
+ * Body: { appId, companyId, deploymentId, maxDevices?, features?, plan?, expiresAt,
+ *         databases?: [{ name, label?, isDefault?, ... }] }
  *
  * - Unicité : 1 seule licence par (appId, companyId).
+ * - deploymentId obligatoire : URLs + apiKey héritées du déploiement.
  * - databases est optionnel : tu peux créer la licence nue puis ajouter les bases après.
  */
 router.post('/', async (req, res) => {
   try {
     const {
       appId, companyId, deploymentId,
-      syncServiceUrl, syncServiceUrlLocal, apiKey,
       maxDevices, features, plan, expiresAt,
       databases,
     } = req.body;
 
-    if (!appId || !companyId || !expiresAt) {
-      return res.status(400).json({ error: 'appId, companyId et expiresAt requis' });
+    if (!appId || !companyId || !deploymentId || !expiresAt) {
+      return res.status(400).json({ error: 'appId, companyId, deploymentId et expiresAt requis' });
     }
 
-    // Vérifier que l'app existe
     const app = await prisma.app.findUnique({ where: { id: appId } });
     if (!app) return res.status(404).json({ error: 'Application non trouvée' });
 
-    // Vérifier que l'entreprise existe
     const company = await prisma.company.findUnique({ where: { id: companyId } });
     if (!company) return res.status(404).json({ error: 'Entreprise non trouvée' });
 
-    // Vérifier unicité (appId, companyId)
+    const deployment = await prisma.syncServiceDeployment.findUnique({ where: { id: deploymentId } });
+    if (!deployment) return res.status(404).json({ error: 'Déploiement non trouvé' });
+    if (deployment.companyId !== companyId) {
+      return res.status(400).json({ error: 'Le déploiement appartient à une autre entreprise' });
+    }
+
+    // Unicité (appId, companyId)
     const existing = await prisma.license.findUnique({
       where: { appId_companyId: { appId, companyId } },
     });
@@ -102,33 +101,12 @@ router.post('/', async (req, res) => {
       return res.status(409).json({ error: 'Une licence existe déjà pour cette application et ce client' });
     }
 
-    let resolvedDeployment = null;
-    if (deploymentId) {
-      resolvedDeployment = await prisma.syncServiceDeployment.findUnique({ where: { id: deploymentId } });
-      if (!resolvedDeployment) return res.status(404).json({ error: 'Déploiement non trouvé' });
-      if (resolvedDeployment.companyId !== companyId) {
-        return res.status(400).json({ error: 'Le déploiement appartient à une autre entreprise' });
-      }
-    }
-
-    // Valeurs finales : héritage depuis le déploiement si fourni, sinon valeurs body,
-    // sinon (pour apiKey) auto-génération.
-    const finalSyncUrl = syncServiceUrl || resolvedDeployment?.publicUrl || '';
-    const finalSyncUrlLocal = syncServiceUrlLocal ?? resolvedDeployment?.localUrl ?? '';
-    const finalApiKey = apiKey || resolvedDeployment?.apiKey || generateApiKey();
-    if (!finalSyncUrl) {
-      return res.status(400).json({ error: 'syncServiceUrl requis (ou hérité via deploymentId)' });
-    }
-
     const license = await prisma.license.create({
       data: {
         appId,
         companyId,
-        ...(deploymentId && { deploymentId }),
+        deploymentId,
         licenseKey: generateLicenseKey(app.code),
-        syncServiceUrl: finalSyncUrl,
-        syncServiceUrlLocal: finalSyncUrlLocal,
-        apiKey: finalApiKey,
         maxDevices: maxDevices || 5,
         features: features || ['orders', 'quotations', 'invoices'],
         plan: plan || 'professional',
@@ -167,12 +145,16 @@ router.post('/', async (req, res) => {
 /**
  * PUT /api/admin/licenses/:id
  * Les bases (databases) se gèrent via les routes /databases dédiées ci-dessous.
+ * deploymentId est obligatoire — il ne peut plus être mis à null.
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { deploymentId, syncServiceUrl, syncServiceUrlLocal, apiKey, maxDevices, features, plan, expiresAt, isActive } = req.body;
+    const { deploymentId, maxDevices, features, plan, expiresAt, isActive } = req.body;
 
-    if (deploymentId) {
+    if (deploymentId !== undefined) {
+      if (!deploymentId) {
+        return res.status(400).json({ error: 'deploymentId ne peut pas être vide' });
+      }
       const current = await prisma.license.findUnique({ where: { id: req.params.id }, select: { companyId: true } });
       const deployment = await prisma.syncServiceDeployment.findUnique({ where: { id: deploymentId } });
       if (!deployment) return res.status(404).json({ error: 'Déploiement non trouvé' });
@@ -184,10 +166,7 @@ router.put('/:id', async (req, res) => {
     const license = await prisma.license.update({
       where: { id: req.params.id },
       data: {
-        ...(deploymentId !== undefined && { deploymentId: deploymentId || null }),
-        ...(syncServiceUrl !== undefined && { syncServiceUrl }),
-        ...(syncServiceUrlLocal !== undefined && { syncServiceUrlLocal }),
-        ...(apiKey !== undefined && { apiKey }),
+        ...(deploymentId !== undefined && { deploymentId }),
         ...(maxDevices !== undefined && { maxDevices }),
         ...(features !== undefined && { features }),
         ...(plan !== undefined && { plan }),
