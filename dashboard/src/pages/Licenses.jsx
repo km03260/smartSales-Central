@@ -111,9 +111,15 @@ export default function Licenses() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Clé API SyncService *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Clé API SyncService <span className="text-gray-400 font-normal">— optionnelle</span>
+              </label>
               <input value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                placeholder="Laisser vide pour générer automatiquement"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <p className="text-xs text-gray-500 mt-1">
+                Si vide, héritée du déploiement sélectionné, ou générée aléatoirement (256 bits).
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Plan</label>

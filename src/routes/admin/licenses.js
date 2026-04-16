@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { randomBytes } from 'crypto';
 import { generateLicenseKey } from '../../services/licenseService.js';
 
 const router = Router();
 const prisma = new PrismaClient();
+
+function generateApiKey() {
+  return randomBytes(32).toString('hex');
+}
 
 /**
  * GET /api/admin/licenses
@@ -106,12 +111,13 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // Valeurs finales : héritage depuis le déploiement si fourni, sinon valeurs body.
+    // Valeurs finales : héritage depuis le déploiement si fourni, sinon valeurs body,
+    // sinon (pour apiKey) auto-génération.
     const finalSyncUrl = syncServiceUrl || resolvedDeployment?.publicUrl || '';
     const finalSyncUrlLocal = syncServiceUrlLocal ?? resolvedDeployment?.localUrl ?? '';
-    const finalApiKey = apiKey || resolvedDeployment?.apiKey || '';
-    if (!finalSyncUrl || !finalApiKey) {
-      return res.status(400).json({ error: 'syncServiceUrl et apiKey requis (ou hérités via deploymentId)' });
+    const finalApiKey = apiKey || resolvedDeployment?.apiKey || generateApiKey();
+    if (!finalSyncUrl) {
+      return res.status(400).json({ error: 'syncServiceUrl requis (ou hérité via deploymentId)' });
     }
 
     const license = await prisma.license.create({
