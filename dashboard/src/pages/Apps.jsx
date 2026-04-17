@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
-import { Package, Upload, Trash2, Download, QrCode, Plus, X } from 'lucide-react';
+import { Package, Upload, Trash2, Download, QrCode, Plus, X, Server } from 'lucide-react';
 
 export default function Apps() {
   const [apps, setApps] = useState([]);
@@ -29,12 +29,22 @@ export default function Apps() {
 
   const handleApkDelete = async (appId) => {
     if (!confirm('Supprimer l\'APK et le QR code associé ?')) return;
-    try {
-      await api.deleteApk(appId);
-      await load();
-    } catch (err) {
-      alert(err.message);
-    }
+    try { await api.deleteApk(appId); await load(); }
+    catch (err) { alert(err.message); }
+  };
+
+  const handleBundleUpload = async (appId, file, version) => {
+    if (!file) return;
+    setUploadingId(appId);
+    try { await api.uploadServiceBundle(appId, file, version); await load(); }
+    catch (err) { alert(err.message); }
+    finally { setUploadingId(null); }
+  };
+
+  const handleBundleDelete = async (appId) => {
+    if (!confirm('Supprimer le bundle SyncService ?')) return;
+    try { await api.deleteServiceBundle(appId); await load(); }
+    catch (err) { alert(err.message); }
   };
 
   if (loading) return <div className="text-gray-500">Chargement...</div>;
@@ -61,6 +71,8 @@ export default function Apps() {
             onUpload={(file, version) => handleApkUpload(app.id, file, version)}
             onDeleteApk={() => handleApkDelete(app.id)}
             onShowQr={() => setQrPreview(app)}
+            onUploadBundle={(file, version) => handleBundleUpload(app.id, file, version)}
+            onDeleteBundle={() => handleBundleDelete(app.id)}
           />
         ))}
       </div>
@@ -78,15 +90,24 @@ export default function Apps() {
   );
 }
 
-function AppCard({ app, uploading, onUpload, onDeleteApk, onShowQr }) {
+function AppCard({ app, uploading, onUpload, onDeleteApk, onShowQr, onUploadBundle, onDeleteBundle }) {
   const fileRef = useRef(null);
+  const bundleRef = useRef(null);
   const [version, setVersion] = useState('');
+  const [bundleVersion, setBundleVersion] = useState('');
   const hasApk = !!app.apkFileName;
+  const hasBundle = !!app.serviceBundlePath;
 
   const triggerUpload = () => fileRef.current?.click();
+  const triggerBundleUpload = () => bundleRef.current?.click();
   const onFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) onUpload(file, version);
+    e.target.value = '';
+  };
+  const onBundleChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) onUploadBundle(file, bundleVersion);
     e.target.value = '';
   };
 
@@ -188,6 +209,59 @@ function AppCard({ app, uploading, onUpload, onDeleteApk, onShowQr }) {
         className="hidden"
         onChange={onFileChange}
       />
+
+      {/* Service Bundle (SyncService .NET) */}
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-2 mb-2">
+          <Server size={16} className="text-gray-500" />
+          <span className="text-sm font-semibold text-gray-700">SyncService (binaires .NET)</span>
+        </div>
+        {hasBundle ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-100 rounded-lg">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-gray-900">service-bundle.zip</div>
+                <div className="text-xs text-gray-500">
+                  {app.serviceBundleVersion && <span>v{app.serviceBundleVersion} · </span>}
+                  {app.serviceBundleUpdatedAt && <span>{new Date(app.serviceBundleUpdatedAt).toLocaleDateString()}</span>}
+                </div>
+              </div>
+              <button onClick={onDeleteBundle}
+                className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded transition-colors" title="Supprimer">
+                <Trash2 size={18} />
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <input type="text" value={bundleVersion}
+                onChange={(e) => setBundleVersion(e.target.value)}
+                placeholder="Nouvelle version"
+                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <button onClick={triggerBundleUpload} disabled={uploading}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors">
+                <Upload size={16} /> {uploading ? 'Upload...' : 'Remplacer'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center text-sm text-gray-500">
+              Aucun bundle SyncService. Uploadez le ZIP contenant l'exe + DLLs compilé via <code className="text-xs font-mono bg-gray-100 px-1 rounded">dotnet publish</code>.
+            </div>
+            <div className="flex gap-2">
+              <input type="text" value={bundleVersion}
+                onChange={(e) => setBundleVersion(e.target.value)}
+                placeholder="Version"
+                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <button onClick={triggerBundleUpload} disabled={uploading}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                <Upload size={16} /> {uploading ? 'Upload...' : 'Uploader ZIP'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <input ref={bundleRef} type="file" accept=".zip" className="hidden" onChange={onBundleChange} />
     </div>
   );
 }

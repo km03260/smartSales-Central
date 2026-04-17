@@ -154,10 +154,16 @@ export default function DeploymentDetail() {
             {deployment.company?.name} &mdash; {deployment.licenses?.length || 0} licence(s) associée(s)
           </p>
         </div>
-        <button onClick={handleDownload} disabled={downloading}
-          className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 cursor-pointer">
-          <Download size={16} /> {downloading ? 'Téléchargement...' : 'Télécharger appsettings.json'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={async () => { try { await api.downloadDeploymentBundle(id); } catch (e) { alert(e.message); } }}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 cursor-pointer">
+            <Download size={16} /> Bundle complet (.zip)
+          </button>
+          <button onClick={handleDownload} disabled={downloading}
+            className="flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-gray-800 disabled:opacity-50 cursor-pointer">
+            <Download size={14} /> {downloading ? '...' : 'appsettings.json'}
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
@@ -424,6 +430,75 @@ export default function DeploymentDetail() {
             })}
           </div>
         )}
+      </div>
+
+      {/* Guide d'installation / désinstallation */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mt-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Guide d'installation</h2>
+
+        <div className="prose prose-sm max-w-none text-gray-700">
+          <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mt-0">Nouvelle installation</h3>
+          <ol className="list-decimal list-inside space-y-1 text-sm">
+            <li>Cliquer sur <strong>"Bundle complet (.zip)"</strong> ci-dessus pour télécharger le ZIP.</li>
+            <li>Extraire le ZIP dans un dossier définitif sur le serveur Windows du client
+              (ex: <code className="text-xs font-mono bg-gray-100 px-1 rounded">C:\SmartSales\SyncService</code>).
+            </li>
+            <li>
+              Extraire le contenu de <code className="text-xs font-mono bg-gray-100 px-1 rounded">service-bundle.zip</code> dans
+              <strong> ce même dossier</strong>. Vous devez obtenir <code className="text-xs font-mono bg-gray-100 px-1 rounded">SmartSalesSyncService.exe</code> à
+              côté de <code className="text-xs font-mono bg-gray-100 px-1 rounded">appsettings.json</code>,
+              <code className="text-xs font-mono bg-gray-100 px-1 rounded">certificate.pfx</code>,
+              <code className="text-xs font-mono bg-gray-100 px-1 rounded">Install.ps1</code>.
+            </li>
+            <li>Clic droit sur <strong>Install.ps1</strong> → "Exécuter avec PowerShell" (en admin).</li>
+            <li>Suivre les instructions : le script installe le service Windows, crée la règle pare-feu, et démarre le service.</li>
+            <li>Vérifier les logs : <code className="text-xs font-mono bg-gray-100 px-1 rounded">Get-Content logs\smartsales-sync-*.txt -Tail 20</code></li>
+          </ol>
+
+          <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mt-5">Mise à jour de la configuration</h3>
+          <ol className="list-decimal list-inside space-y-1 text-sm">
+            <li>Modifier les paramètres dans ce dashboard (instances SQL, bases, certificat, etc.).</li>
+            <li>Cliquer <strong>"appsettings.json"</strong> pour retélécharger la configuration.</li>
+            <li>Remplacer le fichier sur le serveur du client.</li>
+            <li>
+              Redémarrer : <code className="text-xs font-mono bg-gray-100 px-1 rounded">
+                Restart-Service SmartSalesSync_{deployment.name.replace(/[^a-zA-Z0-9]+/g, '')}
+              </code>
+            </li>
+          </ol>
+
+          <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mt-5">Mise à jour des binaires</h3>
+          <ol className="list-decimal list-inside space-y-1 text-sm">
+            <li>
+              Arrêter le service : <code className="text-xs font-mono bg-gray-100 px-1 rounded">
+                Stop-Service SmartSalesSync_{deployment.name.replace(/[^a-zA-Z0-9]+/g, '')}
+              </code>
+            </li>
+            <li>Télécharger le nouveau <strong>Bundle complet</strong> (ou juste uploader une nouvelle version du service bundle dans la page Applications).</li>
+            <li>Extraire et remplacer les fichiers (.exe + DLLs).</li>
+            <li>
+              Redémarrer : <code className="text-xs font-mono bg-gray-100 px-1 rounded">
+                Start-Service SmartSalesSync_{deployment.name.replace(/[^a-zA-Z0-9]+/g, '')}
+              </code>
+            </li>
+          </ol>
+
+          <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mt-5">Désinstallation</h3>
+          <ol className="list-decimal list-inside space-y-1 text-sm">
+            <li>Clic droit sur <strong>Uninstall.ps1</strong> → "Exécuter en tant qu'administrateur".</li>
+            <li>Le service est arrêté et supprimé de Windows.</li>
+            <li>Optionnel : supprimer le dossier manuellement.</li>
+          </ol>
+
+          <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mt-5">Commandes PowerShell utiles</h3>
+          <div className="bg-gray-50 rounded-lg p-3 text-xs font-mono space-y-1">
+            <div>Start-Service SmartSalesSync_{deployment.name.replace(/[^a-zA-Z0-9]+/g, '')}</div>
+            <div>Stop-Service SmartSalesSync_{deployment.name.replace(/[^a-zA-Z0-9]+/g, '')}</div>
+            <div>Restart-Service SmartSalesSync_{deployment.name.replace(/[^a-zA-Z0-9]+/g, '')}</div>
+            <div>Get-Service SmartSalesSync_{deployment.name.replace(/[^a-zA-Z0-9]+/g, '')}</div>
+            <div>Get-Content logs\smartsales-sync-*.txt -Tail 50 -Wait</div>
+          </div>
+        </div>
       </div>
 
       {/* Modal génération certificat */}

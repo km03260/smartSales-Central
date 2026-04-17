@@ -68,6 +68,21 @@ export const api = {
     return data;
   },
   deleteApk: (appId) => request(`/admin/apps/${appId}/apk`, { method: 'DELETE' }),
+  uploadServiceBundle: async (appId, file, version) => {
+    const token = localStorage.getItem('admin_token');
+    const formData = new FormData();
+    formData.append('bundle', file);
+    if (version) formData.append('version', version);
+    const res = await fetch(`${API_BASE}/admin/apps/${appId}/service-bundle`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur upload service bundle');
+    return data;
+  },
+  deleteServiceBundle: (appId) => request(`/admin/apps/${appId}/service-bundle`, { method: 'DELETE' }),
 
   // Licenses
   getLicenses: (appId) => request(`/admin/licenses${appId ? `?appId=${appId}` : ''}`),
@@ -107,6 +122,44 @@ export const api = {
   regenerateDeploymentApiKey: (id) => request(`/admin/deployments/${id}/regenerate-api-key`, { method: 'POST' }),
   generateDeploymentCertificate: (id, body) =>
     request(`/admin/deployments/${id}/generate-certificate`, { method: 'POST', body }),
+  downloadDeploymentBundle: async (id) => {
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API_BASE}/admin/deployments/${id}/bundle`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Erreur téléchargement bundle');
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get('content-disposition') || '';
+    const match = disposition.match(/filename="(.+)"/);
+    const filename = match?.[1] || 'SyncService_bundle.zip';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+  downloadDeploymentInstallScript: async (id) => {
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API_BASE}/admin/deployments/${id}/install-script`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error('Erreur téléchargement Install.ps1');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Install.ps1';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
   downloadDeploymentCertificate: async (id) => {
     const token = localStorage.getItem('admin_token');
     const res = await fetch(`${API_BASE}/admin/deployments/${id}/certificate`, {

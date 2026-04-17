@@ -8,7 +8,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const uploadsRoot = join(__dirname, '../../../uploads/apps');
+const servicesRoot = join(__dirname, '../../../uploads/services');
 if (!existsSync(uploadsRoot)) mkdirSync(uploadsRoot, { recursive: true });
+if (!existsSync(servicesRoot)) mkdirSync(servicesRoot, { recursive: true });
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -256,6 +258,94 @@ router.delete('/:id/apk', async (req, res) => {
     res.json({ success: true, app: updated });
   } catch (error) {
     console.error('[APPS:APK_DELETE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ─── Service Bundle (ZIP des binaires SyncService .NET) ────────────────────
+
+const serviceBundleStorage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    try {
+      const app = await prisma.app.findUnique({ where: { id: req.params.id } });
+      if (!app) return cb(new Error('Application non trouvée'));
+      const dir = join(servicesRoot, app.code);
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+      req._appRecord = app;
+      cb(null, dir);
+    } catch (err) {
+      cb(err);
+    }
+  },
+  filename: (req, file, cb) => {
+    cb(null, 'service-bundle.zip');
+  },
+});
+
+const uploadServiceBundle = multer({
+  storage: serviceBundleStorage,
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB max (binaires .NET self-contained)
+  fileFilter: (req, file, cb) => {
+    const isZip =
+      file.mimetype === 'application/zip' ||
+      file.mimetype === 'application/x-zip-compressed' ||
+      file.mimetype === 'application/octet-stream' ||
+      file.originalname.toLowerCase().endsWith('.zip');
+    if (!isZip) return cb(new Error('Seuls les fichiers ZIP sont acceptés'));
+    cb(null, true);
+  },
+});
+
+/**
+ * POST /api/admin/apps/:id/service-bundle
+ * Upload du ZIP contenant les binaires du SyncService (.exe + DLLs).
+ * Body (multipart): bundle (file), version (optional string field)
+ */
+router.post('/:id/service-bundle', uploadServiceBundle.single('bundle'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Fichier ZIP requis (max 500 MB)' });
+    }
+
+    const app = req._appRecord;
+    const relativePath = `uploads/services/${app.code}/service-bundle.zip`;
+
+    const updated = await prisma.app.update({
+      where: { id: app.id },
+      data: {
+        serviceBundlePath: relativePath,
+        serviceBundleVersion: req.body.version || '',
+        serviceBundleUpdatedAt: new Date(),
+      },
+    });
+
+    res.json({ success: true, app: updated });
+  } catch (error) {
+    console.error('[APPS:SERVICE_BUNDLE_UPLOAD]', error);
+    res.status(500).json({ error: error.message || 'Erreur serveur' });
+  }
+});
+
+/**
+ * DELETE /api/admin/apps/:id/service-bundle
+ */
+router.delete('/:id/service-bundle', async (req, res) => {
+  try {
+    const app = await prisma.app.findUnique({ where: { id: req.params.id } });
+    if (!app) return res.status(404).json({ error: 'Application non trouvée' });
+
+    const dir = join(servicesRoot, app.code);
+    const bundlePath = join(dir, 'service-bundle.zip');
+    if (existsSync(bundlePath)) rmSync(bundlePath);
+
+    const updated = await prisma.app.update({
+      where: { id: app.id },
+      data: { serviceBundlePath: '', serviceBundleVersion: '', serviceBundleUpdatedAt: null },
+    });
+
+    res.json({ success: true, app: updated });
+  } catch (error) {
+    console.error('[APPS:SERVICE_BUNDLE_DELETE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
