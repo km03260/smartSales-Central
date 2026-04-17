@@ -311,6 +311,7 @@ export default function LicenseDetail() {
                     <Smartphone size={18} className={d.isActive ? 'text-blue-600' : 'text-gray-400'} />
                     <div>
                       <div className="text-sm font-medium text-gray-900">{d.deviceName || 'Appareil'}</div>
+                      {d.userName && <div className="text-xs text-blue-600 font-medium">{d.userName}</div>}
                       <div className="text-xs text-gray-500 font-mono">{d.deviceId}</div>
                       <div className="text-xs text-gray-400">
                         {d.platform} &mdash; Dernier contact : {new Date(d.lastHeartbeat).toLocaleString('fr-FR')}

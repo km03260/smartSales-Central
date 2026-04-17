@@ -235,6 +235,7 @@ model DeviceActivation {
   licenseId     String   @db.VarChar(36)
   deviceId      String   @db.VarChar(100)
   deviceName    String   @default("") @db.VarChar(200)
+  userName      String   @default("") @db.VarChar(500)
   platform      String   @default("android") @db.VarChar(20)
   activatedAt   DateTime @default(now())
   lastHeartbeat DateTime @default(now())

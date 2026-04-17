@@ -153,11 +153,11 @@ router.post('/activate', async (req, res) => {
  * POST /api/licenses/heartbeat
  * Rafraîchit le JWT licence et met à jour le lastHeartbeat de l'appareil.
  * Headers: Authorization: Bearer <licenseToken>
- * Body: { deviceId }
+ * Body: { deviceId, userName? }
  */
 router.post('/heartbeat', licenseAuth, async (req, res) => {
   try {
-    const { deviceId } = req.body;
+    const { deviceId, userName } = req.body;
     const licenseId = req.license.sub;
 
     if (!deviceId) {
@@ -181,10 +181,24 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
       return res.status(403).json({ error: 'Licence invalide ou désactivée' });
     }
 
-    // Mettre à jour le heartbeat de l'appareil
+    // Mettre à jour le heartbeat + ajouter le userName à la liste (sans doublon)
+    const updateData = { lastHeartbeat: new Date() };
+    if (userName) {
+      const device = await prisma.deviceActivation.findUnique({
+        where: { licenseId_deviceId: { licenseId, deviceId } },
+        select: { userName: true },
+      });
+      const existing = device?.userName
+        ? device.userName.split(',').map(n => n.trim()).filter(Boolean)
+        : [];
+      if (!existing.includes(userName.trim())) {
+        existing.push(userName.trim());
+        updateData.userName = existing.join(', ');
+      }
+    }
     await prisma.deviceActivation.updateMany({
       where: { licenseId, deviceId },
-      data: { lastHeartbeat: new Date() },
+      data: updateData,
     });
 
     // Générer un nouveau JWT (rafraîchi)
