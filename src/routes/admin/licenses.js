@@ -259,6 +259,27 @@ router.post('/:licenseId/devices/:deviceId/deactivate', async (req, res) => {
 });
 
 /**
+ * PUT /api/admin/licenses/:licenseId/devices/:deviceId/owner
+ * Met à jour le propriétaire d'un appareil.
+ */
+router.put('/:licenseId/devices/:deviceId/owner', async (req, res) => {
+  try {
+    const { owner } = req.body;
+    await prisma.deviceActivation.updateMany({
+      where: {
+        licenseId: req.params.licenseId,
+        deviceId: req.params.deviceId,
+      },
+      data: { owner: owner || '' },
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[DEVICES:OWNER]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
  * POST /api/admin/licenses/:id/block
  * Bloque une licence (l'app mobile sera bloquée au prochain heartbeat).
  */

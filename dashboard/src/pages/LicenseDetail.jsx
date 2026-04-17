@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import {
   ArrowLeft, Ban, RefreshCw, Smartphone, Save, Server, Database, ServerCog,
-  Plus, Trash2, Star, StarOff, Pencil, X, Check,
+  Plus, Trash2, Star, StarOff, Pencil, X, Check, User,
 } from 'lucide-react';
 
 export default function LicenseDetail() {
@@ -306,23 +306,7 @@ export default function LicenseDetail() {
           ) : (
             <div className="space-y-3">
               {license.devices.map((d) => (
-                <div key={d.id} className={`flex items-center justify-between p-3 rounded-lg ${d.isActive ? 'bg-gray-50' : 'bg-gray-100 opacity-50'}`}>
-                  <div className="flex items-center gap-3">
-                    <Smartphone size={18} className={d.isActive ? 'text-blue-600' : 'text-gray-400'} />
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{d.deviceName || 'Appareil'}</div>
-                      {d.userName && <div className="text-xs text-blue-600 font-medium">{d.userName}</div>}
-                      <div className="text-xs text-gray-500 font-mono">{d.deviceId}</div>
-                      <div className="text-xs text-gray-400">
-                        {d.platform} &mdash; Dernier contact : {new Date(d.lastHeartbeat).toLocaleString('fr-FR')}
-                      </div>
-                    </div>
-                  </div>
-                  {d.isActive && (
-                    <button onClick={() => handleDeactivateDevice(d.deviceId)}
-                      className="text-xs text-red-500 hover:text-red-700 cursor-pointer">Désactiver</button>
-                  )}
-                </div>
+                <DeviceCard key={d.id} device={d} licenseId={id} onDeactivate={handleDeactivateDevice} onUpdate={load} />
               ))}
             </div>
           )}
@@ -662,6 +646,72 @@ export default function LicenseDetail() {
               );
             })}
           </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DeviceCard({ device: d, licenseId, onDeactivate, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [owner, setOwner] = useState(d.owner || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.updateDeviceOwner(licenseId, d.deviceId, owner);
+      setEditing(false);
+      onUpdate();
+    } catch (err) { alert(err.message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className={`p-3 rounded-lg ${d.isActive ? 'bg-gray-50' : 'bg-gray-100 opacity-50'}`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Smartphone size={18} className={d.isActive ? 'text-blue-600' : 'text-gray-400'} />
+          <div>
+            <div className="text-sm font-medium text-gray-900">{d.deviceName || 'Appareil'}</div>
+            {d.userName && <div className="text-xs text-blue-600 font-medium">{d.userName}</div>}
+            <div className="text-xs text-gray-500 font-mono">{d.deviceId}</div>
+            <div className="text-xs text-gray-400">
+              {d.platform} &mdash; Dernier contact : {new Date(d.lastHeartbeat).toLocaleString('fr-FR')}
+            </div>
+          </div>
+        </div>
+        {d.isActive && (
+          <button onClick={() => onDeactivate(d.deviceId)}
+            className="text-xs text-red-500 hover:text-red-700 cursor-pointer">Désactiver</button>
+        )}
+      </div>
+      <div className="mt-2 flex items-center gap-2 ml-[30px]">
+        <User size={14} className="text-gray-400 flex-shrink-0" />
+        {editing ? (
+          <>
+            <input
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              placeholder="Nom du propriétaire"
+              autoFocus
+              className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+            />
+            <button onClick={handleSave} disabled={saving} className="text-green-600 hover:text-green-800 cursor-pointer">
+              <Check size={14} />
+            </button>
+            <button onClick={() => { setEditing(false); setOwner(d.owner || ''); }} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+              <X size={14} />
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="text-xs text-gray-600">{d.owner || <span className="text-gray-400 italic">Propriétaire non défini</span>}</span>
+            <button onClick={() => setEditing(true)} className="text-gray-400 hover:text-blue-600 cursor-pointer">
+              <Pencil size={12} />
+            </button>
+          </>
         )}
       </div>
     </div>
