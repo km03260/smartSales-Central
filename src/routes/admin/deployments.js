@@ -60,11 +60,9 @@ function buildAppsettings(deployment) {
     trust: deployment.trustServerCertificate,
   });
 
-  // Map par base. Une entrée par base avec la ConnectionString complète.
-  // Clé = nom de la base (X-Database). Si 2 bases portent le même nom dans 2
-  // instances différentes, la clé composée "INSTANCE/BASE" est utilisée.
+  // Map par base. La clé primaire est toujours "INSTANCE/BASE" (format utilisé par le
+  // BO recompilé qui lit X-Instance + X-Database). Correspond à ComposeKey() côté C#.
   const Databases = {};
-  const seenNames = {};
   for (const license of deployment.licenses || []) {
     for (const instance of license.instances || []) {
       for (const db of instance.databases || []) {
@@ -82,20 +80,7 @@ function buildAppsettings(deployment) {
           entry.ClientsDiversTircode = db.clientsDiversTircode;
         }
 
-        if (seenNames[db.name]) {
-          // Collision : 2 bases ont le même nom → utiliser la clé composée pour les deux
-          // Renommer la première si elle était en clé plate
-          if (Databases[db.name]) {
-            const firstKey = seenNames[db.name];
-            Databases[firstKey] = Databases[db.name];
-            delete Databases[db.name];
-          }
-          Databases[`${instance.key}/${db.name}`] = entry;
-        } else {
-          // Pas de collision → clé plate
-          seenNames[db.name] = `${instance.key}/${db.name}`;
-          Databases[db.name] = entry;
-        }
+        Databases[`${instance.key}/${db.name}`] = entry;
       }
     }
   }
