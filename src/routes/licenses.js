@@ -6,6 +6,16 @@ import licenseAuth from '../middleware/licenseAuth.js';
 const router = Router();
 const prisma = new PrismaClient();
 
+function absoluteUrl(req, relativePath) {
+  if (!relativePath) return '';
+  if (relativePath.startsWith('http')) return relativePath; // déjà absolue (legacy)
+  const base = process.env.PUBLIC_API_URL;
+  if (base) return `${base.replace(/\/$/, '')}${relativePath}`;
+  const protocol = req.headers['x-forwarded-proto'] || 'https';
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  return `${protocol}://${host}${relativePath}`;
+}
+
 /**
  * POST /api/licenses/activate
  * Échange un code d'activation contre un JWT licence + config entreprise.
@@ -112,7 +122,7 @@ router.post('/activate', async (req, res) => {
         quotationValidityDays: config.quotationValidityDays,
         tvaRate: config.tvaRate,
       },
-      logoUrl: config.logoUrl,
+      logoUrl: absoluteUrl(req, config.logoUrl),
       termsAndConditions: config.termsAndConditions,
     } : null;
 
@@ -240,7 +250,7 @@ router.get('/config', licenseAuth, async (req, res) => {
         quotationValidityDays: config.quotationValidityDays,
         tvaRate: config.tvaRate,
       },
-      logoUrl: config.logoUrl,
+      logoUrl: absoluteUrl(req, config.logoUrl),
       termsAndConditions: config.termsAndConditions,
     });
   } catch (error) {
