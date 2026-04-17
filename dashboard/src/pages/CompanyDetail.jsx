@@ -47,7 +47,7 @@ export default function CompanyDetail() {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Supprimer ${company.name} et toutes ses licences ?`)) return;
+    if (!confirm(`Supprimer ${company.name} ?\n\nTout sera supprimé :\n- Licences et appareils activés\n- Déploiements SyncService\n- Configuration branding\n\nCette action est irréversible.`)) return;
     try {
       await api.deleteCompany(id);
       navigate('/companies');

@@ -142,11 +142,24 @@ router.put('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   try {
-    await prisma.company.delete({ where: { id: req.params.id } });
+    const companyId = req.params.id;
+
+    // Suppression explicite dans le bon ordre pour éviter les conflits de FK
+    await prisma.$transaction([
+      // 1. Supprimer les licences (+ cascade : instances, databases, devices, logs, alerts)
+      prisma.license.deleteMany({ where: { companyId } }),
+      // 2. Supprimer les déploiements (plus aucune licence ne les référence)
+      prisma.syncServiceDeployment.deleteMany({ where: { companyId } }),
+      // 3. Supprimer la config branding
+      prisma.companyConfig.deleteMany({ where: { companyId } }),
+      // 4. Supprimer l'entreprise
+      prisma.company.delete({ where: { id: companyId } }),
+    ]);
+
     res.json({ success: true });
   } catch (error) {
     console.error('[COMPANIES:DELETE]', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur lors de la suppression' });
   }
 });
 
