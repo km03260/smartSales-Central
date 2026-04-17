@@ -60,10 +60,10 @@ function buildAppsettings(deployment) {
     trust: deployment.trustServerCertificate,
   });
 
-  // Map par clé "INSTANCE_KEY/DATABASE_NAME" :
-  //  - Chaque entrée porte sa ConnectionString complète (résout host + base)
-  //  - ClientsDiversTircode est optionnel
-  // Le BO lit Databases:{X-Instance}/{X-Database}:ConnectionString.
+  // Map par base. Deux formats de clé émis pour rétro-compatibilité :
+  //  - "INSTANCE_KEY/DATABASE_NAME" : format multi-instances (nouveau BO avec X-Instance)
+  //  - "DATABASE_NAME" : format plat (ancien BO sans X-Instance, clé = X-Database seul)
+  // Le BO tente d'abord la clé composée, puis fallback sur la clé plate.
   const Databases = {};
   for (const license of deployment.licenses || []) {
     for (const instance of license.instances || []) {
@@ -82,7 +82,13 @@ function buildAppsettings(deployment) {
           entry.ClientsDiversTircode = db.clientsDiversTircode;
         }
 
+        // Clé composée (nouveau format multi-instances)
         Databases[`${instance.key}/${db.name}`] = entry;
+
+        // Clé plate (rétro-compat ancien BO) — écrit seulement si pas de collision
+        if (!Databases[db.name]) {
+          Databases[db.name] = entry;
+        }
       }
     }
   }
