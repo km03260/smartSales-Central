@@ -218,7 +218,7 @@ function AppCard({ app, uploading, onUpload, onDeleteApk, onShowQr, onUploadBund
         </div>
         {hasBundle ? (
           <div className="space-y-2">
-            <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-100 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900">service-bundle.zip</div>
                 <div className="text-xs text-gray-500">
