@@ -184,9 +184,7 @@ router.post('/:id/logo', upload.single('logo'), async (req, res) => {
       return res.status(400).json({ error: 'Fichier logo requis (PNG, JPG, WebP, max 2 MB)' });
     }
 
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers['x-forwarded-host'] || req.headers.host;
-    const logoUrl = `${protocol}://${host}/uploads/logos/${req.file.filename}`;
+    const logoUrl = `/uploads/logos/${req.file.filename}`;
 
     // Mettre à jour le logoUrl dans la config
     await prisma.companyConfig.upsert({

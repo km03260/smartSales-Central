@@ -11,7 +11,7 @@ RUN npx prisma generate
 COPY src ./src/
 COPY keys ./keys/
 COPY start.sh ./
-RUN mkdir -p /app/uploads/logos
+RUN mkdir -p /app/uploads/logos /app/uploads/apps /app/uploads/services
 
 EXPOSE 3500
 
