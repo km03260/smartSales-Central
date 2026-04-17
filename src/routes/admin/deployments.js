@@ -60,11 +60,11 @@ function buildAppsettings(deployment) {
     trust: deployment.trustServerCertificate,
   });
 
-  // Map par base. Deux formats de clé émis pour rétro-compatibilité :
-  //  - "INSTANCE_KEY/DATABASE_NAME" : format multi-instances (nouveau BO avec X-Instance)
-  //  - "DATABASE_NAME" : format plat (ancien BO sans X-Instance, clé = X-Database seul)
-  // Le BO tente d'abord la clé composée, puis fallback sur la clé plate.
+  // Map par base. Une entrée par base avec la ConnectionString complète.
+  // Clé = nom de la base (X-Database). Si 2 bases portent le même nom dans 2
+  // instances différentes, la clé composée "INSTANCE/BASE" est utilisée.
   const Databases = {};
+  const seenNames = {};
   for (const license of deployment.licenses || []) {
     for (const instance of license.instances || []) {
       for (const db of instance.databases || []) {
@@ -82,11 +82,18 @@ function buildAppsettings(deployment) {
           entry.ClientsDiversTircode = db.clientsDiversTircode;
         }
 
-        // Clé composée (nouveau format multi-instances)
-        Databases[`${instance.key}/${db.name}`] = entry;
-
-        // Clé plate (rétro-compat ancien BO) — écrit seulement si pas de collision
-        if (!Databases[db.name]) {
+        if (seenNames[db.name]) {
+          // Collision : 2 bases ont le même nom → utiliser la clé composée pour les deux
+          // Renommer la première si elle était en clé plate
+          if (Databases[db.name]) {
+            const firstKey = seenNames[db.name];
+            Databases[firstKey] = Databases[db.name];
+            delete Databases[db.name];
+          }
+          Databases[`${instance.key}/${db.name}`] = entry;
+        } else {
+          // Pas de collision → clé plate
+          seenNames[db.name] = `${instance.key}/${db.name}`;
           Databases[db.name] = entry;
         }
       }
