@@ -1,11 +1,11 @@
-# SmartSales Central
+# customApps
 
-Plateforme centrale de gestion des licences, clients et branding pour SmartSales.
+Plateforme centrale de gestion des licences, clients et branding pour customSales.
 
 ## Architecture
 
 ```
-smartsales-central/
+customapps/
 ├── src/            # API Node.js/Express (port 3500)
 ├── prisma/         # Schema + migrations + seed MariaDB
 ├── dashboard/      # Dashboard admin (React + Vite + Tailwind)
@@ -23,7 +23,7 @@ smartsales-central/
 | website   | ${DOMAIN}              | Site vitrine Astro                 |
 | db        | interne (dbnet)        | MariaDB 11                         |
 
-Le domaine est configurable via la variable `DOMAIN` dans `.env` (par defaut : `smartsales.fr`).
+Le domaine est configurable via la variable `DOMAIN` dans `.env` (par defaut : `customapps.fr`).
 
 ## Installation sur le VPS
 
@@ -36,8 +36,8 @@ Le domaine est configurable via la variable `DOMAIN` dans `.env` (par defaut : `
 ### 1. Cloner et configurer
 
 ```bash
-git clone <repo-url> smartsales-central
-cd smartsales-central
+git clone <repo-url> customapps
+cd customapps
 ```
 
 ### 2. Configurer l'environnement
@@ -51,10 +51,10 @@ Adapter les variables :
 
 ```env
 # Base de données (host = db sur le réseau dbtesting)
-DATABASE_URL="mysql://smartsales:MOT_DE_PASSE@db:3306/smartsales_central"
+DATABASE_URL="mysql://customapps:MOT_DE_PASSE@db:3306/customapps_central"
 
 # Domaine
-DOMAIN=smartsales.fr
+DOMAIN=customapps.fr
 
 # Serveur
 PORT=3500
@@ -72,9 +72,9 @@ LICENSE_PUBLIC_KEY_PATH="./keys/public.pem"
 
 ```bash
 docker exec -it db mariadb -u root -p -e "
-  CREATE DATABASE IF NOT EXISTS smartsales_central;
-  CREATE USER IF NOT EXISTS 'smartsales'@'%' IDENTIFIED BY 'MOT_DE_PASSE';
-  GRANT ALL ON smartsales_central.* TO 'smartsales'@'%';
+  CREATE DATABASE IF NOT EXISTS customapps_central;
+  CREATE USER IF NOT EXISTS 'customapps'@'%' IDENTIFIED BY 'MOT_DE_PASSE';
+  GRANT ALL ON customapps_central.* TO 'customapps'@'%';
   FLUSH PRIVILEGES;
 "
 ```
@@ -100,14 +100,14 @@ docker compose up -d --build
 
 ```bash
 # Migration de la base
-docker exec smartsales-api npx prisma migrate deploy
+docker exec customapps-api npx prisma migrate deploy
 
 # Seed (admin + premier client Maurer)
-docker exec smartsales-api node prisma/seed.js
+docker exec customapps-api node prisma/seed.js
 ```
 
 Identifiants admin par défaut :
-- Email : `admin@smartsales.fr`
+- Email : `admin@customapps.fr`
 - Mot de passe : `admin123`
 - Code licence Maurer : `SS-MAUR-INIT-0001`
 
@@ -115,13 +115,13 @@ Identifiants admin par défaut :
 
 ```bash
 # Health check
-curl https://api.smartsales.fr/api/health
+curl https://api.customapps.fr/api/health
 
 # Dashboard
-open https://admin.smartsales.fr
+open https://admin.customapps.fr
 
 # Site vitrine
-open https://smartsales.fr
+open https://customapps.fr
 ```
 
 ## Développement local

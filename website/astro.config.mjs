@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://smartsales.fr',
+  site: 'https://customapps.fr',
   integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],

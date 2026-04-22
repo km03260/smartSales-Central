@@ -1,7 +1,7 @@
 {
-  "name": "smartsales-central",
+  "name": "customapps",
   "version": "1.0.0",
-  "description": "SmartSales Central API - Licensing & Client Management",
+  "description": "customApps Central API - Licensing & Client Management",
   "main": "src/server.js",
   "type": "module",
   "scripts": {

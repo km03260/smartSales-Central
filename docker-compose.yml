@@ -1,7 +1,7 @@
 services:
   api:
     build: .
-    container_name: smartapps-api
+    container_name: customapps-api
     restart: unless-stopped
     env_file: .env
     volumes:
@@ -14,10 +14,10 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.smartapps-api.rule=Host(`api.${DOMAIN}`)"
-      - "traefik.http.routers.smartapps-api.entrypoints=websecure"
-      - "traefik.http.routers.smartapps-api.tls.certresolver=myresolver"
-      - "traefik.http.services.smartapps-api.loadbalancer.server.port=3500"
+      - "traefik.http.routers.customapps-api.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.customapps-api.entrypoints=websecure"
+      - "traefik.http.routers.customapps-api.tls.certresolver=myresolver"
+      - "traefik.http.services.customapps-api.loadbalancer.server.port=3500"
       - "traefik.docker.network=traefik"
     networks:
       - traefik
@@ -25,28 +25,28 @@ services:
 
   dashboard:
     build: ./dashboard
-    container_name: smartapps-dashboard
+    container_name: customapps-dashboard
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.smartapps-dashboard.rule=Host(`admin.${DOMAIN}`)"
-      - "traefik.http.routers.smartapps-dashboard.entrypoints=websecure"
-      - "traefik.http.routers.smartapps-dashboard.tls.certresolver=myresolver"
-      - "traefik.http.services.smartapps-dashboard.loadbalancer.server.port=80"
+      - "traefik.http.routers.customapps-dashboard.rule=Host(`admin.${DOMAIN}`)"
+      - "traefik.http.routers.customapps-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.customapps-dashboard.tls.certresolver=myresolver"
+      - "traefik.http.services.customapps-dashboard.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik"
     networks:
       - traefik
 
   website:
     build: ./website
-    container_name: smartapps-website
+    container_name: customapps-website
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.smartapps-website.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.smartapps-website.entrypoints=websecure"
-      - "traefik.http.routers.smartapps-website.tls.certresolver=myresolver"
-      - "traefik.http.services.smartapps-website.loadbalancer.server.port=80"
+      - "traefik.http.routers.customapps-website.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.customapps-website.entrypoints=websecure"
+      - "traefik.http.routers.customapps-website.tls.certresolver=myresolver"
+      - "traefik.http.services.customapps-website.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik"
     networks:
       - traefik

@@ -107,7 +107,7 @@ export async function signLicenseToken(license, company, appCode) {
     .setIssuedAt()
     .setExpirationTime(license.expiresAt)
     .setSubject(license.id)
-    .setIssuer('smartsales-central')
+    .setIssuer('customapps')
     .sign(privateKey);
 
   return token;
@@ -115,11 +115,12 @@ export async function signLicenseToken(license, company, appCode) {
 
 /**
  * Vérifie un JWT de licence (utilisé pour le heartbeat).
+ * Accepte les deux issuers pour rétro-compatibilité avec les JWT émis avant le rebranding.
  */
 export async function verifyLicenseToken(token) {
   await loadKeys();
   const { payload } = await jwtVerify(token, publicKey, {
-    issuer: 'smartsales-central',
+    issuer: ['customapps', 'smartsales-central'],
   });
   return payload;
 }

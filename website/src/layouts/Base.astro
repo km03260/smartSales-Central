@@ -11,11 +11,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "SmartSales",
+  "name": "customSales",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Android",
   "description": description,
-  "url": "https://smartsales.fr",
+  "url": "https://customapps.fr",
   "offers": {
     "@type": "AggregateOffer",
     "priceCurrency": "EUR",
@@ -25,9 +25,9 @@ const jsonLd = {
   },
   "publisher": {
     "@type": "Organization",
-    "name": "SmartSales",
-    "url": "https://smartsales.fr",
-    "email": "contact@smartsales.fr"
+    "name": "customSales",
+    "url": "https://customapps.fr",
+    "email": "contact@customapps.fr"
   }
 };
 ---
@@ -49,7 +49,7 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(ogImage, Astro.site).href} />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:site_name" content="SmartSales" />
+    <meta property="og:site_name" content="customSales" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -74,13 +74,13 @@ const jsonLd = {
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/20">
       <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between" aria-label="Navigation principale">
-        <a href="/" class="flex items-center gap-2" aria-label="SmartSales - Accueil">
+        <a href="/" class="flex items-center gap-2" aria-label="customSales - Accueil">
           <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg flex items-center justify-center">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <span class="text-xl font-bold text-gradient">SmartSales</span>
+          <span class="text-xl font-bold text-gradient">customSales</span>
         </a>
         <div class="hidden md:flex items-center gap-8">
           <a href="/fonctionnalites" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Fonctionnalités</a>
@@ -111,7 +111,7 @@ const jsonLd = {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <span class="text-xl font-bold">SmartSales</span>
+              <span class="text-xl font-bold">customSales</span>
             </div>
             <p class="text-gray-400 text-sm leading-relaxed max-w-md">
               Application mobile de prise de commandes pour les commerciaux itinérants.
@@ -143,14 +143,14 @@ const jsonLd = {
                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                contact@smartsales.fr
+                contact@customapps.fr
               </li>
             </ul>
           </div>
         </div>
         <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p class="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} SmartSales. Tous droits réservés.
+            &copy; {new Date().getFullYear()} customSales. Tous droits réservés.
           </p>
           <p class="text-xs text-gray-600">
             Fait avec passion en France

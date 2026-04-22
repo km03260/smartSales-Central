@@ -30,7 +30,7 @@ app.use('/uploads', express.static(join(__dirname, '../uploads')));
 
 // ─── Health check ───────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', service: 'smartsales-central', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', service: 'customapps', timestamp: new Date().toISOString() });
 });
 
 // ─── Routes publiques (app mobile) ──────────────────────────────────────────
@@ -70,7 +70,7 @@ process.on('unhandledRejection', (reason) => {
 
 // ─── Démarrage ──────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`SmartSales Central API running on port ${PORT}`);
+  console.log(`customApps Central API running on port ${PORT}`);
   console.log(`Health: http://localhost:${PORT}/api/health`);
 
   // Démarrer les cron jobs

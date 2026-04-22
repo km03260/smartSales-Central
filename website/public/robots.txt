@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://smartsales.fr/sitemap-index.xml
+Sitemap: https://customapps.fr/sitemap-index.xml

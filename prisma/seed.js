@@ -10,10 +10,10 @@ async function main() {
   // ─── Admin user ─────────────────────────────────────────────────────────
   const adminPassword = await bcrypt.hash('admin123', 10);
   const admin = await prisma.adminUser.upsert({
-    where: { email: 'admin@smartsales.fr' },
+    where: { email: 'admin@customapps.fr' },
     update: {},
     create: {
-      email: 'admin@smartsales.fr',
+      email: 'admin@customapps.fr',
       passwordHash: adminPassword,
       role: 'superadmin',
     },
@@ -94,7 +94,7 @@ async function main() {
   console.log(`License: ${license.licenseKey} (${license.plan})`);
 
   console.log('\n--- Seed complete ---');
-  console.log(`Admin login: admin@smartsales.fr / admin123`);
+  console.log(`Admin login: admin@customapps.fr / admin123`);
   console.log(`Maurer activation code: ${license.licenseKey}`);
 }
 

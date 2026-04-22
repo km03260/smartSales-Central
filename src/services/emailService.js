@@ -17,7 +17,7 @@ function getTransporter() {
   return transporter;
 }
 
-const FROM = () => process.env.SMTP_FROM || 'noreply@smartsales.fr';
+const FROM = () => process.env.SMTP_FROM || 'noreply@customapps.fr';
 
 /**
  * Envoie un email d'alerte d'expiration de licence.
