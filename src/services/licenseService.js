@@ -2,6 +2,13 @@ import { SignJWT, jwtVerify, importPKCS8, importSPKI } from 'jose';
 import { readFileSync } from 'fs';
 import { randomBytes } from 'crypto';
 
+function buildApkPublicUrl(app) {
+  if (!app?.apkFileName || !app?.code) return '';
+  const base = (process.env.PUBLIC_API_URL || '').replace(/\/$/, '');
+  const path = `/uploads/apps/${app.code}/${app.apkFileName}`;
+  return base ? `${base}${path}` : path;
+}
+
 let privateKey = null;
 let publicKey = null;
 
@@ -75,6 +82,8 @@ export async function signLicenseToken(license, company, appCode) {
     ? (defaultInstance.databases.find(d => d.isDefault) || defaultInstance.databases[0] || null)
     : null;
 
+  const app = license.app;
+
   const token = await new SignJWT({
     clientId: company.id,
     companyName: company.legalName,
@@ -90,6 +99,9 @@ export async function signLicenseToken(license, company, appCode) {
     features: license.features,
     plan: license.plan,
     isBlocked: license.isBlocked || false,
+    // Infos de mise à jour de l'app mobile
+    appLatestVersion: app?.apkVersion || '',
+    appApkUrl: buildApkPublicUrl(app),
   })
     .setProtectedHeader({ alg: 'RS256' })
     .setIssuedAt()
