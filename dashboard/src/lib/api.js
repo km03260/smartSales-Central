@@ -84,6 +84,20 @@ export const api = {
   },
   deleteServiceBundle: (appId) => request(`/admin/apps/${appId}/service-bundle`, { method: 'DELETE' }),
 
+  // App features (marketing)
+  createAppFeature: (appId, body) => request(`/admin/apps/${appId}/features`, { method: 'POST', body }),
+  updateAppFeature: (appId, featureId, body) =>
+    request(`/admin/apps/${appId}/features/${featureId}`, { method: 'PUT', body }),
+  deleteAppFeature: (appId, featureId) =>
+    request(`/admin/apps/${appId}/features/${featureId}`, { method: 'DELETE' }),
+
+  // App pricing plans (marketing)
+  createAppPlan: (appId, body) => request(`/admin/apps/${appId}/plans`, { method: 'POST', body }),
+  updateAppPlan: (appId, planId, body) =>
+    request(`/admin/apps/${appId}/plans/${planId}`, { method: 'PUT', body }),
+  deleteAppPlan: (appId, planId) =>
+    request(`/admin/apps/${appId}/plans/${planId}`, { method: 'DELETE' }),
+
   // Licenses
   getLicenses: (appId) => request(`/admin/licenses${appId ? `?appId=${appId}` : ''}`),
   getLicense: (id) => request(`/admin/licenses/${id}`),

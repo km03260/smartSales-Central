@@ -5,30 +5,21 @@ interface Props {
   ogImage?: string;
 }
 
-const { title, description = "Application mobile de prise de commandes pour les commerciaux itinérants. Synchronisation ERP WaveSoft, mode hors-ligne.", ogImage = "/og-default.png" } = Astro.props;
+const {
+  title,
+  description = "customApps — suite d'applications mobiles pour digitaliser vos processus terrain : ventes, achats, expéditions, synchronisation de fichiers. Compatible ERP WaveSoft.",
+  ogImage = "/og-default.png",
+} = Astro.props;
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "customSales",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Android",
-  "description": description,
+  "@type": "Organization",
+  "name": "customApps",
   "url": "https://customapps.fr",
-  "offers": {
-    "@type": "AggregateOffer",
-    "priceCurrency": "EUR",
-    "lowPrice": "200",
-    "highPrice": "380",
-    "offerCount": "3"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "customSales",
-    "url": "https://customapps.fr",
-    "email": "contact@customapps.fr"
-  }
+  "email": "contact@customapps.fr",
+  "description": description,
 };
 ---
 
@@ -49,7 +40,7 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(ogImage, Astro.site).href} />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:site_name" content="customSales" />
+    <meta property="og:site_name" content="customApps" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -74,17 +65,16 @@ const jsonLd = {
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/20">
       <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between" aria-label="Navigation principale">
-        <a href="/" class="flex items-center gap-2" aria-label="customSales - Accueil">
+        <a href="/" class="flex items-center gap-2" aria-label="customApps - Accueil">
           <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg flex items-center justify-center">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
           </div>
-          <span class="text-xl font-bold text-gradient">customSales</span>
+          <span class="text-xl font-bold text-gradient">customApps</span>
         </a>
         <div class="hidden md:flex items-center gap-8">
-          <a href="/fonctionnalites" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Fonctionnalités</a>
-          <a href="/tarifs" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Tarifs</a>
+          <a href="/#apps" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Applications</a>
           <a href="/contact" class="text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium">Contact</a>
         </div>
         <a href="/contact" class="bg-gradient-to-r from-blue-600 to-violet-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
@@ -108,14 +98,14 @@ const jsonLd = {
             <div class="flex items-center gap-2 mb-4">
               <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-500 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
               </div>
-              <span class="text-xl font-bold">customSales</span>
+              <span class="text-xl font-bold">customApps</span>
             </div>
             <p class="text-gray-400 text-sm leading-relaxed max-w-md">
-              Application mobile de prise de commandes pour les commerciaux itinérants.
-              Synchronisation temps réel avec votre ERP WaveSoft. Gagnez en productivité sur le terrain.
+              La suite d'applications mobiles qui digitalise vos opérations terrain :
+              ventes, achats, expéditions et gestion documentaire. Synchronisation temps réel avec votre ERP WaveSoft.
             </p>
             <div class="flex gap-3 mt-6">
               <span class="inline-flex items-center gap-1.5 bg-white/10 text-gray-300 px-3 py-1.5 rounded-full text-xs font-medium">
@@ -129,11 +119,12 @@ const jsonLd = {
             </div>
           </div>
           <div>
-            <h3 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Produit</h3>
+            <h3 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Applications</h3>
             <ul class="space-y-3 text-sm text-gray-400">
-              <li><a href="/fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a></li>
-              <li><a href="/tarifs" class="hover:text-white transition-colors">Tarifs</a></li>
-              <li><a href="/contact" class="hover:text-white transition-colors">Demander une démo</a></li>
+              <li><a href="/apps/custom-sales" class="hover:text-white transition-colors">customSales</a></li>
+              <li><a href="/apps/custom-supply" class="hover:text-white transition-colors">customSupply</a></li>
+              <li><a href="/apps/custom-shipping" class="hover:text-white transition-colors">customShipping</a></li>
+              <li><a href="/apps/custom-file-sync" class="hover:text-white transition-colors">customFileSync</a></li>
             </ul>
           </div>
           <div>
@@ -145,12 +136,13 @@ const jsonLd = {
                 </svg>
                 contact@customapps.fr
               </li>
+              <li><a href="/contact" class="hover:text-white transition-colors">Demander une démo</a></li>
             </ul>
           </div>
         </div>
         <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p class="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} customSales. Tous droits réservés.
+            &copy; {new Date().getFullYear()} customApps. Tous droits réservés.
           </p>
           <p class="text-xs text-gray-600">
             Fait avec passion en France

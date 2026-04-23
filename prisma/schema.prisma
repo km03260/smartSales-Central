@@ -11,9 +11,15 @@ datasource db {
 
 model App {
   id          String   @id @default(uuid()) @db.VarChar(36)
-  code        String   @unique @db.VarChar(10) // "SS", "SE", "SA"
-  name        String   @db.VarChar(100) // "SmartSales", "SmartExpeditions"
+  code        String   @unique @db.VarChar(10) // "SS", "SU", "SH", "FS"
+  slug        String   @unique @default("") @db.VarChar(100) // URL publique : "custom-sales"
+  name        String   @db.VarChar(100) // "customSales"
   description String   @default("") @db.VarChar(500)
+  tagline     String   @default("") @db.VarChar(200)  // slogan court pour le hero
+  longDescription String @default("") @db.Text        // description riche pour la page produit
+  color       String   @default("blue") @db.VarChar(20) // classe Tailwind (blue, emerald, orange, violet, ...)
+  iconSvgPath String   @default("") @db.Text            // `d` de l'icône SVG (lucide / heroicons)
+  order       Int      @default(0)                      // ordre dans le catalogue
   isActive    Boolean  @default(true)
   apkFileName        String   @default("") @db.VarChar(200)
   apkVersion         String   @default("") @db.VarChar(50)
@@ -25,8 +31,47 @@ model App {
   updatedAt          DateTime @updatedAt
 
   licenses    License[]
+  features    AppFeature[]
+  pricingPlans AppPricingPlan[]
 
   @@map("apps")
+}
+
+// ─── Contenu marketing : fonctionnalités listées sur la page produit ─────
+
+model AppFeature {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  appId       String   @db.VarChar(36)
+  title       String   @db.VarChar(200)
+  description String   @default("") @db.Text
+  iconSvgPath String   @default("") @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  app         App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@map("app_features")
+}
+
+// ─── Contenu marketing : plans tarifaires listés sur la page produit ─────
+
+model AppPricingPlan {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  appId       String   @db.VarChar(36)
+  name        String   @db.VarChar(100)       // "Starter", "Pro", "Enterprise"
+  price       String   @db.VarChar(50)        // "200 €", "Sur devis"
+  period      String   @default("/mois") @db.VarChar(50)
+  features    Json                            // array de strings (lignes de la liste)
+  isFeatured  Boolean  @default(false)        // mis en avant avec un style particulier
+  ctaLabel    String   @default("Demander une démo") @db.VarChar(100)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  app         App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@map("app_pricing_plans")
 }
 
 // ─── Entreprises clientes (acheteurs de SmartSales) ─────────────────────────

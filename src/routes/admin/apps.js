@@ -63,14 +63,27 @@ const upload = multer({
   },
 });
 
+function slugify(input) {
+  return String(input || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 100);
+}
+
 /**
  * GET /api/admin/apps
  */
 router.get('/', async (req, res) => {
   try {
     const apps = await prisma.app.findMany({
-      include: { _count: { select: { licenses: true } } },
-      orderBy: { createdAt: 'asc' },
+      include: {
+        _count: { select: { licenses: true } },
+        features: { orderBy: { order: 'asc' } },
+        pricingPlans: { orderBy: { order: 'asc' } },
+      },
+      orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
     });
 
     res.json(apps.map(a => ({
@@ -93,7 +106,11 @@ router.get('/:id', async (req, res) => {
   try {
     const app = await prisma.app.findUnique({
       where: { id: req.params.id },
-      include: { _count: { select: { licenses: true } } },
+      include: {
+        _count: { select: { licenses: true } },
+        features: { orderBy: { order: 'asc' } },
+        pricingPlans: { orderBy: { order: 'asc' } },
+      },
     });
 
     if (!app) return res.status(404).json({ error: 'Application non trouvée' });
@@ -111,11 +128,11 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/admin/apps
- * Body: { code, name, description? }
+ * Body: { code, name, slug?, description?, tagline?, longDescription?, color?, iconSvgPath?, order? }
  */
 router.post('/', async (req, res) => {
   try {
-    const { code, name, description } = req.body;
+    const { code, name, slug, description, tagline, longDescription, color, iconSvgPath, order } = req.body;
 
     if (!code || !name) {
       return res.status(400).json({ error: 'code et name requis' });
@@ -124,15 +141,21 @@ router.post('/', async (req, res) => {
     const app = await prisma.app.create({
       data: {
         code: code.toUpperCase().trim(),
+        slug: slug || slugify(name),
         name,
         description: description || '',
+        tagline: tagline || '',
+        longDescription: longDescription || '',
+        color: color || 'blue',
+        iconSvgPath: iconSvgPath || '',
+        order: order ?? 0,
       },
     });
 
     res.status(201).json(app);
   } catch (error) {
     if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'Ce code application existe déjà' });
+      return res.status(409).json({ error: 'Ce code ou slug existe déjà' });
     }
     console.error('[APPS:CREATE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -144,19 +167,28 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { name, description, isActive } = req.body;
+    const { name, slug, description, tagline, longDescription, color, iconSvgPath, order, isActive } = req.body;
 
     const app = await prisma.app.update({
       where: { id: req.params.id },
       data: {
         ...(name !== undefined && { name }),
+        ...(slug !== undefined && { slug: slug || slugify(name || '') }),
         ...(description !== undefined && { description }),
+        ...(tagline !== undefined && { tagline }),
+        ...(longDescription !== undefined && { longDescription }),
+        ...(color !== undefined && { color }),
+        ...(iconSvgPath !== undefined && { iconSvgPath }),
+        ...(order !== undefined && { order }),
         ...(isActive !== undefined && { isActive }),
       },
     });
 
     res.json(app);
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Ce slug existe déjà' });
+    }
     console.error('[APPS:UPDATE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
@@ -346,6 +378,136 @@ router.delete('/:id/service-bundle', async (req, res) => {
     res.json({ success: true, app: updated });
   } catch (error) {
     console.error('[APPS:SERVICE_BUNDLE_DELETE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ─── Features (contenu marketing) ──────────────────────────────────────────
+
+/**
+ * POST /api/admin/apps/:id/features
+ * Body: { title, description, iconSvgPath, order }
+ */
+router.post('/:id/features', async (req, res) => {
+  try {
+    const { title, description, iconSvgPath, order } = req.body;
+    if (!title) return res.status(400).json({ error: 'title requis' });
+
+    const feature = await prisma.appFeature.create({
+      data: {
+        appId: req.params.id,
+        title,
+        description: description || '',
+        iconSvgPath: iconSvgPath || '',
+        order: order ?? 0,
+      },
+    });
+    res.status(201).json(feature);
+  } catch (error) {
+    console.error('[APPS:FEATURE_CREATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * PUT /api/admin/apps/:id/features/:featureId
+ */
+router.put('/:id/features/:featureId', async (req, res) => {
+  try {
+    const { title, description, iconSvgPath, order } = req.body;
+    const feature = await prisma.appFeature.update({
+      where: { id: req.params.featureId },
+      data: {
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+        ...(iconSvgPath !== undefined && { iconSvgPath }),
+        ...(order !== undefined && { order }),
+      },
+    });
+    res.json(feature);
+  } catch (error) {
+    console.error('[APPS:FEATURE_UPDATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * DELETE /api/admin/apps/:id/features/:featureId
+ */
+router.delete('/:id/features/:featureId', async (req, res) => {
+  try {
+    await prisma.appFeature.delete({ where: { id: req.params.featureId } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[APPS:FEATURE_DELETE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ─── Pricing Plans (contenu marketing) ─────────────────────────────────────
+
+/**
+ * POST /api/admin/apps/:id/plans
+ * Body: { name, price, period, features[], isFeatured, ctaLabel, order }
+ */
+router.post('/:id/plans', async (req, res) => {
+  try {
+    const { name, price, period, features, isFeatured, ctaLabel, order } = req.body;
+    if (!name || !price) return res.status(400).json({ error: 'name et price requis' });
+
+    const plan = await prisma.appPricingPlan.create({
+      data: {
+        appId: req.params.id,
+        name,
+        price,
+        period: period ?? '/mois',
+        features: Array.isArray(features) ? features : [],
+        isFeatured: !!isFeatured,
+        ctaLabel: ctaLabel || 'Demander une démo',
+        order: order ?? 0,
+      },
+    });
+    res.status(201).json(plan);
+  } catch (error) {
+    console.error('[APPS:PLAN_CREATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * PUT /api/admin/apps/:id/plans/:planId
+ */
+router.put('/:id/plans/:planId', async (req, res) => {
+  try {
+    const { name, price, period, features, isFeatured, ctaLabel, order } = req.body;
+    const plan = await prisma.appPricingPlan.update({
+      where: { id: req.params.planId },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(price !== undefined && { price }),
+        ...(period !== undefined && { period }),
+        ...(features !== undefined && { features: Array.isArray(features) ? features : [] }),
+        ...(isFeatured !== undefined && { isFeatured: !!isFeatured }),
+        ...(ctaLabel !== undefined && { ctaLabel }),
+        ...(order !== undefined && { order }),
+      },
+    });
+    res.json(plan);
+  } catch (error) {
+    console.error('[APPS:PLAN_UPDATE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
+ * DELETE /api/admin/apps/:id/plans/:planId
+ */
+router.delete('/:id/plans/:planId', async (req, res) => {
+  try {
+    await prisma.appPricingPlan.delete({ where: { id: req.params.planId } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[APPS:PLAN_DELETE]', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });

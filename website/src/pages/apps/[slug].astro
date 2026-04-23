@@ -1,0 +1,279 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
+
+// Minimal fallback si l'API est injoignable au build : les 4 apps sont créées statiquement
+// avec taglines/descriptions/features/plans. Au runtime, un script côté client
+// rafraîchit APK + QR code.
+const FALLBACK_APPS = [
+  { code: 'SS', slug: 'custom-sales', name: 'customSales', color: 'blue' },
+  { code: 'SU', slug: 'custom-supply', name: 'customSupply', color: 'emerald' },
+  { code: 'SH', slug: 'custom-shipping', name: 'customShipping', color: 'orange' },
+  { code: 'FS', slug: 'custom-file-sync', name: 'customFileSync', color: 'violet' },
+];
+
+export async function getStaticPaths() {
+  const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
+  try {
+    const res = await fetch(`${API_URL}/api/apps`);
+    if (res.ok) {
+      const apps = await res.json();
+      if (Array.isArray(apps) && apps.length > 0) {
+        return apps.map((app) => ({ params: { slug: app.slug }, props: { app } }));
+      }
+    }
+  } catch {
+    // fallback ci-dessous
+  }
+  return [
+    { params: { slug: 'custom-sales' },     props: { app: null } },
+    { params: { slug: 'custom-supply' },    props: { app: null } },
+    { params: { slug: 'custom-shipping' },  props: { app: null } },
+    { params: { slug: 'custom-file-sync' }, props: { app: null } },
+  ];
+}
+
+const { slug } = Astro.params;
+let { app } = Astro.props;
+
+// Si on n'a pas les détails (fallback build), on retente au moment du rendu
+if (!app || !app.features || !app.pricingPlans) {
+  try {
+    const res = await fetch(`${API_URL}/api/apps/${slug}`);
+    if (res.ok) app = await res.json();
+  } catch {
+    // pas d'API dispo — utiliser valeurs minimales
+  }
+}
+
+if (!app) {
+  const fallback = FALLBACK_APPS.find(a => a.slug === slug);
+  app = {
+    code: fallback?.code || '',
+    slug,
+    name: fallback?.name || slug,
+    tagline: '',
+    description: '',
+    longDescription: '',
+    color: fallback?.color || 'blue',
+    iconSvgPath: '',
+    apkUrl: null,
+    qrcodeUrl: null,
+    apkVersion: null,
+    features: [],
+    pricingPlans: [],
+  };
+}
+
+const COLOR_CLASSES = {
+  blue:    { from: 'from-blue-500',    to: 'to-blue-600',    fromDark: 'from-blue-600',    toDark: 'to-blue-700',    text: 'text-blue-600',    bg: 'bg-blue-50',    bgSoft: 'from-blue-100',    heroBg: 'from-blue-100',    ring: 'ring-blue-200',    border: 'border-blue-200',    shadow: 'shadow-blue-500/25',    ctaShadow: 'shadow-blue-500/20' },
+  violet:  { from: 'from-violet-500',  to: 'to-violet-600',  fromDark: 'from-violet-600',  toDark: 'to-violet-700',  text: 'text-violet-600',  bg: 'bg-violet-50',  bgSoft: 'from-violet-100',  heroBg: 'from-violet-100',  ring: 'ring-violet-200',  border: 'border-violet-200',  shadow: 'shadow-violet-500/25',  ctaShadow: 'shadow-violet-500/20' },
+  emerald: { from: 'from-emerald-500', to: 'to-emerald-600', fromDark: 'from-emerald-600', toDark: 'to-emerald-700', text: 'text-emerald-600', bg: 'bg-emerald-50', bgSoft: 'from-emerald-100', heroBg: 'from-emerald-100', ring: 'ring-emerald-200', border: 'border-emerald-200', shadow: 'shadow-emerald-500/25', ctaShadow: 'shadow-emerald-500/20' },
+  orange:  { from: 'from-orange-500',  to: 'to-orange-600',  fromDark: 'from-orange-600',  toDark: 'to-orange-700',  text: 'text-orange-600',  bg: 'bg-orange-50',  bgSoft: 'from-orange-100',  heroBg: 'from-orange-100',  ring: 'ring-orange-200',  border: 'border-orange-200',  shadow: 'shadow-orange-500/25',  ctaShadow: 'shadow-orange-500/20' },
+  pink:    { from: 'from-pink-500',    to: 'to-pink-600',    fromDark: 'from-pink-600',    toDark: 'to-pink-700',    text: 'text-pink-600',    bg: 'bg-pink-50',    bgSoft: 'from-pink-100',    heroBg: 'from-pink-100',    ring: 'ring-pink-200',    border: 'border-pink-200',    shadow: 'shadow-pink-500/25',    ctaShadow: 'shadow-pink-500/20' },
+  cyan:    { from: 'from-cyan-500',    to: 'to-cyan-600',    fromDark: 'from-cyan-600',    toDark: 'to-cyan-700',    text: 'text-cyan-600',    bg: 'bg-cyan-50',    bgSoft: 'from-cyan-100',    heroBg: 'from-cyan-100',    ring: 'ring-cyan-200',    border: 'border-cyan-200',    shadow: 'shadow-cyan-500/25',    ctaShadow: 'shadow-cyan-500/20' },
+};
+const c = COLOR_CLASSES[app.color] || COLOR_CLASSES.blue;
+
+const title = `${app.name} — ${app.tagline || app.description || 'customApps'}`;
+const description = app.description || app.tagline || '';
+---
+
+<Base title={title} description={description}>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 -z-10">
+      <div class={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-to-br ${c.heroBg} via-violet-50 to-transparent rounded-full blur-3xl opacity-60`}></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 py-20 md:py-28">
+      <div class="max-w-3xl mx-auto text-center">
+        <a href="/#apps" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 mb-6 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Toutes les applications
+        </a>
+
+        {app.iconSvgPath && (
+          <div class={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${c.from} ${c.to} rounded-2xl mb-6 shadow-lg ${c.shadow}`}>
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={app.iconSvgPath} />
+            </svg>
+          </div>
+        )}
+
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight">{app.name}</h1>
+          <span class={`text-xs font-mono px-2 py-1 ${c.bg} ${c.text} rounded`}>{app.code}</span>
+        </div>
+
+        {app.tagline && (
+          <p class={`text-xl md:text-2xl font-bold ${c.text} mb-6`}>{app.tagline}</p>
+        )}
+
+        <p class="text-lg text-gray-500 leading-relaxed mb-10">
+          {app.longDescription || app.description}
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/contact" class={`bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white px-8 py-3.5 rounded-full font-semibold hover:shadow-xl ${c.shadow} transition-all duration-300 hover:-translate-y-0.5`}>
+            Demander une démo gratuite
+          </a>
+          {app.apkUrl && (
+            <a id="apk-download" href={app.apkUrl} class="group bg-white text-gray-700 px-8 py-3.5 rounded-full font-semibold border border-gray-200 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 inline-flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Télécharger l'APK <span id="apk-version" class="text-xs text-gray-400">{app.apkVersion && `v${app.apkVersion}`}</span>
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Features */}
+  {app.features && app.features.length > 0 && (
+    <section class="py-24">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Fonctionnalités</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Tout ce dont vous avez besoin</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {app.features.map((feature) => (
+            <div class="card-hover bg-white rounded-2xl p-7 border border-gray-100 shadow-sm">
+              <div class={`w-12 h-12 bg-gradient-to-br ${c.from} ${c.to} rounded-xl flex items-center justify-center mb-5 shadow-lg`}>
+                {feature.iconSvgPath && (
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={feature.iconSvgPath} />
+                  </svg>
+                )}
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2 text-lg">{feature.title}</h3>
+              <p class="text-sm text-gray-500 leading-relaxed">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Download + QR */}
+  {app.qrcodeUrl && (
+    <section class="bg-gradient-to-br from-gray-50 to-blue-50/30 py-24">
+      <div class="max-w-4xl mx-auto px-6">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
+          <div class="flex-shrink-0">
+            <img id="apk-qrcode" src={app.qrcodeUrl} alt={`QR Code - Télécharger ${app.name}`} class="w-40 h-40" />
+          </div>
+          <div class="text-center md:text-left">
+            <span class={`inline-block text-sm font-semibold ${c.text} mb-2 uppercase tracking-wider`}>Installation</span>
+            <h3 class="font-bold text-gray-900 mb-2 text-2xl">Scannez pour installer</h3>
+            <p class="text-sm text-gray-500 leading-relaxed mb-4">
+              Scannez le QR code avec votre appareil Android ou téléchargez directement l'APK.
+              Pas de Play Store, installation directe depuis votre navigateur.
+            </p>
+            {app.apkUrl && (
+              <a id="apk-download-2" href={app.apkUrl} class={`inline-flex items-center gap-2 bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:shadow-lg ${c.shadow} transition-all duration-300 hover:-translate-y-0.5`}>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Télécharger l'APK
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Pricing */}
+  {app.pricingPlans && app.pricingPlans.length > 0 && (
+    <section class="py-24">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Tarifs</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Choisissez votre formule</h2>
+          <p class="text-lg text-gray-500 max-w-2xl mx-auto">Tarifs indicatifs HT, facturation mensuelle. Contactez-nous pour un devis personnalisé.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {app.pricingPlans.map((plan) => (
+            <div class={`relative bg-white rounded-2xl p-8 border ${plan.isFeatured ? `${c.border} ring-4 ${c.ring} shadow-xl` : 'border-gray-100 shadow-sm'}`}>
+              {plan.isFeatured && (
+                <div class={`absolute top-0 right-6 -translate-y-1/2 bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white text-xs font-bold px-3 py-1 rounded-full`}>
+                  Recommandé
+                </div>
+              )}
+              <h3 class="font-bold text-gray-900 text-2xl mb-2">{plan.name}</h3>
+              <div class="flex items-baseline gap-1 mb-6">
+                <span class="text-4xl font-extrabold text-gray-900">{plan.price}</span>
+                {plan.period && <span class="text-gray-500 text-sm">{plan.period}</span>}
+              </div>
+              <ul class="space-y-3 mb-8">
+                {(Array.isArray(plan.features) ? plan.features : []).map((feat) => (
+                  <li class="flex items-start gap-2 text-sm text-gray-600">
+                    <svg class={`w-5 h-5 ${c.text} flex-shrink-0 mt-0.5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+              <a href="/contact" class={plan.isFeatured
+                ? `block text-center bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg ${c.shadow} transition-all duration-300`
+                : `block text-center bg-white text-gray-700 px-6 py-3 rounded-full font-semibold border border-gray-200 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300`}>
+                {plan.ctaLabel || 'Demander une démo'}
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* CTA */}
+  <section class="py-24">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class={`relative overflow-hidden bg-gradient-to-br ${c.fromDark} ${c.toDark} rounded-3xl p-12 md:p-16 text-center shadow-2xl ${c.ctaShadow}`}>
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="relative z-10">
+          <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Prêt à essayer {app.name} ?</h2>
+          <p class="text-lg text-white/80 mb-8 max-w-xl mx-auto">
+            Demandez une démonstration gratuite personnalisée sur votre métier et vos données.
+          </p>
+          <a href="/contact" class={`inline-flex items-center gap-2 bg-white ${c.text} px-8 py-3.5 rounded-full font-semibold hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5`}>
+            Demander une démo gratuite
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Rafraîchir l'APK/QR/version au runtime si l'API est joignable */}
+  <script define:vars={{ API_URL, slug: app.slug }}>
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/apps/${slug}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const qr = document.getElementById('apk-qrcode');
+        const link1 = document.getElementById('apk-download');
+        const link2 = document.getElementById('apk-download-2');
+        const version = document.getElementById('apk-version');
+        if (qr && data.qrcodeUrl) qr.src = data.qrcodeUrl;
+        if (link1 && data.apkUrl) link1.href = data.apkUrl;
+        if (link2 && data.apkUrl) link2.href = data.apkUrl;
+        if (version && data.apkVersion) version.textContent = `v${data.apkVersion}`;
+      } catch {
+        /* API indisponible : on garde les valeurs du build */
+      }
+    })();
+  </script>
+</Base>
