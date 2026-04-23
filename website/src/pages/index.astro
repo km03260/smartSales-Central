@@ -1,14 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
+import PhoneMockup from '../components/PhoneMockup.astro';
 
 const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
 
-// Liste par défaut si l'API est injoignable au build (le client rechargera au runtime)
 const FALLBACK_APPS = [
-  { code: 'SS', slug: 'custom-sales', name: 'customSales', tagline: 'Vos commerciaux prennent commande sur le terrain', description: 'Prise de commandes, devis et catalogue mobile pour vos équipes itinérantes.', color: 'blue', iconSvgPath: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
-  { code: 'SU', slug: 'custom-supply', name: 'customSupply', tagline: 'Pilotez vos approvisionnements depuis le terrain', description: 'Demandes d\'achat, commandes fournisseurs et réceptions scannées.', color: 'emerald', iconSvgPath: 'M20 7l-8-4-8 4m16 0v10l-8 4m0 0l-8-4V7m8 4v10' },
-  { code: 'SH', slug: 'custom-shipping', name: 'customShipping', tagline: 'Préparez et livrez sans papier', description: 'Picking guidé, colisage et émargement client en direct.', color: 'orange', iconSvgPath: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
-  { code: 'FS', slug: 'custom-file-sync', name: 'customFileSync', tagline: 'Vos documents partout, toujours à jour', description: 'Synchronisation sécurisée des documents entre ERP et mobiles.', color: 'violet', iconSvgPath: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12' },
+  { code: 'SS', slug: 'custom-sales',     name: 'customSales',     tagline: "La force de vente mobile qui ne s'arrête jamais",            description: "Commandes, devis et catalogue depuis le mobile — même sans réseau.",            color: 'blue',    iconSvgPath: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+  { code: 'SP', slug: 'custom-supply',    name: 'customSupply',    tagline: 'Achetez mieux, suivez chaque commande',                       description: "Demandes d'achat, commandes fournisseurs et réceptions scannées.",                color: 'emerald', iconSvgPath: 'M20 7l-8-4-8 4m16 0v10l-8 4m0 0l-8-4V7m8 4v10' },
+  { code: 'SH', slug: 'custom-shipping',  name: 'customShipping',  tagline: 'Chaque colis, chaque livraison, parfaitement orchestrés',     description: 'Picking guidé, étiquettes transporteurs et émargement client.',                   color: 'orange',  iconSvgPath: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
+  { code: 'FS', slug: 'custom-file-sync', name: 'customFileSync',  tagline: 'Vos documents techniques, toujours à portée de main',          description: "Synchronisation sécurisée des documents entre ERP et mobile.",                    color: 'violet',  iconSvgPath: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12' },
 ];
 
 let apps = FALLBACK_APPS;
@@ -19,77 +19,105 @@ try {
     if (Array.isArray(data) && data.length > 0) apps = data;
   }
 } catch {
-  // API indisponible au build — on garde les fallbacks, le client rechargera au runtime
+  // fallback
 }
 
-// Mapping des classes Tailwind par couleur (les classes doivent apparaître statiquement
-// dans le code pour que Tailwind les purge correctement)
 const COLOR_CLASSES = {
-  blue:    { from: 'from-blue-500',    to: 'to-blue-600',    text: 'text-blue-600',    bg: 'bg-blue-50',    ring: 'ring-blue-100' },
-  violet:  { from: 'from-violet-500',  to: 'to-violet-600',  text: 'text-violet-600',  bg: 'bg-violet-50',  ring: 'ring-violet-100' },
-  emerald: { from: 'from-emerald-500', to: 'to-emerald-600', text: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-100' },
-  orange:  { from: 'from-orange-500',  to: 'to-orange-600',  text: 'text-orange-600',  bg: 'bg-orange-50',  ring: 'ring-orange-100' },
-  pink:    { from: 'from-pink-500',    to: 'to-pink-600',    text: 'text-pink-600',    bg: 'bg-pink-50',    ring: 'ring-pink-100' },
-  cyan:    { from: 'from-cyan-500',    to: 'to-cyan-600',    text: 'text-cyan-600',    bg: 'bg-cyan-50',    ring: 'ring-cyan-100' },
+  blue:    { from: 'from-blue-500',    to: 'to-blue-600',    fromDark: 'from-blue-600',    toDark: 'to-violet-600',   text: 'text-blue-600',    bg: 'bg-blue-50',    mesh: 'from-blue-100/40' },
+  violet:  { from: 'from-violet-500',  to: 'to-violet-600',  fromDark: 'from-violet-600',  toDark: 'to-pink-600',     text: 'text-violet-600',  bg: 'bg-violet-50',  mesh: 'from-violet-100/40' },
+  emerald: { from: 'from-emerald-500', to: 'to-emerald-600', fromDark: 'from-emerald-600', toDark: 'to-teal-600',     text: 'text-emerald-600', bg: 'bg-emerald-50', mesh: 'from-emerald-100/40' },
+  orange:  { from: 'from-orange-500',  to: 'to-orange-600',  fromDark: 'from-orange-600',  toDark: 'to-pink-600',     text: 'text-orange-600',  bg: 'bg-orange-50',  mesh: 'from-orange-100/40' },
+};
+
+// Map slug → phone mockup variant
+const MOCKUP_VARIANT = {
+  'custom-sales':     'sales',
+  'custom-supply':    'supply',
+  'custom-shipping':  'shipping',
+  'custom-file-sync': 'fileSync',
 };
 ---
 
 <Base
-  title="customApps — La suite d'applications mobiles pour digitaliser vos opérations terrain"
+  title="customApps — Une suite d'apps pour digitaliser vos opérations terrain"
   description="customApps est une suite d'applications mobiles compatibles ERP WaveSoft : ventes, achats, expéditions, synchronisation de fichiers. Mode hors-ligne, sync temps réel."
 >
   <!-- Hero -->
-  <section class="relative overflow-hidden">
-    <div class="absolute inset-0 -z-10">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-to-br from-blue-100 via-violet-50 to-transparent rounded-full blur-3xl opacity-60"></div>
-      <div class="absolute top-40 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-violet-100 to-transparent rounded-full blur-3xl opacity-40"></div>
+  <section class="relative overflow-hidden bg-noise">
+    <!-- Aurora gradient background -->
+    <div class="absolute inset-0 -z-10 bg-mesh">
+      <div class="absolute top-10 -left-40 w-[500px] h-[500px] bg-gradient-to-br from-blue-200/40 via-violet-100/40 to-transparent rounded-full blur-3xl animate-aurora"></div>
+      <div class="absolute top-40 right-0 w-[600px] h-[500px] bg-gradient-to-bl from-pink-100/40 via-violet-100/30 to-transparent rounded-full blur-3xl animate-aurora" style="animation-delay: -6s"></div>
     </div>
 
-    <div class="max-w-6xl mx-auto px-6 py-24 md:py-32 text-center">
-      <div class="animate-fade-in-up">
-        <div class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-8 border border-blue-100/50">
-          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          Compatible WaveSoft ERP
+    <div class="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-12 grid md:grid-cols-2 gap-12 items-center">
+      <!-- Texte -->
+      <div>
+        <div class="animate-fade-in-up inline-flex items-center gap-2 glass-strong text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-8">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-60"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+          </span>
+          Compatible WaveSoft ERP · Mode hors-ligne
+        </div>
+
+        <h1 class="animate-fade-in-up delay-100 text-5xl md:text-7xl font-extrabold text-gray-900 leading-[1.05] mb-6 tracking-tight">
+          Une suite d'apps
+          <span class="block">pour <span class="font-display-italic text-gradient">digitaliser</span></span>
+          <span class="block">le terrain.</span>
+        </h1>
+
+        <p class="animate-fade-in-up delay-200 text-lg md:text-xl text-gray-500 max-w-xl mb-10 leading-relaxed">
+          Ventes, achats, expéditions, documents : <strong class="text-gray-900 font-semibold">{apps.length} applications mobiles</strong> qui fonctionnent hors-ligne et se synchronisent en temps réel avec votre ERP.
+        </p>
+
+        <div class="animate-fade-in-up delay-300 flex flex-col sm:flex-row gap-3">
+          <a href="#apps" class="group inline-flex items-center justify-center gap-2 bg-gray-900 text-white px-6 py-3.5 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 hover:-translate-y-0.5 shadow-xl shadow-gray-900/20">
+            Découvrir la suite
+            <svg class="w-4 h-4 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          </a>
+          <a href="/contact" class="group inline-flex items-center justify-center gap-2 glass-strong text-gray-700 px-6 py-3.5 rounded-full font-semibold hover:bg-white transition-all duration-300 hover:-translate-y-0.5">
+            Demander une démo
+            <span class="inline-block transition-transform group-hover:translate-x-0.5">&rarr;</span>
+          </a>
+        </div>
+
+        <!-- Trust strip -->
+        <div class="animate-fade-in-up delay-500 flex items-center gap-6 mt-12 text-sm text-gray-500">
+          <div class="flex items-center gap-2">
+            <div class="flex -space-x-2">
+              {[0,1,2,3].map((i) => (
+                <div class={`w-7 h-7 rounded-full border-2 border-white bg-gradient-to-br ${['from-blue-400 to-blue-600','from-violet-400 to-violet-600','from-emerald-400 to-emerald-600','from-orange-400 to-orange-600'][i]}`}></div>
+              ))}
+            </div>
+            <span>Déjà adopté par des équipes terrain</span>
+          </div>
         </div>
       </div>
 
-      <h1 class="animate-fade-in-up delay-100 text-5xl md:text-7xl font-extrabold text-gray-900 leading-[1.1] mb-6 tracking-tight">
-        Une suite d'apps pour<br/>
-        <span class="text-gradient">digitaliser le terrain</span>
-      </h1>
-
-      <p class="animate-fade-in-up delay-200 text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-        Ventes, achats, expéditions, documents : {apps.length} applications mobiles qui fonctionnent
-        hors-ligne et se synchronisent en temps réel avec votre ERP.
-      </p>
-
-      <div class="animate-fade-in-up delay-300 flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="#apps" class="bg-gradient-to-r from-blue-600 to-violet-600 text-white px-8 py-3.5 rounded-full font-semibold hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
-          Découvrir la suite
-        </a>
-        <a href="/contact" class="group bg-white text-gray-700 px-8 py-3.5 rounded-full font-semibold border border-gray-200 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300">
-          Demander une démo gratuite
-          <span class="inline-block ml-1 transition-transform group-hover:translate-x-1">&rarr;</span>
-        </a>
+      <!-- Phone mockup -->
+      <div class="relative flex justify-center items-center animate-scale-in delay-200">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-200/30 via-violet-200/30 to-pink-200/30 rounded-full blur-3xl"></div>
+        <div class="relative">
+          <PhoneMockup variant="sales" />
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Stats / Trust -->
-  <section class="border-y border-gray-100 bg-gray-50/50">
+  <!-- Marquee / Trust -->
+  <section class="border-y border-gray-100 bg-white">
     <div class="max-w-6xl mx-auto px-6 py-12">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         {[
-          { value: `${apps.length}`, label: "Applications" },
-          { value: "99.9%", label: "Disponibilité" },
-          { value: "< 2s", label: "Sync. moyenne" },
-          { value: "100%", label: "Hors-ligne" },
+          { value: `${apps.length}`,   label: 'Applications' },
+          { value: '99.9%', label: 'Disponibilité' },
+          { value: '< 2s',  label: 'Sync. moyenne' },
+          { value: '100%',  label: 'Hors-ligne' },
         ].map(({ value, label }) => (
-          <div>
-            <div class="text-3xl md:text-4xl font-extrabold text-gradient mb-1">{value}</div>
-            <div class="text-sm text-gray-500 font-medium">{label}</div>
+          <div class="reveal">
+            <div class="text-4xl md:text-5xl font-extrabold text-gradient mb-1 tracking-tight">{value}</div>
+            <div class="text-xs text-gray-500 font-medium uppercase tracking-wider">{label}</div>
           </div>
         ))}
       </div>
@@ -97,40 +125,47 @@ const COLOR_CLASSES = {
   </section>
 
   <!-- Catalogue des apps -->
-  <section id="apps" class="py-24">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center mb-16">
+  <section id="apps" class="relative py-28 overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-mesh-soft"></div>
+
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="reveal text-center mb-16">
         <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">La suite customApps</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Une application par métier, un ERP unique</h2>
+        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          Une application par métier,<br/>
+          <span class="font-display-italic text-gray-500">un ERP unique.</span>
+        </h2>
         <p class="text-lg text-gray-500 max-w-2xl mx-auto">
-          Choisissez la ou les applications adaptées à vos besoins. Toutes partagent la même base technique et la même compatibilité WaveSoft.
+          Chaque app partage la même base technique et la même compatibilité WaveSoft. Déployez celles qui correspondent à vos équipes.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {apps.map((app) => {
+        {apps.map((app, i) => {
           const c = COLOR_CLASSES[app.color] || COLOR_CLASSES.blue;
+          const variant = MOCKUP_VARIANT[app.slug] || 'sales';
           return (
             <a
               href={`/apps/${app.slug}`}
-              class={`group relative overflow-hidden bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
+              class={`reveal card-premium group relative overflow-hidden glass-strong rounded-3xl p-8 pt-10 flex flex-col md:flex-row md:items-center gap-6 min-h-[280px]`}
+              style={`transition-delay: ${i * 80}ms`}
             >
-              <div class={`absolute top-0 right-0 w-32 h-32 ${c.bg} rounded-full blur-2xl opacity-60 -translate-y-1/2 translate-x-1/2`}></div>
+              <div class={`absolute -top-20 -right-20 w-80 h-80 bg-gradient-to-br ${c.mesh} to-transparent rounded-full blur-3xl opacity-60 group-hover:opacity-100 transition-opacity`}></div>
 
-              <div class="relative z-10">
-                <div class={`w-14 h-14 bg-gradient-to-br ${c.from} ${c.to} rounded-2xl flex items-center justify-center mb-5 shadow-lg`}>
-                  <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <div class="relative z-10 flex-1 min-w-0">
+                <div class={`inline-flex w-12 h-12 bg-gradient-to-br ${c.from} ${c.to} rounded-xl items-center justify-center mb-4 shadow-lg`}>
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={app.iconSvgPath} />
                   </svg>
                 </div>
 
                 <div class="flex items-center gap-2 mb-2">
-                  <h3 class="text-2xl font-extrabold text-gray-900">{app.name}</h3>
-                  <span class={`text-xs font-mono px-2 py-0.5 ${c.bg} ${c.text} rounded`}>{app.code}</span>
+                  <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight">{app.name}</h3>
+                  <span class={`text-[10px] font-mono px-1.5 py-0.5 ${c.bg} ${c.text} rounded`}>{app.code}</span>
                 </div>
 
-                {app.tagline && <p class={`text-sm font-semibold ${c.text} mb-3`}>{app.tagline}</p>}
-                <p class="text-sm text-gray-500 leading-relaxed mb-4">{app.description}</p>
+                {app.tagline && <p class={`text-sm font-semibold ${c.text} mb-2`}>{app.tagline}</p>}
+                <p class="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">{app.description}</p>
 
                 <span class={`inline-flex items-center gap-1 text-sm font-semibold ${c.text} group-hover:gap-2 transition-all`}>
                   En savoir plus
@@ -146,25 +181,30 @@ const COLOR_CLASSES = {
     </div>
   </section>
 
-  <!-- How it works -->
-  <section class="bg-gradient-to-br from-gray-50 to-blue-50/30 py-24">
+  <!-- Comment ça marche -->
+  <section class="relative py-28 bg-gradient-to-br from-gray-50 via-white to-blue-50/30 overflow-hidden">
     <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center mb-16">
+      <div class="reveal text-center mb-16">
         <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Simple</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Comment ça marche ?</h2>
-        <p class="text-lg text-gray-500 max-w-2xl mx-auto">Une architecture unique pour toute la suite</p>
+        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          Trois étapes<br/>
+          <span class="font-display-italic text-gray-500">pour démarrer.</span>
+        </h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
-          { step: "1", title: "Choisissez vos apps", desc: "Selon vos besoins terrain : ventes, achats, expéditions ou gestion documentaire." },
-          { step: "2", title: "Connectez WaveSoft", desc: "Notre SyncService sécurisé ponte vos apps mobiles avec votre ERP existant." },
-          { step: "3", title: "Déployez sur le terrain", desc: "Vos équipes installent l'app via QR code et travaillent immédiatement, même sans réseau." },
-        ].map(({ step, title, desc }) => (
-          <div class="relative text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl text-white text-2xl font-extrabold mb-5 shadow-lg shadow-blue-500/20">
-              {step}
+          { step: '1', title: 'Choisissez vos apps', desc: 'Selon vos besoins terrain : ventes, achats, expéditions ou gestion documentaire.' },
+          { step: '2', title: 'Connectez WaveSoft', desc: 'Notre SyncService sécurisé ponte vos apps mobiles avec votre ERP existant.' },
+          { step: '3', title: 'Déployez sur le terrain', desc: 'Vos équipes installent via QR code et travaillent immédiatement, même sans réseau.' },
+        ].map(({ step, title, desc }, i) => (
+          <div class="reveal relative text-center" style={`transition-delay: ${i * 120}ms`}>
+            <div class="relative inline-flex items-center justify-center w-20 h-20 mb-6">
+              <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-violet-600 rounded-3xl rotate-6 opacity-20"></div>
+              <div class="relative bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl w-full h-full flex items-center justify-center text-white text-3xl font-extrabold shadow-xl shadow-blue-500/30">
+                {step}
+              </div>
             </div>
-            <h3 class="font-bold text-gray-900 mb-2 text-lg">{title}</h3>
+            <h3 class="font-bold text-gray-900 mb-2 text-xl">{title}</h3>
             <p class="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">{desc}</p>
           </div>
         ))}
@@ -173,18 +213,24 @@ const COLOR_CLASSES = {
   </section>
 
   <!-- CTA -->
-  <section class="py-24">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700 rounded-3xl p-12 md:p-16 text-center shadow-2xl shadow-blue-500/20">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+  <section class="py-28">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="reveal-scale relative overflow-hidden bg-gray-900 rounded-3xl p-12 md:p-20 text-center bg-noise">
+        <div class="absolute inset-0 -z-10">
+          <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-blue-500/30 via-violet-500/20 to-transparent rounded-full blur-3xl animate-aurora"></div>
+          <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-pink-500/20 via-purple-500/20 to-transparent rounded-full blur-3xl animate-aurora" style="animation-delay: -8s"></div>
+        </div>
 
         <div class="relative z-10">
-          <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Prêt à digitaliser vos équipes terrain ?</h2>
-          <p class="text-lg text-blue-100 mb-8 max-w-xl mx-auto">
-            Demandez une démonstration gratuite et découvrez la suite customApps adaptée à votre métier.
+          <span class="inline-block text-sm font-semibold text-blue-300 mb-3 uppercase tracking-wider">Démarrez aujourd'hui</span>
+          <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-[1.1]">
+            Prêt à digitaliser<br/>
+            <span class="font-display-italic bg-gradient-to-r from-blue-300 to-pink-300 bg-clip-text text-transparent">vos équipes terrain ?</span>
+          </h2>
+          <p class="text-lg text-white/70 mb-10 max-w-xl mx-auto">
+            Demandez une démonstration gratuite. On revient vers vous sous 24 h avec un devis personnalisé.
           </p>
-          <a href="/contact" class="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-3.5 rounded-full font-semibold hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+          <a href="/contact" class="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-full font-semibold hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5">
             Demander une démo gratuite
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />

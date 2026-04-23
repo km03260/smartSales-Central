@@ -51,10 +51,10 @@ const jsonLd = {
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Fonts -->
+    <!-- Fonts : Inter (body) + Instrument Serif (display italique) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -164,6 +164,25 @@ const jsonLd = {
         </svg>
       </span>
     </a>
+
+    <!-- Scroll reveal observer : applique .is-visible dès qu'un élément .reveal / .reveal-scale entre dans le viewport -->
+    <script is:inline>
+      (() => {
+        if (typeof IntersectionObserver === 'undefined') {
+          document.querySelectorAll('.reveal, .reveal-scale').forEach(el => el.classList.add('is-visible'));
+          return;
+        }
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal, .reveal-scale').forEach(el => observer.observe(el));
+      })();
+    </script>
   </body>
 </html>
 

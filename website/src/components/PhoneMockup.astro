@@ -1,0 +1,240 @@
+---
+// Mockup mobile stylisé — simule l'UI de chacune des 4 apps customApps.
+// 4 variants : 'sales' (SS), 'supply' (SP), 'shipping' (SH), 'fileSync' (FS).
+interface Props {
+  variant: 'sales' | 'supply' | 'shipping' | 'fileSync';
+  class?: string;
+}
+
+const { variant, class: className = '' } = Astro.props;
+
+const THEMES = {
+  sales:    { from: 'from-blue-500',    to: 'to-blue-600',    accent: 'text-blue-600',    soft: 'bg-blue-50',    border: 'border-blue-100' },
+  supply:   { from: 'from-emerald-500', to: 'to-emerald-600', accent: 'text-emerald-600', soft: 'bg-emerald-50', border: 'border-emerald-100' },
+  shipping: { from: 'from-orange-500',  to: 'to-orange-600',  accent: 'text-orange-600',  soft: 'bg-orange-50',  border: 'border-orange-100' },
+  fileSync: { from: 'from-violet-500',  to: 'to-violet-600',  accent: 'text-violet-600',  soft: 'bg-violet-50',  border: 'border-violet-100' },
+};
+
+const t = THEMES[variant];
+---
+
+<div class={`phone-frame phone-frame-md animate-float ${className}`}>
+  <div class="phone-screen">
+    {/* Status bar */}
+    <div class="flex items-center justify-between px-6 pt-8 pb-2 text-xs font-semibold text-gray-900">
+      <span>9:41</span>
+      <div class="flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21z"/></svg>
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17 7h-2v2h2V7zm0 4h-2v2h2v-2zm-4-4H7v2h6V7zm0 4H7v2h6v-2zM5 15h14v2H5v-2zm14-10H5v2h14V5z"/></svg>
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+
+    {/* App-specific content */}
+    {variant === 'sales' && (
+      <div class="px-4 pt-2">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-wider">Bonjour, Julien</div>
+            <div class="font-bold text-gray-900 text-lg">Tournée du jour</div>
+          </div>
+          <div class={`w-10 h-10 rounded-full bg-gradient-to-br ${t.from} ${t.to} flex items-center justify-center text-white font-bold text-sm`}>JD</div>
+        </div>
+
+        <div class={`${t.soft} rounded-xl p-3 mb-3 border ${t.border}`}>
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-[10px] text-gray-500">Objectif mensuel</div>
+              <div class={`font-bold ${t.accent} text-lg`}>78%</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10px] text-gray-500">CA du mois</div>
+              <div class="font-bold text-gray-900">14 230 €</div>
+            </div>
+          </div>
+          <div class="w-full bg-white/60 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div class={`h-full bg-gradient-to-r ${t.from} ${t.to} rounded-full`} style="width: 78%"></div>
+          </div>
+        </div>
+
+        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Clients à visiter</div>
+        <div class="space-y-2">
+          {[
+            { name: 'Garage Durand', addr: '63 Clermont', status: '10:30', color: 'bg-green-100 text-green-700' },
+            { name: 'Carrosserie Pro', addr: '15 Aurillac', status: '14:00', color: 'bg-blue-100 text-blue-700' },
+            { name: 'Auto Service 43', addr: '43 Le Puy',  status: '16:30', color: 'bg-gray-100 text-gray-600' },
+          ].map((c) => (
+            <div class="bg-white border border-gray-100 rounded-xl p-2.5 flex items-center gap-2.5">
+              <div class={`w-8 h-8 rounded-lg bg-gradient-to-br ${t.from} ${t.to} flex items-center justify-center text-white text-[10px] font-bold`}>
+                {c.name.slice(0, 2).toUpperCase()}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-semibold text-gray-900 text-xs truncate">{c.name}</div>
+                <div class="text-[10px] text-gray-500 truncate">{c.addr}</div>
+              </div>
+              <span class={`${c.color} text-[10px] font-semibold px-2 py-0.5 rounded-full`}>{c.status}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class={`fixed-like mt-4 bg-gradient-to-r ${t.from} ${t.to} text-white rounded-xl p-3 flex items-center justify-center gap-2 text-xs font-semibold shadow-lg`}>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Nouvelle commande
+        </div>
+      </div>
+    )}
+
+    {variant === 'supply' && (
+      <div class="px-4 pt-2">
+        <div class="mb-3">
+          <div class="text-[10px] text-gray-400 uppercase tracking-wider">Approvisionnements</div>
+          <div class="font-bold text-gray-900 text-lg">Commandes en cours</div>
+        </div>
+
+        <div class="flex gap-1.5 mb-3">
+          {[
+            { label: 'À valider', count: 3, active: true },
+            { label: 'Envoyées', count: 12, active: false },
+            { label: 'Reçues',   count: 8,  active: false },
+          ].map((tab) => (
+            <div class={tab.active
+              ? `flex-1 bg-gradient-to-br ${t.from} ${t.to} text-white rounded-lg py-1.5 text-center`
+              : 'flex-1 bg-gray-50 text-gray-500 rounded-lg py-1.5 text-center'}>
+              <div class="text-[9px] font-medium opacity-80">{tab.label}</div>
+              <div class="text-sm font-bold">{tab.count}</div>
+            </div>
+          ))}
+        </div>
+
+        <div class="space-y-2">
+          {[
+            { supplier: 'Matériaux SA', ref: 'CMD-2304', amount: '2 480 €', items: 12, status: 'urgent' },
+            { supplier: 'Outillage Pro', ref: 'CMD-2303', amount: '890 €',   items: 5,  status: 'normal' },
+            { supplier: 'Fixations+',    ref: 'CMD-2302', amount: '345 €',   items: 8,  status: 'normal' },
+          ].map((o) => (
+            <div class="bg-white border border-gray-100 rounded-xl p-2.5">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-semibold text-gray-900 text-xs">{o.supplier}</span>
+                {o.status === 'urgent' && <span class="text-[9px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">URGENT</span>}
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-gray-500">
+                <span>{o.ref} · {o.items} articles</span>
+                <span class="font-bold text-gray-900">{o.amount}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class={`${t.soft} border ${t.border} rounded-xl p-3 mt-3 flex items-center gap-2.5`}>
+          <div class={`w-8 h-8 rounded-lg bg-gradient-to-br ${t.from} ${t.to} flex items-center justify-center flex-shrink-0`}>
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm0 12h4v4H4v-4zM12 4h4v4h-4V4zm0 12h4v4h-4v-4z"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="text-[10px] text-gray-500">Prêt à scanner</div>
+            <div class={`text-xs font-semibold ${t.accent}`}>Réception marchandise</div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {variant === 'shipping' && (
+      <div class="px-4 pt-2">
+        <div class="mb-3">
+          <div class="text-[10px] text-gray-400 uppercase tracking-wider">Tournée #42</div>
+          <div class="font-bold text-gray-900 text-lg">Livraisons du jour</div>
+        </div>
+
+        <div class={`relative rounded-xl overflow-hidden h-32 bg-gradient-to-br ${t.from} ${t.to} mb-3`}>
+          <svg class="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 200 100" preserveAspectRatio="none">
+            <path d="M0,70 Q50,30 100,50 T200,40" stroke="white" stroke-width="1.5" fill="none" stroke-dasharray="3,3"/>
+            <circle cx="20"  cy="68" r="4" fill="white"/>
+            <circle cx="60"  cy="40" r="4" fill="white"/>
+            <circle cx="110" cy="50" r="4" fill="white"/>
+            <circle cx="170" cy="43" r="4" fill="white"/>
+          </svg>
+          <div class="absolute inset-0 p-3 flex flex-col justify-between text-white">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-semibold bg-white/20 backdrop-blur rounded-full px-2 py-0.5">EN ROUTE</span>
+              <span class="text-[10px] opacity-80">4 arrêts</span>
+            </div>
+            <div>
+              <div class="text-[10px] opacity-80">Prochain arrêt</div>
+              <div class="font-bold text-sm">12 rue des Artisans, Lyon</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          {[
+            { n: 1, addr: 'Quincaillerie Martin', status: 'Livré',    color: 'text-green-600', done: true },
+            { n: 2, addr: 'Atelier Moreau',       status: 'Livré',    color: 'text-green-600', done: true },
+            { n: 3, addr: 'Garage Petit',         status: 'En cours', color: t.accent,         done: false },
+            { n: 4, addr: 'Menuiserie Blanc',     status: 'Prévu',    color: 'text-gray-400',  done: false },
+          ].map((s) => (
+            <div class="flex items-center gap-2 py-1.5">
+              <div class={s.done
+                ? 'w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px] font-bold'
+                : (s.status === 'En cours'
+                  ? `w-6 h-6 rounded-full bg-gradient-to-br ${t.from} ${t.to} text-white flex items-center justify-center text-[10px] font-bold animate-pulse`
+                  : 'w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-bold')}>
+                {s.done ? '✓' : s.n}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-xs font-semibold text-gray-900 truncate">{s.addr}</div>
+              </div>
+              <span class={`text-[10px] font-semibold ${s.color}`}>{s.status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {variant === 'fileSync' && (
+      <div class="px-4 pt-2">
+        <div class="mb-3">
+          <div class="text-[10px] text-gray-400 uppercase tracking-wider">Synchronisation</div>
+          <div class="font-bold text-gray-900 text-lg">Documents métier</div>
+        </div>
+
+        <div class={`${t.soft} border ${t.border} rounded-xl p-3 mb-3`}>
+          <div class="flex items-center gap-2 mb-2">
+            <div class={`w-2 h-2 rounded-full bg-green-500 animate-pulse`}></div>
+            <span class="text-[10px] font-semibold text-gray-900">Sync active · 2 min</span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class={`text-2xl font-extrabold ${t.accent}`}>342</span>
+            <span class="text-[10px] text-gray-500">fichiers sur 12 Go</span>
+          </div>
+          <div class="w-full bg-white/60 rounded-full h-1 mt-2 overflow-hidden">
+            <div class={`h-full bg-gradient-to-r ${t.from} ${t.to} rounded-full`} style="width: 68%"></div>
+          </div>
+        </div>
+
+        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Récemment mis à jour</div>
+        <div class="space-y-1.5">
+          {[
+            { name: 'Catalogue 2026.pdf',     size: '4.2 Mo', time: "à l'instant", locked: true },
+            { name: 'Fiche-tech-ref-A42.pdf', size: '1.1 Mo', time: '2 min',       locked: false },
+            { name: 'Certification-ISO.pdf',  size: '230 Ko', time: '1 h',         locked: true },
+            { name: 'CGV-2026.docx',          size: '78 Ko',  time: '3 h',         locked: false },
+          ].map((f) => (
+            <div class="bg-white border border-gray-100 rounded-xl p-2 flex items-center gap-2.5">
+              <div class={`w-8 h-8 rounded-lg bg-gradient-to-br ${t.from} ${t.to} flex items-center justify-center flex-shrink-0`}>
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1">
+                  <span class="text-xs font-semibold text-gray-900 truncate">{f.name}</span>
+                  {f.locked && (
+                    <svg class="w-2.5 h-2.5 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1a5 5 0 00-5 5v4H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V12a2 2 0 00-2-2h-2V6a5 5 0 00-5-5zm0 2a3 3 0 013 3v4H9V6a3 3 0 013-3z"/></svg>
+                  )}
+                </div>
+                <div class="text-[10px] text-gray-500">{f.size} · {f.time}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
