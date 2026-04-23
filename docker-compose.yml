@@ -21,7 +21,7 @@ services:
       - "traefik.docker.network=traefik"
     networks:
       - traefik
-      - dbtesting
+      - dbnetprod
 
   dashboard:
     build: ./dashboard
@@ -57,5 +57,5 @@ volumes:
 networks:
   traefik:
     external: true
-  dbtesting:
+  dbnetprod:
     external: true

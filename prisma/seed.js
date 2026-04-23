@@ -33,7 +33,7 @@ const APPS = [
     ],
   },
   {
-    code: 'SU',
+    code: 'SP',
     slug: 'custom-supply',
     name: 'customSupply',
     description: 'Application mobile de gestion des approvisionnements et des réceptions fournisseurs.',
