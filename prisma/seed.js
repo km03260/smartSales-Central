@@ -10,10 +10,10 @@ const APPS = [
     code: 'SS',
     slug: 'custom-sales',
     name: 'customSales',
-    description: 'Application mobile de prise de commandes pour les commerciaux itinérants.',
-    tagline: 'Vos commerciaux prennent commande sur le terrain',
+    description: "Donnez à vos commerciaux le pouvoir de prendre commandes, devis et paiements directement chez le client — même sans réseau.",
+    tagline: "La force de vente mobile qui ne s'arrête jamais",
     longDescription:
-      "customSales équipe vos forces de vente itinérantes d'une application Android professionnelle pour prendre commandes et devis en quelques taps, même sans réseau. Le catalogue complet, les tarifs clients et les conditions de paiement sont synchronisés en temps réel avec votre ERP WaveSoft. Historique, clients, secteurs et remises suivent le commercial partout.",
+      "customSales équipe vos équipes itinérantes d'un outil mobile pensé pour le terrain. Vos commerciaux consultent le catalogue produits avec photos et tarifs personnalisés, créent commandes et devis en quelques taps, génèrent un PDF et l'envoient par email en un geste. Toutes les données — clients, articles, prix, historique, encours, conditions de paiement — sont synchronisées en temps réel avec votre ERP WaveSoft. En zone blanche, l'application continue de fonctionner hors-ligne et rattrape la synchronisation dès le retour du réseau. Résultat : plus de double saisie au bureau, plus d'erreurs de tarification, plus de délais avant la livraison.",
     color: 'blue',
     iconSvgPath:
       'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
@@ -36,10 +36,10 @@ const APPS = [
     code: 'SP',
     slug: 'custom-supply',
     name: 'customSupply',
-    description: 'Application mobile de gestion des approvisionnements et des réceptions fournisseurs.',
-    tagline: 'Pilotez vos approvisionnements depuis le terrain',
+    description: "Digitalisez vos approvisionnements de bout en bout : demandes d'achat, commandes fournisseurs, réceptions scannées — directement depuis le mobile de vos équipes.",
+    tagline: 'Achetez mieux, suivez chaque commande',
     longDescription:
-      "customSupply digitalise le processus d'achat de bout en bout : création de demandes d'achat, validation des commandes fournisseurs, réceptions marchandises avec scan code-barres, et suivi des écarts en temps réel. Vos acheteurs et magasiniers partagent la même information que l'ERP, même en entrepôt sans couverture réseau.",
+      "customSupply transforme votre chaîne d'approvisionnement en un flux fluide et traçable. Les chefs d'équipe saisissent leurs demandes d'achat depuis le mobile, qui partent en validation selon votre workflow et vos seuils. Les acheteurs génèrent les commandes fournisseurs, suivent les accusés de réception et sont alertés des retards. À la réception, le magasinier scanne les codes-barres des colis, pointe les quantités réelles et signale immédiatement les écarts prix ou les manquants. Toutes les données reviennent dans WaveSoft sans ressaisie, avec l'historique fournisseur, les délais moyens et les statistiques de qualité. Visibilité totale, décisions plus rapides, moins de stock mort.",
     color: 'emerald',
     iconSvgPath:
       'M20 7l-8-4-8 4m16 0v10l-8 4m0 0l-8-4V7m8 4v10',
@@ -62,10 +62,10 @@ const APPS = [
     code: 'SH',
     slug: 'custom-shipping',
     name: 'customShipping',
-    description: 'Application mobile pour les équipes expédition : préparation, colisage et tournées de livraison.',
-    tagline: 'Préparez et livrez sans papier',
+    description: "Accompagnez vos équipes de la préparation à l'émargement client : picking guidé, étiquettes transporteurs, tournées GPS, signature sur tablette.",
+    tagline: 'Chaque colis, chaque livraison, parfaitement orchestrés',
     longDescription:
-      "customShipping digitalise le processus d'expédition : préparation picking guidée, colisage avec étiquettes transporteurs, émargement client sur tablette et suivi en direct des tournées de livraison. Les bons de livraison partent automatiquement vers votre ERP et votre client dès la signature.",
+      "customShipping pilote tout le processus expédition depuis un seul écran mobile. En entrepôt, le préparateur suit un parcours de picking optimisé, scanne les articles et ferme les colis — étiquettes transporteurs et bons de livraison générés automatiquement. Sur la route, les livreurs suivent leur tournée du jour avec navigation GPS intégrée, photographient le point de livraison, recueillent la signature du client sur la tablette et envoient instantanément la preuve de livraison par email. Le back-office voit la position des véhicules, le statut de chaque colis et déclenche les facturations automatiquement. Fini les bordereaux papier, les ressaisies au retour, les réclamations sans preuve.",
     color: 'orange',
     iconSvgPath:
       'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
@@ -88,10 +88,10 @@ const APPS = [
     code: 'FS',
     slug: 'custom-file-sync',
     name: 'customFileSync',
-    description: 'Service de synchronisation sécurisée de fichiers entre votre ERP et vos applications mobiles.',
-    tagline: 'Vos documents partout, toujours à jour',
+    description: "Synchronisez fiches techniques, certificats, catalogues PDF et documents contractuels entre votre ERP et chaque appareil mobile — chiffrement bout-en-bout.",
+    tagline: 'Vos documents techniques, toujours à portée de main',
     longDescription:
-      "customFileSync est le trait d'union entre vos applications métier et votre ERP : synchronisation automatique des catalogues PDF, fiches techniques, certificats et documents contractuels. Chiffrement bout-en-bout, versioning automatique, et mode hors-ligne garanti sur mobile.",
+      "customFileSync est le pont sécurisé entre vos documents métier et les équipes qui en ont besoin sur le terrain. Dès qu'un fichier est modifié dans votre ERP ou votre GED, il est automatiquement poussé vers les appareils autorisés — fiches techniques pour les commerciaux, procédures qualité pour les installateurs, contrats pour les négociateurs. Chiffrement AES-256 en transit et au repos, clés hébergées sur vos serveurs, versioning complet avec audit des accès, et mode hors-ligne garanti pour consulter sans réseau. Révocation instantanée d'un appareil perdu, droits fins par dossier et par groupe. Vos documents sensibles ne quittent jamais votre environnement, mais suivent vos équipes partout.",
     color: 'violet',
     iconSvgPath:
       'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12',
