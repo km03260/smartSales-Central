@@ -103,15 +103,13 @@ const description = app.description || app.tagline || '';
         )}
 
         <div class="flex items-center justify-center gap-2 mb-4">
-          <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight">{app.name}</h1>
+          <h1 id="app-name" class="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight">{app.name}</h1>
           <span class={`text-xs font-mono px-2 py-1 ${c.bg} ${c.text} rounded`}>{app.code}</span>
         </div>
 
-        {app.tagline && (
-          <p class={`text-xl md:text-2xl font-bold ${c.text} mb-6`}>{app.tagline}</p>
-        )}
+        <p id="app-tagline" class={`text-xl md:text-2xl font-bold ${c.text} mb-6 ${app.tagline ? '' : 'hidden'}`}>{app.tagline}</p>
 
-        <p class="text-lg text-gray-500 leading-relaxed mb-10">
+        <p id="app-description" class="text-lg text-gray-500 leading-relaxed mb-10">
           {app.longDescription || app.description}
         </p>
 
@@ -256,13 +254,33 @@ const description = app.description || app.tagline || '';
     </div>
   </section>
 
-  {/* Rafraîchir l'APK/QR/version au runtime si l'API est joignable */}
+  {/* Rafraîchir descriptions + APK/QR/version au runtime si l'API est joignable */}
   <script define:vars={{ API_URL, slug: app.slug }}>
     (async () => {
       try {
         const res = await fetch(`${API_URL}/api/apps/${slug}`, { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
+
+        // Descriptions (hero)
+        const name = document.getElementById('app-name');
+        const tagline = document.getElementById('app-tagline');
+        const description = document.getElementById('app-description');
+        if (name && data.name) name.textContent = data.name;
+        if (tagline) {
+          if (data.tagline) {
+            tagline.textContent = data.tagline;
+            tagline.classList.remove('hidden');
+          } else {
+            tagline.classList.add('hidden');
+          }
+        }
+        if (description) {
+          const text = data.longDescription || data.description;
+          if (text) description.textContent = text;
+        }
+
+        // APK / QR / version
         const qr = document.getElementById('apk-qrcode');
         const link1 = document.getElementById('apk-download');
         const link2 = document.getElementById('apk-download-2');
