@@ -48,6 +48,11 @@ services:
       - "traefik.http.routers.customapps-website.tls.certresolver=myresolver"
       - "traefik.http.services.customapps-website.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik"
+      # Redirections 301 des anciennes URLs (SEO — préserve le link juice)
+      - "traefik.http.middlewares.customapps-old-urls.redirectregex.regex=^https?://${DOMAIN}/(fonctionnalites|tarifs)/?$$"
+      - "traefik.http.middlewares.customapps-old-urls.redirectregex.replacement=https://${DOMAIN}/apps/custom-sales"
+      - "traefik.http.middlewares.customapps-old-urls.redirectregex.permanent=true"
+      - "traefik.http.routers.customapps-website.middlewares=customapps-old-urls"
     networks:
       - traefik
 

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="20%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="80%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow1)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <!-- Logo (4 squares like the site) -->
+  <g transform="translate(100, 100)">
+    <rect x="0"  y="0"  width="28" height="28" rx="6" fill="url(#accent)"/>
+    <rect x="40" y="0"  width="28" height="28" rx="6" fill="url(#accent)" opacity="0.7"/>
+    <rect x="0"  y="40" width="28" height="28" rx="6" fill="url(#accent)" opacity="0.7"/>
+    <rect x="40" y="40" width="28" height="28" rx="6" fill="url(#accent)"/>
+  </g>
+  <text x="196" y="143" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="32" fill="#ffffff">customApps</text>
+
+  <!-- Title -->
+  <text x="100" y="300" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="72" fill="#ffffff" letter-spacing="-2">
+    Une suite d&apos;apps
+  </text>
+  <text x="100" y="390" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="72" fill="#ffffff" letter-spacing="-2">
+    pour <tspan font-family="Instrument Serif, Times, serif" font-style="italic" font-weight="400" fill="url(#accent)">digitaliser</tspan>
+  </text>
+  <text x="100" y="480" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="72" fill="#ffffff" letter-spacing="-2">
+    le terrain.
+  </text>
+
+  <!-- Subtitle -->
+  <text x="100" y="550" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="24" fill="#94a3b8">
+    Ventes · Achats · Expéditions · Documents · Compatible WaveSoft
+  </text>
+
+  <!-- Decoration: app badges -->
+  <g transform="translate(870, 240)" opacity="0.95">
+    <circle cx="60"  cy="60" r="52" fill="#3b82f6" opacity="0.2"/>
+    <circle cx="60"  cy="60" r="40" fill="#3b82f6"/>
+    <path d="M 50,55 L 58,63 L 72,49" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="translate(985, 240)" opacity="0.95">
+    <circle cx="60"  cy="60" r="52" fill="#10b981" opacity="0.2"/>
+    <circle cx="60"  cy="60" r="40" fill="#10b981"/>
+    <path d="M 50,55 L 58,63 L 72,49" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="translate(870, 355)" opacity="0.95">
+    <circle cx="60"  cy="60" r="52" fill="#f97316" opacity="0.2"/>
+    <circle cx="60"  cy="60" r="40" fill="#f97316"/>
+    <path d="M 50,55 L 58,63 L 72,49" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="translate(985, 355)" opacity="0.95">
+    <circle cx="60"  cy="60" r="52" fill="#8b5cf6" opacity="0.2"/>
+    <circle cx="60"  cy="60" r="40" fill="#8b5cf6"/>
+    <path d="M 50,55 L 58,63 L 72,49" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- Bottom url bar -->
+  <rect x="100" y="590" width="300" height="2" fill="url(#accent)"/>
+  <text x="100" y="620" font-family="Inter, system-ui, sans-serif" font-weight="600" font-size="18" fill="#cbd5e1">
+    customapps.fr
+  </text>
+</svg>

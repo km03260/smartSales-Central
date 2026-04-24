@@ -4,6 +4,44 @@ import PhoneMockup from '../components/PhoneMockup.astro';
 
 const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
 
+// ─── FAQ : contenu + schema JSON-LD ─────────────────────────────────────────
+const FAQ_ITEMS = [
+  {
+    q: "Comment s'installent les applications customApps sur les smartphones Android ?",
+    a: "L'installation se fait en scannant un QR code ou en téléchargeant directement l'APK depuis votre page produit. Pas de passage par le Play Store — vos équipes installent l'app en moins d'une minute et saisissent leur clé de licence pour activer l'appareil.",
+  },
+  {
+    q: "Faut-il obligatoirement WaveSoft pour utiliser customApps ?",
+    a: "Aujourd'hui oui — l'ensemble de la suite est conçu autour d'un service de synchronisation (SyncService) qui se connecte à votre base WaveSoft. Si vous utilisez un autre ERP, contactez-nous : nous étudions au cas par cas la faisabilité d'un connecteur dédié.",
+  },
+  {
+    q: "Que se passe-t-il quand mes équipes terrain n'ont pas de réseau ?",
+    a: "Toutes les apps fonctionnent entièrement hors-ligne. Les données (clients, articles, commandes, documents) sont stockées localement sur l'appareil. Dès que la connexion revient, la synchronisation rattrape automatiquement les saisies faites sans réseau. Zéro perte de données.",
+  },
+  {
+    q: "Combien d'utilisateurs et d'appareils couvre une licence ?",
+    a: "Le nombre d'appareils maximum est défini par votre plan (Starter, Pro, Enterprise). Vous pouvez gérer les activations depuis votre espace admin : voir les appareils connectés, désactiver un appareil perdu, ré-attribuer une licence à un nouveau commercial.",
+  },
+  {
+    q: "Les données métier transitent-elles par vos serveurs ?",
+    a: "Non. Le SyncService est installé sur vos propres serveurs (on-premise ou votre cloud privé) et communique directement avec vos apps mobiles via HTTPS chiffré. Nous ne stockons jamais vos données clients, articles ou commandes — uniquement les métadonnées de licence pour vérifier vos activations.",
+  },
+  {
+    q: "Quel est le délai de mise en place d'une solution customApps ?",
+    a: "De 2 à 10 jours selon la complexité. Phase 1 : installation du SyncService sur votre infrastructure (½ journée). Phase 2 : paramétrage des règles métier (secteurs, tarifs, conditions) et tests sur un poste pilote (2-5 jours). Phase 3 : déploiement sur le parc d'appareils (½ journée par vague de 10 commerciaux).",
+  },
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": FAQ_ITEMS.map(({ q, a }) => ({
+    "@type": "Question",
+    "name": q,
+    "acceptedAnswer": { "@type": "Answer", "text": a },
+  })),
+};
+
 const FALLBACK_APPS = [
   { code: 'SS', slug: 'custom-sales',     name: 'customSales',     tagline: "La force de vente mobile qui ne s'arrête jamais",            description: "Commandes, devis et catalogue depuis le mobile — même sans réseau.",            color: 'blue',    iconSvgPath: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
   { code: 'SP', slug: 'custom-supply',    name: 'customSupply',    tagline: 'Achetez mieux, suivez chaque commande',                       description: "Demandes d'achat, commandes fournisseurs et réceptions scannées.",                color: 'emerald', iconSvgPath: 'M20 7l-8-4-8 4m16 0v10l-8 4m0 0l-8-4V7m8 4v10' },
@@ -249,6 +287,44 @@ const MOCKUP_VARIANT = {
       } catch {}
     })();
   </script>
+
+  <!-- FAQ -->
+  <section class="py-28 bg-gradient-to-br from-white to-gray-50/50">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="reveal text-center mb-12">
+        <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Questions fréquentes</span>
+        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          Tout ce que vous<br/>
+          <span class="font-display-italic text-gray-500">voulez savoir.</span>
+        </h2>
+      </div>
+
+      <div class="space-y-3">
+        {FAQ_ITEMS.map((item, i) => (
+          <details class="reveal group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={`transition-delay: ${i * 50}ms`}>
+            <summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-colors list-none">
+              <h3 class="font-semibold text-gray-900 text-base md:text-lg pr-4">{item.q}</h3>
+              <svg class="flex-shrink-0 w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 pb-6 -mt-2">
+              <p class="text-gray-500 leading-relaxed">{item.a}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+
+      <div class="text-center mt-10">
+        <p class="text-sm text-gray-500">
+          Une autre question ?
+          <a href="/contact" class="font-semibold text-blue-600 hover:text-blue-700 transition-colors ml-1">Contactez-nous</a>
+        </p>
+      </div>
+    </div>
+
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </section>
 
   <!-- CTA -->
   <section class="py-28">

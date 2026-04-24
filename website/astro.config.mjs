@@ -5,7 +5,13 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://customapps.fr',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      lastmod: new Date(),
+      changefreq: 'weekly',
+      priority: 0.8,
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

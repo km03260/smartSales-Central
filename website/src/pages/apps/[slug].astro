@@ -70,18 +70,76 @@ if (!app) {
 const mockupVariant = MOCKUP_VARIANT[app.slug] || 'sales';
 
 const COLOR_CLASSES = {
-  blue:    { from: 'from-blue-500',    to: 'to-blue-600',    fromDark: 'from-blue-600',    toDark: 'to-violet-600',   text: 'text-blue-600',    bg: 'bg-blue-50',    bgSoft: 'from-blue-200/40',  ring: 'ring-blue-200',    border: 'border-blue-200',    shadow: 'shadow-blue-500/25',    accent: 'bg-blue-500' },
-  violet:  { from: 'from-violet-500',  to: 'to-violet-600',  fromDark: 'from-violet-600',  toDark: 'to-pink-600',     text: 'text-violet-600',  bg: 'bg-violet-50',  bgSoft: 'from-violet-200/40', ring: 'ring-violet-200',  border: 'border-violet-200',  shadow: 'shadow-violet-500/25',  accent: 'bg-violet-500' },
-  emerald: { from: 'from-emerald-500', to: 'to-emerald-600', fromDark: 'from-emerald-600', toDark: 'to-teal-600',     text: 'text-emerald-600', bg: 'bg-emerald-50', bgSoft: 'from-emerald-200/40', ring: 'ring-emerald-200', border: 'border-emerald-200', shadow: 'shadow-emerald-500/25', accent: 'bg-emerald-500' },
-  orange:  { from: 'from-orange-500',  to: 'to-orange-600',  fromDark: 'from-orange-600',  toDark: 'to-pink-600',     text: 'text-orange-600',  bg: 'bg-orange-50',  bgSoft: 'from-orange-200/40',  ring: 'ring-orange-200',  border: 'border-orange-200',  shadow: 'shadow-orange-500/25',  accent: 'bg-orange-500' },
+  blue:    { from: 'from-blue-500',    to: 'to-blue-600',    fromDark: 'from-blue-600',    toDark: 'to-violet-600',   text: 'text-blue-600',    bg: 'bg-blue-50',    bgSoft: 'from-blue-200/40',  ring: 'ring-blue-200',    border: 'border-blue-200',    shadow: 'shadow-blue-500/25',    accent: 'bg-blue-500',    mesh: 'from-blue-100/40' },
+  violet:  { from: 'from-violet-500',  to: 'to-violet-600',  fromDark: 'from-violet-600',  toDark: 'to-pink-600',     text: 'text-violet-600',  bg: 'bg-violet-50',  bgSoft: 'from-violet-200/40', ring: 'ring-violet-200',  border: 'border-violet-200',  shadow: 'shadow-violet-500/25',  accent: 'bg-violet-500',  mesh: 'from-violet-100/40' },
+  emerald: { from: 'from-emerald-500', to: 'to-emerald-600', fromDark: 'from-emerald-600', toDark: 'to-teal-600',     text: 'text-emerald-600', bg: 'bg-emerald-50', bgSoft: 'from-emerald-200/40', ring: 'ring-emerald-200', border: 'border-emerald-200', shadow: 'shadow-emerald-500/25', accent: 'bg-emerald-500', mesh: 'from-emerald-100/40' },
+  orange:  { from: 'from-orange-500',  to: 'to-orange-600',  fromDark: 'from-orange-600',  toDark: 'to-pink-600',     text: 'text-orange-600',  bg: 'bg-orange-50',  bgSoft: 'from-orange-200/40',  ring: 'ring-orange-200',  border: 'border-orange-200',  shadow: 'shadow-orange-500/25',  accent: 'bg-orange-500',  mesh: 'from-orange-100/40' },
 };
 const c = COLOR_CLASSES[app.color] || COLOR_CLASSES.blue;
 
-const title = `${app.name} — ${app.tagline || app.description || 'customApps'}`;
+// Autres apps pour cross-linking "Découvrez aussi"
+let otherApps = [];
+try {
+  const resAll = await fetch(`${API_URL}/api/apps`);
+  if (resAll.ok) {
+    const allApps = await resAll.json();
+    if (Array.isArray(allApps)) {
+      otherApps = allApps.filter((a) => a.slug !== app.slug).slice(0, 3);
+    }
+  }
+} catch {}
+
+const title = `${app.name} — ${app.tagline || app.description || 'customApps'} | customApps`;
 const description = app.description || app.tagline || '';
+const canonicalUrl = new URL(`/apps/${app.slug}/`, Astro.site).href;
+
+// JSON-LD SoftwareApplication + BreadcrumbList
+const plans = Array.isArray(app.pricingPlans) ? app.pricingPlans : [];
+const prices = plans.map(p => parseFloat(String(p.price).replace(/[^0-9.]/g, ''))).filter(Number.isFinite);
+const lowPrice = prices.length ? Math.min(...prices) : null;
+const highPrice = prices.length ? Math.max(...prices) : null;
+
+const softwareSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": app.name,
+  "description": app.longDescription || app.description || app.tagline || '',
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Android 8+",
+  "url": canonicalUrl,
+  ...(lowPrice != null && highPrice != null ? {
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "EUR",
+      "lowPrice": String(lowPrice),
+      "highPrice": String(highPrice),
+      "offerCount": String(plans.length),
+    }
+  } : {}),
+  "publisher": {
+    "@type": "Organization",
+    "name": "customApps",
+    "url": "https://customapps.fr",
+  },
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://customapps.fr/" },
+    { "@type": "ListItem", "position": 2, "name": "Applications", "item": "https://customapps.fr/#apps" },
+    { "@type": "ListItem", "position": 3, "name": app.name, "item": canonicalUrl },
+  ],
+};
 ---
 
+
 <Base title={title} description={description}>
+  <!-- JSON-LD : SoftwareApplication + BreadcrumbList -->
+  <script type="application/ld+json" set:html={JSON.stringify(softwareSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
   <!-- Hero -->
   <section class="relative overflow-hidden bg-noise">
     <div class="absolute inset-0 -z-10">
@@ -91,10 +149,16 @@ const description = app.description || app.tagline || '';
 
     <div class="max-w-7xl mx-auto px-6 pt-12 md:pt-20 pb-16 grid md:grid-cols-2 gap-12 items-center">
       <div>
-        <a href="/#apps" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 mb-6 transition-colors animate-fade-in-up">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-          Toutes les applications
-        </a>
+        <!-- Fil d'ariane SEO + accessibilité -->
+        <nav aria-label="Fil d'ariane" class="mb-6 animate-fade-in-up">
+          <ol class="flex items-center gap-1.5 text-sm text-gray-500">
+            <li><a href="/" class="hover:text-gray-900 transition-colors">Accueil</a></li>
+            <li aria-hidden="true" class="text-gray-300">/</li>
+            <li><a href="/#apps" class="hover:text-gray-900 transition-colors">Applications</a></li>
+            <li aria-hidden="true" class="text-gray-300">/</li>
+            <li aria-current="page" class="text-gray-900 font-medium truncate" id="app-breadcrumb">{app.name}</li>
+          </ol>
+        </nav>
 
         <div class="animate-fade-in-up delay-100 flex items-center gap-3 mb-6">
           {app.iconSvgPath && (
@@ -152,8 +216,8 @@ const description = app.description || app.tagline || '';
         <div class="reveal text-center mb-16">
           <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Fonctionnalités</span>
           <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            Tout ce dont<br/>
-            <span class="font-display-italic text-gray-500">vous avez besoin.</span>
+            Les fonctionnalités de<br/>
+            <span class="font-display-italic text-gray-500" id="app-name-features">{app.name}</span>
           </h2>
         </div>
         <div id="features-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -186,9 +250,9 @@ const description = app.description || app.tagline || '';
           </div>
           <div class="text-center md:text-left flex-1">
             <span class={`inline-block text-sm font-semibold ${c.text} mb-2 uppercase tracking-wider`}>Installation</span>
-            <h3 class="font-extrabold text-gray-900 mb-2 text-3xl tracking-tight">
-              Scannez pour <span class="font-display-italic text-gray-500">installer</span>
-            </h3>
+            <h2 class="font-extrabold text-gray-900 mb-2 text-3xl tracking-tight">
+              Installer <span class="font-display-italic text-gray-500" id="app-name-install">{app.name}</span> sur Android
+            </h2>
             <p class="text-sm text-gray-500 leading-relaxed mb-4">
               Scannez le QR code avec votre appareil Android ou téléchargez directement l'APK. Pas de Play Store — installation directe.
             </p>
@@ -231,8 +295,8 @@ const description = app.description || app.tagline || '';
         <div class="reveal text-center mb-16">
           <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Tarifs</span>
           <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            Choisissez<br/>
-            <span class="font-display-italic text-gray-500">votre formule.</span>
+            Tarifs <span class="font-display-italic text-gray-500" id="app-name-pricing">{app.name}</span> —<br/>
+            choisissez votre formule.
           </h2>
           <p class="text-lg text-gray-500 max-w-2xl mx-auto">
             Tarifs indicatifs HT, facturation mensuelle. Contactez-nous pour un devis personnalisé.
@@ -274,6 +338,52 @@ const description = app.description || app.tagline || '';
               </a>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Découvrez aussi — cross-linking pour SEO + rétention */}
+  {otherApps.length > 0 && (
+    <section class="relative py-24 bg-gray-50/50 overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="reveal text-center mb-12">
+          <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Complétez avec</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+            Découvrez aussi<br/>
+            <span class="font-display-italic text-gray-500">les autres apps de la suite.</span>
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {otherApps.map((other) => {
+            const oc = COLOR_CLASSES[other.color] || COLOR_CLASSES.blue;
+            return (
+              <a
+                href={`/apps/${other.slug}`}
+                class="reveal card-premium group relative overflow-hidden glass-strong rounded-2xl p-6 block"
+              >
+                <div class={`absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-br ${oc.mesh} to-transparent rounded-full blur-3xl opacity-60 group-hover:opacity-100 transition-opacity`}></div>
+                <div class="relative z-10">
+                  <div class={`inline-flex w-10 h-10 bg-gradient-to-br ${oc.from} ${oc.to} rounded-xl items-center justify-center mb-3 shadow-lg`}>
+                    {other.iconSvgPath && (
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={other.iconSvgPath} />
+                      </svg>
+                    )}
+                  </div>
+                  <h3 class="font-extrabold text-gray-900 text-lg tracking-tight mb-1">{other.name}</h3>
+                  {other.tagline && <p class={`text-xs font-semibold ${oc.text} mb-2`}>{other.tagline}</p>}
+                  <p class="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-3">{other.description}</p>
+                  <span class={`inline-flex items-center gap-1 text-xs font-semibold ${oc.text} group-hover:gap-2 transition-all`}>
+                    Découvrir
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -322,11 +432,19 @@ const description = app.description || app.tagline || '';
         // ── Hero ──────────────────────────────────────────────────────────
         const name = document.getElementById('app-name');
         const nameCta = document.getElementById('app-name-cta');
+        const nameBreadcrumb = document.getElementById('app-breadcrumb');
+        const nameFeatures = document.getElementById('app-name-features');
+        const nameInstall = document.getElementById('app-name-install');
+        const namePricing = document.getElementById('app-name-pricing');
         const code = document.getElementById('app-code');
         const tagline = document.getElementById('app-tagline');
         const description = document.getElementById('app-description');
         if (name && data.name) name.textContent = data.name;
         if (nameCta && data.name) nameCta.textContent = data.name;
+        if (nameBreadcrumb && data.name) nameBreadcrumb.textContent = data.name;
+        if (nameFeatures && data.name) nameFeatures.textContent = data.name;
+        if (nameInstall && data.name)  nameInstall.textContent = data.name;
+        if (namePricing && data.name)  namePricing.textContent = data.name;
         if (code && data.code) code.textContent = data.code;
         // Titre du navigateur
         if (data.name && data.tagline) document.title = `${data.name} — ${data.tagline}`;
