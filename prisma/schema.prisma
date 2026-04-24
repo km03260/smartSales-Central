@@ -322,6 +322,29 @@ model AdminUser {
   @@map("admin_users")
 }
 
+// ─── Articles de blog (site vitrine) ────────────────────────────────────────
+
+model BlogPost {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  slug        String   @unique @db.VarChar(200)
+  title       String   @db.VarChar(300)
+  description String   @db.Text                    // meta description + hook catalogue
+  content     String   @db.LongText                // markdown
+  publishedAt DateTime                             // date affichée au lecteur
+  updatedAt   DateTime @updatedAt
+  author      String   @default("Équipe customApps") @db.VarChar(100)
+  category    String   @default("guide") @db.VarChar(50)   // guide, actualites, etude-de-cas, produit, sous-le-capot
+  tags        Json                                  // ["force de vente", "ROI", ...]
+  coverImage  String   @default("") @db.VarChar(500)
+  featured    Boolean  @default(false)
+  draft       Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([publishedAt])
+  @@index([category, publishedAt])
+  @@map("blog_posts")
+}
+
 // ─── Demandes de contact (site vitrine) ─────────────────────────────────────
 
 model ContactRequest {

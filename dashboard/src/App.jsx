@@ -11,6 +11,8 @@ import Deployments from './pages/Deployments';
 import DeploymentDetail from './pages/DeploymentDetail';
 import Contacts from './pages/Contacts';
 import Apps from './pages/Apps';
+import Blog from './pages/Blog';
+import BlogEditor from './pages/BlogEditor';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -33,6 +35,9 @@ export default function App() {
             <Route path="deployments" element={<Deployments />} />
             <Route path="deployments/:id" element={<DeploymentDetail />} />
             <Route path="contacts" element={<Contacts />} />
+            <Route path="blog" element={<Blog />} />
+            <Route path="blog/new" element={<BlogEditor />} />
+            <Route path="blog/:id" element={<BlogEditor />} />
           </Route>
         </Routes>
       </BrowserRouter>

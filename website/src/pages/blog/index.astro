@@ -1,9 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
+
+let posts = [];
+try {
+  const res = await fetch(`${API_URL}/api/blog`);
+  if (res.ok) posts = await res.json();
+} catch {}
 
 const CATEGORY_LABELS = {
   'guide': 'Guide',
@@ -21,10 +25,10 @@ const CATEGORY_COLORS = {
   'sous-le-capot':  'bg-orange-50 text-orange-700',
 };
 
-const featured = posts.find(p => p.data.featured) || posts[0];
-const rest = posts.filter(p => p.id !== featured?.id);
+const featured = posts.find(p => p.featured) || posts[0];
+const rest = posts.filter(p => p.slug !== featured?.slug);
 
-const dateFormat = (d) => new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }).format(d);
+const dateFormat = (d) => new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(d));
 
 const title = 'Blog customApps — digitalisation ERP, apps métier, WaveSoft';
 const description = "Guides, actualités et retours d'expérience sur la digitalisation des processus terrain : force de vente mobile, achats, expéditions, sécurité des apps Android métier.";
@@ -46,32 +50,30 @@ const description = "Guides, actualités et retours d'expérience sur la digital
     </div>
   </section>
 
-  {posts.length === 0 && (
-    <section class="py-24 text-center">
-      <p class="text-gray-500">Les premiers articles arrivent bientôt. <a href="/contact" class="text-blue-600 font-semibold">Contactez-nous</a> pour suggérer un sujet.</p>
-    </section>
-  )}
+  <div id="blog-empty-state" class={`py-24 text-center ${posts.length === 0 ? '' : 'hidden'}`}>
+    <p class="text-gray-500">Les premiers articles arrivent bientôt. <a href="/contact" class="text-blue-600 font-semibold">Contactez-nous</a> pour suggérer un sujet.</p>
+  </div>
 
-  {featured && (
-    <!-- Article mis en avant -->
-    <section class="py-16">
-      <div class="max-w-6xl mx-auto px-6">
-        <a href={`/blog/${featured.id}`} class="reveal card-premium group block glass-strong rounded-3xl p-8 md:p-12 overflow-hidden relative">
+  <!-- Article mis en avant -->
+  <section id="blog-featured-section" class={`py-16 ${featured ? '' : 'hidden'}`}>
+    <div class="max-w-6xl mx-auto px-6">
+      {featured && (
+        <a id="blog-featured-link" href={`/blog/${featured.slug}`} class="reveal card-premium group block glass-strong rounded-3xl p-8 md:p-12 overflow-hidden relative">
           <div class="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-blue-100/40 to-transparent rounded-full blur-3xl opacity-60 group-hover:opacity-100 transition-opacity"></div>
           <div class="relative z-10 grid md:grid-cols-3 gap-8 items-center">
             <div class="md:col-span-2">
               <div class="flex items-center gap-2 mb-4 flex-wrap">
                 <span class="inline-block text-xs font-semibold px-2 py-1 rounded-full bg-blue-600 text-white uppercase tracking-wider">À la une</span>
-                <span class={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${CATEGORY_COLORS[featured.data.category] || CATEGORY_COLORS.guide}`}>
-                  {CATEGORY_LABELS[featured.data.category] || 'Guide'}
+                <span id="blog-featured-category" class={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${CATEGORY_COLORS[featured.category] || CATEGORY_COLORS.guide}`}>
+                  {CATEGORY_LABELS[featured.category] || 'Guide'}
                 </span>
-                <time class="text-xs text-gray-500" datetime={featured.data.publishedAt.toISOString()}>{dateFormat(featured.data.publishedAt)}</time>
+                <time id="blog-featured-date" class="text-xs text-gray-500" datetime={featured.publishedAt}>{dateFormat(featured.publishedAt)}</time>
               </div>
-              <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-3 group-hover:text-blue-600 transition-colors">
-                {featured.data.title}
+              <h2 id="blog-featured-title" class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-3 group-hover:text-blue-600 transition-colors">
+                {featured.title}
               </h2>
-              <p class="text-gray-500 leading-relaxed mb-4">
-                {featured.data.description}
+              <p id="blog-featured-description" class="text-gray-500 leading-relaxed mb-4">
+                {featured.description}
               </p>
               <span class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
                 Lire l'article
@@ -87,39 +89,37 @@ const description = "Guides, actualités et retours d'expérience sur la digital
             </div>
           </div>
         </a>
-      </div>
-    </section>
-  )}
+      )}
+    </div>
+  </section>
 
-  {rest.length > 0 && (
-    <!-- Articles suivants -->
-    <section class="pb-28">
-      <div class="max-w-6xl mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rest.map((post, i) => (
-            <a href={`/blog/${post.id}`} class="reveal card-premium group block bg-white rounded-2xl border border-gray-100 shadow-sm p-7 overflow-hidden" style={`transition-delay: ${i * 60}ms`}>
-              <div class="flex items-center gap-2 mb-3 flex-wrap">
-                <span class={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[post.data.category] || CATEGORY_COLORS.guide}`}>
-                  {CATEGORY_LABELS[post.data.category] || 'Guide'}
-                </span>
-                <time class="text-xs text-gray-400" datetime={post.data.publishedAt.toISOString()}>{dateFormat(post.data.publishedAt)}</time>
-              </div>
-              <h3 class="font-bold text-gray-900 text-lg tracking-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                {post.data.title}
-              </h3>
-              <p class="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4">
-                {post.data.description}
-              </p>
-              <span class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
-                Lire
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+  <!-- Articles suivants -->
+  <section id="blog-rest-section" class={`pb-28 ${rest.length > 0 ? '' : 'hidden'}`}>
+    <div class="max-w-6xl mx-auto px-6">
+      <div id="blog-rest-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {rest.map((post, i) => (
+          <a href={`/blog/${post.slug}`} class="card-premium group block bg-white rounded-2xl border border-gray-100 shadow-sm p-7 overflow-hidden">
+            <div class="flex items-center gap-2 mb-3 flex-wrap">
+              <span class={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[post.category] || CATEGORY_COLORS.guide}`}>
+                {CATEGORY_LABELS[post.category] || 'Guide'}
               </span>
-            </a>
-          ))}
-        </div>
+              <time class="text-xs text-gray-400" datetime={post.publishedAt}>{dateFormat(post.publishedAt)}</time>
+            </div>
+            <h3 class="font-bold text-gray-900 text-lg tracking-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+              {post.title}
+            </h3>
+            <p class="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4">
+              {post.description}
+            </p>
+            <span class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
+              Lire
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </a>
+        ))}
       </div>
-    </section>
-  )}
+    </div>
+  </section>
 
   <!-- RSS -->
   <section class="pb-16 text-center">
@@ -128,4 +128,78 @@ const description = "Guides, actualités et retours d'expérience sur la digital
       Flux RSS
     </a>
   </section>
+
+  <!-- Hydratation runtime : refetch et rebuild des 2 grilles pour refléter les ajouts/suppressions admin -->
+  <script define:vars={{ API_URL, CATEGORY_LABELS, CATEGORY_COLORS }}>
+    (async () => {
+      const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+      const fmt = (d) => new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(d));
+
+      try {
+        const res = await fetch(`${API_URL}/api/blog`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const posts = await res.json();
+        if (!Array.isArray(posts)) return;
+
+        const empty = document.getElementById('blog-empty-state');
+        const featuredSection = document.getElementById('blog-featured-section');
+        const restSection = document.getElementById('blog-rest-section');
+        const restGrid = document.getElementById('blog-rest-grid');
+
+        if (posts.length === 0) {
+          empty?.classList.remove('hidden');
+          featuredSection?.classList.add('hidden');
+          restSection?.classList.add('hidden');
+          return;
+        }
+        empty?.classList.add('hidden');
+
+        const featured = posts.find(p => p.featured) || posts[0];
+        const rest = posts.filter(p => p.slug !== featured.slug);
+
+        // Update featured block
+        if (featured) {
+          featuredSection?.classList.remove('hidden');
+          const link = document.getElementById('blog-featured-link');
+          const cat = document.getElementById('blog-featured-category');
+          const date = document.getElementById('blog-featured-date');
+          const title = document.getElementById('blog-featured-title');
+          const desc = document.getElementById('blog-featured-description');
+          if (link) link.href = `/blog/${featured.slug}`;
+          if (cat) {
+            cat.textContent = CATEGORY_LABELS[featured.category] || 'Guide';
+            cat.className = `inline-block text-xs font-semibold px-2 py-1 rounded-full ${CATEGORY_COLORS[featured.category] || CATEGORY_COLORS.guide}`;
+          }
+          if (date) { date.textContent = fmt(featured.publishedAt); date.setAttribute('datetime', featured.publishedAt); }
+          if (title) title.textContent = featured.title;
+          if (desc) desc.textContent = featured.description;
+        }
+
+        // Rebuild rest grid
+        if (restGrid) {
+          if (rest.length === 0) {
+            restSection?.classList.add('hidden');
+          } else {
+            restSection?.classList.remove('hidden');
+            restGrid.innerHTML = rest.map((post) => `
+              <a href="/blog/${encodeURIComponent(post.slug)}" class="card-premium group block bg-white rounded-2xl border border-gray-100 shadow-sm p-7 overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 flex-wrap">
+                  <span class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[post.category] || CATEGORY_COLORS.guide}">
+                    ${escapeHtml(CATEGORY_LABELS[post.category] || 'Guide')}
+                  </span>
+                  <time class="text-xs text-gray-400" datetime="${escapeHtml(post.publishedAt)}">${escapeHtml(fmt(post.publishedAt))}</time>
+                </div>
+                <h3 class="font-bold text-gray-900 text-lg tracking-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">${escapeHtml(post.title)}</h3>
+                <p class="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4">${escapeHtml(post.description)}</p>
+                <span class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 group-hover:gap-2 transition-all">
+                  Lire
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </span>
+              </a>
+            `).join('');
+          }
+        }
+      } catch {}
+    })();
+  </script>
 </Base>

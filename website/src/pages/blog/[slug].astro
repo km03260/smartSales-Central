@@ -1,14 +1,41 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection, render } from 'astro:content';
+import { marked } from 'marked';
+
+const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
+  try {
+    const res = await fetch(`${API_URL}/api/blog`);
+    if (res.ok) {
+      const posts = await res.json();
+      if (Array.isArray(posts) && posts.length > 0) {
+        return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+      }
+    }
+  } catch {}
+  // Fallback : au moins une page pour éviter un build vide
+  return [{ params: { slug: 'placeholder' }, props: { post: null } }];
 }
 
-const { post } = Astro.props;
-const { Content, headings } = await render(post);
+const { slug } = Astro.params;
+let { post } = Astro.props;
+
+// Si pas de post au build, on essaye encore au render time
+if (!post) {
+  try {
+    const res = await fetch(`${API_URL}/api/blog/${slug}`);
+    if (res.ok) post = await res.json();
+  } catch {}
+}
+
+// 404 si vraiment rien
+if (!post) {
+  return new Response(null, { status: 404, statusText: 'Not found' });
+}
+
+const renderedHtml = marked.parse(post.content || '', { breaks: false, gfm: true });
 
 const CATEGORY_LABELS = {
   'guide': 'Guide',
@@ -25,45 +52,40 @@ const CATEGORY_COLORS = {
   'sous-le-capot':  'bg-orange-50 text-orange-700',
 };
 
-const dateFormat = (d) => new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }).format(d);
+const dateFormat = (d) => new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(d));
 
-// Articles suggérés (même catégorie, hors article courant)
-const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
-  .filter(p => p.id !== post.id);
-const related = allPosts
-  .filter(p => p.data.category === post.data.category)
-  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
-  .slice(0, 2);
-const suggested = related.length >= 2 ? related : [...related, ...allPosts.filter(p => !related.includes(p)).slice(0, 2 - related.length)];
+// Articles suggérés : même catégorie, complétés par d'autres si pas assez
+let allPosts = [];
+try {
+  const resAll = await fetch(`${API_URL}/api/blog`);
+  if (resAll.ok) allPosts = await resAll.json();
+} catch {}
 
-const canonicalUrl = new URL(`/blog/${post.id}/`, Astro.site).href;
+const others = allPosts.filter(p => p.slug !== post.slug);
+const sameCat = others.filter(p => p.category === post.category).slice(0, 2);
+const suggested = sameCat.length >= 2 ? sameCat : [...sameCat, ...others.filter(p => !sameCat.includes(p)).slice(0, 2 - sameCat.length)];
 
-// JSON-LD BlogPosting
+const canonicalUrl = new URL(`/blog/${post.slug}/`, Astro.site).href;
+
 const blogPostingSchema = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": post.data.title,
-  "description": post.data.description,
-  "datePublished": post.data.publishedAt.toISOString(),
-  ...(post.data.updatedAt ? { "dateModified": post.data.updatedAt.toISOString() } : {}),
+  "headline": post.title,
+  "description": post.description,
+  "datePublished": new Date(post.publishedAt).toISOString(),
+  ...(post.updatedAt ? { "dateModified": new Date(post.updatedAt).toISOString() } : {}),
   "author": {
     "@type": "Organization",
-    "name": post.data.author || "customApps",
+    "name": post.author || "customApps",
     "url": "https://customapps.fr",
   },
   "publisher": {
     "@type": "Organization",
     "name": "customApps",
     "url": "https://customapps.fr",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://customapps.fr/og-default.png",
-    },
+    "logo": { "@type": "ImageObject", "url": "https://customapps.fr/og-default.png" },
   },
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": canonicalUrl,
-  },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
 };
 
 const breadcrumbSchema = {
@@ -72,62 +94,53 @@ const breadcrumbSchema = {
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://customapps.fr/" },
     { "@type": "ListItem", "position": 2, "name": "Blog",    "item": "https://customapps.fr/blog/" },
-    { "@type": "ListItem", "position": 3, "name": post.data.title, "item": canonicalUrl },
+    { "@type": "ListItem", "position": 3, "name": post.title, "item": canonicalUrl },
   ],
 };
 ---
 
-<Base title={`${post.data.title} | Blog customApps`} description={post.data.description}>
+<Base title={`${post.title} | Blog customApps`} description={post.description}>
   <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
-  <!-- Hero article -->
   <article class="relative overflow-hidden">
     <div class="absolute inset-0 -z-10">
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-br from-blue-100/40 via-violet-100/30 to-transparent rounded-full blur-3xl"></div>
     </div>
 
     <header class="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-8">
-      <!-- Breadcrumb -->
       <nav aria-label="Fil d'ariane" class="mb-6">
         <ol class="flex items-center gap-1.5 text-sm text-gray-500 flex-wrap">
           <li><a href="/" class="hover:text-gray-900 transition-colors">Accueil</a></li>
           <li aria-hidden="true" class="text-gray-300">/</li>
           <li><a href="/blog" class="hover:text-gray-900 transition-colors">Blog</a></li>
           <li aria-hidden="true" class="text-gray-300">/</li>
-          <li aria-current="page" class="text-gray-900 font-medium truncate">{post.data.title}</li>
+          <li aria-current="page" class="text-gray-900 font-medium truncate">{post.title}</li>
         </ol>
       </nav>
 
       <div class="flex items-center gap-2 mb-6 flex-wrap">
-        <span class={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${CATEGORY_COLORS[post.data.category] || CATEGORY_COLORS.guide}`}>
-          {CATEGORY_LABELS[post.data.category] || 'Guide'}
+        <span class={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${CATEGORY_COLORS[post.category] || CATEGORY_COLORS.guide}`}>
+          {CATEGORY_LABELS[post.category] || 'Guide'}
         </span>
-        <time class="text-sm text-gray-500" datetime={post.data.publishedAt.toISOString()}>Publié le {dateFormat(post.data.publishedAt)}</time>
-        {post.data.updatedAt && (
-          <>
-            <span class="text-gray-300">·</span>
-            <time class="text-sm text-gray-500" datetime={post.data.updatedAt.toISOString()}>Mis à jour le {dateFormat(post.data.updatedAt)}</time>
-          </>
-        )}
+        <time class="text-sm text-gray-500" datetime={new Date(post.publishedAt).toISOString()}>Publié le {dateFormat(post.publishedAt)}</time>
       </div>
 
       <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-[1.1] mb-6">
-        {post.data.title}
+        {post.title}
       </h1>
       <p class="text-xl text-gray-500 leading-relaxed mb-6">
-        {post.data.description}
+        {post.description}
       </p>
 
       <div class="flex items-center gap-3 text-sm text-gray-500">
         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
-          {post.data.author?.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase() || 'CA'}
+          {post.author?.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase() || 'CA'}
         </div>
-        <span>Par <strong class="text-gray-900 font-semibold">{post.data.author || 'Équipe customApps'}</strong></span>
+        <span>Par <strong class="text-gray-900 font-semibold">{post.author || 'Équipe customApps'}</strong></span>
       </div>
     </header>
 
-    <!-- Contenu markdown -->
     <div class="max-w-3xl mx-auto px-6 py-8">
       <div class="prose prose-lg prose-gray max-w-none
                   prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-gray-900
@@ -141,17 +154,14 @@ const breadcrumbSchema = {
                   prose-table:text-sm
                   prose-th:bg-gray-50 prose-th:font-semibold
                   prose-ul:my-4 prose-li:text-gray-600 prose-li:my-1
-                  prose-hr:border-gray-200">
-        <Content />
-      </div>
+                  prose-hr:border-gray-200" set:html={renderedHtml}></div>
     </div>
 
-    <!-- Tags -->
-    {post.data.tags && post.data.tags.length > 0 && (
+    {post.tags && post.tags.length > 0 && (
       <div class="max-w-3xl mx-auto px-6 py-8 border-t border-gray-100">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-sm font-semibold text-gray-700">Tags :</span>
-          {post.data.tags.map(tag => (
+          {post.tags.map(tag => (
             <span class="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-full">#{tag}</span>
           ))}
         </div>
@@ -160,7 +170,6 @@ const breadcrumbSchema = {
   </article>
 
   {suggested.length > 0 && (
-    <!-- Articles suggérés -->
     <section class="py-16 bg-gray-50/50">
       <div class="max-w-6xl mx-auto px-6">
         <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight mb-8 text-center">
@@ -168,18 +177,18 @@ const breadcrumbSchema = {
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {suggested.map((p) => (
-            <a href={`/blog/${p.id}`} class="card-premium group block bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <a href={`/blog/${p.slug}`} class="card-premium group block bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <div class="flex items-center gap-2 mb-3 flex-wrap">
-                <span class={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[p.data.category] || CATEGORY_COLORS.guide}`}>
-                  {CATEGORY_LABELS[p.data.category] || 'Guide'}
+                <span class={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[p.category] || CATEGORY_COLORS.guide}`}>
+                  {CATEGORY_LABELS[p.category] || 'Guide'}
                 </span>
-                <time class="text-xs text-gray-400" datetime={p.data.publishedAt.toISOString()}>{dateFormat(p.data.publishedAt)}</time>
+                <time class="text-xs text-gray-400" datetime={new Date(p.publishedAt).toISOString()}>{dateFormat(p.publishedAt)}</time>
               </div>
               <h3 class="font-bold text-gray-900 text-lg tracking-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                {p.data.title}
+                {p.title}
               </h3>
               <p class="text-sm text-gray-500 leading-relaxed line-clamp-2">
-                {p.data.description}
+                {p.description}
               </p>
             </a>
           ))}
@@ -188,7 +197,6 @@ const breadcrumbSchema = {
     </section>
   )}
 
-  <!-- CTA final -->
   <section class="py-24">
     <div class="max-w-3xl mx-auto px-6 text-center">
       <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">

@@ -2,11 +2,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { api } from '../lib/api';
-import { LayoutDashboard, Building2, KeyRound, MessageSquare, LogOut, Package, Server } from 'lucide-react';
+import { LayoutDashboard, Building2, KeyRound, MessageSquare, LogOut, Package, Server, FileText } from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/apps', icon: Package, label: 'Applications' },
+  { to: '/blog', icon: FileText, label: 'Blog' },
   { to: '/companies', icon: Building2, label: 'Entreprises' },
   { to: '/licenses', icon: KeyRound, label: 'Licences' },
   { to: '/deployments', icon: Server, label: 'Déploiements' },

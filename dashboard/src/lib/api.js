@@ -99,6 +99,13 @@ export const api = {
   deleteAppPlan: (appId, planId) =>
     request(`/admin/apps/${appId}/plans/${planId}`, { method: 'DELETE' }),
 
+  // Blog posts
+  getBlogPosts: () => request('/admin/blog'),
+  getBlogPost: (id) => request(`/admin/blog/${id}`),
+  createBlogPost: (body) => request('/admin/blog', { method: 'POST', body }),
+  updateBlogPost: (id, body) => request(`/admin/blog/${id}`, { method: 'PUT', body }),
+  deleteBlogPost: (id) => request(`/admin/blog/${id}`, { method: 'DELETE' }),
+
   // Licenses
   getLicenses: (appId) => request(`/admin/licenses${appId ? `?appId=${appId}` : ''}`),
   getLicense: (id) => request(`/admin/licenses/${id}`),

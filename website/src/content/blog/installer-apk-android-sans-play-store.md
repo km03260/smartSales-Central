@@ -49,7 +49,7 @@ Cette autorisation s'applique uniquement à l'application source (Chrome, Gmail�
 
 ## Étape 3 : Première activation avec la clé de licence
 
-Au premier lancement, l'app demande une **clé de licence** du type `CS-MAUR-INIT-0001`. Cette clé vous est fournie par votre administrateur depuis le dashboard customApps. Un seul appareil peut être activé par "place" de licence (selon votre formule).
+Au premier lancement, l'app demande une **clé de licence** du type `CS-XXXX-XXXX-XXXX`. Cette clé vous est fournie par votre administrateur depuis le dashboard customApps. Un seul appareil peut être activé par "place" de licence (selon votre formule).
 
 Dès l'activation :
 
