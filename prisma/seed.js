@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 const APPS = [
   {
-    code: 'SS',
+    code: 'CS',
     slug: 'custom-sales',
     name: 'customSales',
     description: "Donnez à vos commerciaux le pouvoir de prendre commandes, devis et paiements directement chez le client — même sans réseau.",

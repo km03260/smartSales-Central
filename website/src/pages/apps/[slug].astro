@@ -103,7 +103,7 @@ const description = app.description || app.tagline || '';
               </svg>
             </div>
           )}
-          <span class={`text-xs font-mono px-2 py-1 ${c.bg} ${c.text} rounded`}>{app.code}</span>
+          <span id="app-code" class={`text-xs font-mono px-2 py-1 ${c.bg} ${c.text} rounded`}>{app.code}</span>
         </div>
 
         <h1 id="app-name" class="animate-fade-in-up delay-200 text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.05] mb-4">
@@ -298,9 +298,11 @@ const description = app.description || app.tagline || '';
         const data = await res.json();
 
         const name = document.getElementById('app-name');
+        const code = document.getElementById('app-code');
         const tagline = document.getElementById('app-tagline');
         const description = document.getElementById('app-description');
         if (name && data.name) name.textContent = data.name;
+        if (code && data.code) code.textContent = data.code;
         if (tagline) {
           if (data.tagline) {
             tagline.textContent = data.tagline;

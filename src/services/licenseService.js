@@ -28,9 +28,10 @@ async function loadKeys() {
 
 /**
  * Génère un code d'activation unique : {appCode}-XXXX-XXXX-XXXX
- * @param {string} appCode - Code de l'application (ex: "SS", "SE", "SA")
+ * @param {string} appCode - Code de l'application (ex: "CS", "SP", "SH", "FS"). Requis.
  */
-export function generateLicenseKey(appCode = 'SS') {
+export function generateLicenseKey(appCode) {
+  if (!appCode) throw new Error('appCode requis pour generateLicenseKey');
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // pas de 0/O/1/I pour éviter confusion
   const segment = () => {
     let s = '';
