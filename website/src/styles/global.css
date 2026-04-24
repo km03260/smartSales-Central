@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ─── Animations ───────────────────────────────────────────────────────── */
 @keyframes fade-in-up {
