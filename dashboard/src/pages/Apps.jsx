@@ -459,27 +459,17 @@ function PlansEditor({ app, onReload }) {
     catch (err) { alert(err.message); }
   };
 
+  const update = async (planId, patch) => {
+    try { await api.updateAppPlan(app.id, planId, patch); await onReload(); }
+    catch (err) { alert(err.message); }
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <h4 className="font-semibold text-gray-900 mb-3 text-sm">Plans tarifaires ({app.pricingPlans?.length ?? 0})</h4>
       <div className="space-y-2 mb-4">
         {(app.pricingPlans || []).map((p) => (
-          <div key={p.id} className="p-3 border border-gray-100 rounded-lg">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-900">{p.name}</span>
-                <span className="text-sm text-gray-700">{p.price}{p.period}</span>
-                {p.isFeatured && <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">⭐ Mis en avant</span>}
-              </div>
-              <button onClick={() => remove(p.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded" title="Supprimer">
-                <Trash2 size={14} />
-              </button>
-            </div>
-            <ul className="text-xs text-gray-500 list-disc pl-5">
-              {(Array.isArray(p.features) ? p.features : []).map((f, i) => <li key={i}>{f}</li>)}
-            </ul>
-            <div className="text-xs text-gray-400 mt-1">CTA : {p.ctaLabel}</div>
-          </div>
+          <PlanRow key={p.id} plan={p} onUpdate={(patch) => update(p.id, patch)} onDelete={() => remove(p.id)} />
         ))}
       </div>
 
@@ -505,6 +495,64 @@ function PlansEditor({ app, onReload }) {
           <button onClick={add} className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
             <Plus size={14} />
             Ajouter le plan
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PlanRow({ plan, onUpdate, onDelete }) {
+  const initialFeaturesText = (Array.isArray(plan.features) ? plan.features : []).join('\n');
+  const [name, setName]                 = useState(plan.name);
+  const [price, setPrice]               = useState(plan.price);
+  const [period, setPeriod]             = useState(plan.period || '');
+  const [ctaLabel, setCtaLabel]         = useState(plan.ctaLabel || '');
+  const [isFeatured, setIsFeatured]     = useState(!!plan.isFeatured);
+  const [featuresText, setFeaturesText] = useState(initialFeaturesText);
+
+  const dirty =
+    name !== plan.name ||
+    price !== plan.price ||
+    period !== (plan.period || '') ||
+    ctaLabel !== (plan.ctaLabel || '') ||
+    isFeatured !== !!plan.isFeatured ||
+    featuresText !== initialFeaturesText;
+
+  const save = () => {
+    const features = featuresText.split('\n').map(s => s.trim()).filter(Boolean);
+    onUpdate({ name, price, period, ctaLabel, isFeatured, features });
+  };
+
+  return (
+    <div className={`p-3 border rounded-lg ${dirty ? 'border-blue-300 bg-blue-50/30' : 'border-gray-100'}`}>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2">
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom"
+          className="px-2 py-1.5 text-sm font-semibold border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Prix"
+          className="px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="text" value={period} onChange={(e) => setPeriod(e.target.value)} placeholder="Période (/mois)"
+          className="px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="text" value={ctaLabel} onChange={(e) => setCtaLabel(e.target.value)} placeholder="CTA"
+          className="md:col-span-2 px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+      <textarea rows={3} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)}
+        placeholder="Fonctionnalités (1 par ligne)"
+        className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-2 text-xs text-gray-700">
+          <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} />
+          Mis en avant (⭐ recommandé)
+        </label>
+        <div className="flex items-center gap-1">
+          {dirty && (
+            <button onClick={save} className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+              <Save size={12} />
+              Enregistrer
+            </button>
+          )}
+          <button onClick={onDelete} className="p-1.5 text-red-500 hover:bg-red-50 rounded" title="Supprimer">
+            <Trash2 size={14} />
           </button>
         </div>
       </div>
