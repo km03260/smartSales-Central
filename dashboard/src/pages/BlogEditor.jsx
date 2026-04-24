@@ -51,6 +51,7 @@ export default function BlogEditor() {
     title: '',
     description: '',
     content: '',
+    coverImage: '',
     publishedAt: new Date().toISOString().slice(0, 10),
     author: 'Équipe customApps',
     category: 'guide',
@@ -67,6 +68,7 @@ export default function BlogEditor() {
         title: post.title,
         description: post.description,
         content: post.content,
+        coverImage: post.coverImage || '',
         publishedAt: new Date(post.publishedAt).toISOString().slice(0, 10),
         author: post.author || 'Équipe customApps',
         category: post.category || 'guide',
@@ -85,11 +87,13 @@ export default function BlogEditor() {
     }
     setSaving(true);
     try {
+      const finalSlug = form.slug || slugify(form.title);
       const payload = {
-        slug: form.slug || slugify(form.title),
+        slug: finalSlug,
         title: form.title,
         description: form.description,
         content: form.content,
+        coverImage: form.coverImage || `/blog/covers/${finalSlug}.svg`,  // défaut = cover SVG auto-généré
         publishedAt: new Date(form.publishedAt).toISOString(),
         author: form.author,
         category: form.category,
@@ -204,6 +208,29 @@ export default function BlogEditor() {
               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-xs text-gray-400 mt-1">{form.description.length} caractères</p>
+          </div>
+
+          {/* Cover image */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Image de couverture (URL)</label>
+            <div className="flex items-center gap-3">
+              <input
+                type="text" value={form.coverImage}
+                onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
+                placeholder={form.slug ? `/blog/covers/${form.slug}.svg (défaut auto)` : '/blog/covers/mon-article.svg'}
+                className="flex-1 px-3 py-2 text-sm font-mono border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {(form.coverImage || form.slug) && (
+                <div className="flex-shrink-0 w-24 h-[54px] rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+                  <img src={form.coverImage || `/blog/covers/${form.slug || slugify(form.title)}.svg`}
+                    alt="Aperçu" className="w-full h-full object-cover"
+                    onError={(e) => { e.target.style.display = 'none'; }} />
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Laisse vide pour utiliser le cover par défaut (généré à <code className="bg-gray-100 px-1 rounded">/blog/covers/{form.slug || slugify(form.title) || 'slug'}.svg</code>). Ou colle une URL d'image personnalisée.
+            </p>
           </div>
 
           {/* Métadonnées en grille */}

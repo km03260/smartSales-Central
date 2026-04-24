@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="ROI">
+  <defs>
+    <linearGradient id="bg-vrai-cout-processus-commande-papier" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <radialGradient id="glow-vrai-cout-processus-commande-papier" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.45"/>
+      <stop offset="70%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="corner-vrai-cout-processus-commande-papier" cx="100%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots-vrai-cout-processus-commande-papier" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#ffffff" fill-opacity="0.06"/>
+    </pattern>
+    <filter id="blur-vrai-cout-processus-commande-papier" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <!-- Backgrounds -->
+  <rect width="1200" height="630" fill="url(#bg-vrai-cout-processus-commande-papier)"/>
+  <rect width="1200" height="630" fill="url(#dots-vrai-cout-processus-commande-papier)"/>
+  <rect width="1200" height="630" fill="url(#corner-vrai-cout-processus-commande-papier)"/>
+
+  <!-- Glow behind icon -->
+  <circle cx="600" cy="315" r="240" fill="url(#glow-vrai-cout-processus-commande-papier)"/>
+
+  <!-- Decorative arcs -->
+  <circle cx="600" cy="315" r="200" stroke="#60a5fa" stroke-opacity="0.18" stroke-width="1.5" fill="none"/>
+  <circle cx="600" cy="315" r="260" stroke="#60a5fa" stroke-opacity="0.10" stroke-width="1" fill="none"/>
+  <circle cx="600" cy="315" r="320" stroke="#60a5fa" stroke-opacity="0.06" stroke-width="1" fill="none"/>
+
+  <!-- Decorative blobs -->
+  <circle cx="100" cy="100" r="180" fill="#3b82f6" fill-opacity="0.12" filter="url(#blur-vrai-cout-processus-commande-papier)"/>
+  <circle cx="1100" cy="530" r="160" fill="#60a5fa" fill-opacity="0.10" filter="url(#blur-vrai-cout-processus-commande-papier)"/>
+
+  <!-- Central icon in a rounded square -->
+  <rect x="480" y="195" width="240" height="240" rx="48" fill="#3b82f6" fill-opacity="0.15"/>
+  <rect x="490" y="205" width="220" height="220" rx="42" fill="#0f172a" fill-opacity="0.6"/>
+  <rect x="490" y="205" width="220" height="220" rx="42" fill="none" stroke="#60a5fa" stroke-opacity="0.4" stroke-width="1.5"/>
+
+  <!-- Icon (heroicons outline, scaled/translated to fit 160×160 centered at 600,315) -->
+  <g transform="translate(520, 235) scale(6.67)">
+    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Category label -->
+  <g transform="translate(600, 490)">
+    <rect x="-120" y="-20" width="240" height="40" rx="20" fill="#ffffff" fill-opacity="0.1"/>
+    <text x="0" y="6" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="600" font-size="16" fill="#60a5fa" letter-spacing="2">ROI</text>
+  </g>
+
+  <!-- customApps logo corner -->
+  <g transform="translate(60, 560)">
+    <rect x="0"  y="0"  width="18" height="18" rx="4" fill="#60a5fa"/>
+    <rect x="24" y="0"  width="18" height="18" rx="4" fill="#60a5fa" fill-opacity="0.5"/>
+    <rect x="0"  y="24" width="18" height="18" rx="4" fill="#60a5fa" fill-opacity="0.5"/>
+    <rect x="24" y="24" width="18" height="18" rx="4" fill="#60a5fa"/>
+    <text x="54" y="28" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="20" fill="#ffffff" fill-opacity="0.85">customApps</text>
+  </g>
+
+  <!-- Subtle badge bottom-right -->
+  <g transform="translate(1140, 590)" text-anchor="end">
+    <text font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="13" fill="#ffffff" fill-opacity="0.45">blog.customapps.fr</text>
+  </g>
+</svg>

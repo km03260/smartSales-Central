@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Étude de cas">
+  <defs>
+    <linearGradient id="bg-etude-cas-maurer-digitalisation-commerciaux" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <radialGradient id="glow-etude-cas-maurer-digitalisation-commerciaux" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.45"/>
+      <stop offset="70%" stop-color="#10b981" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="corner-etude-cas-maurer-digitalisation-commerciaux" cx="100%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots-etude-cas-maurer-digitalisation-commerciaux" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#ffffff" fill-opacity="0.06"/>
+    </pattern>
+    <filter id="blur-etude-cas-maurer-digitalisation-commerciaux" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <!-- Backgrounds -->
+  <rect width="1200" height="630" fill="url(#bg-etude-cas-maurer-digitalisation-commerciaux)"/>
+  <rect width="1200" height="630" fill="url(#dots-etude-cas-maurer-digitalisation-commerciaux)"/>
+  <rect width="1200" height="630" fill="url(#corner-etude-cas-maurer-digitalisation-commerciaux)"/>
+
+  <!-- Glow behind icon -->
+  <circle cx="600" cy="315" r="240" fill="url(#glow-etude-cas-maurer-digitalisation-commerciaux)"/>
+
+  <!-- Decorative arcs -->
+  <circle cx="600" cy="315" r="200" stroke="#34d399" stroke-opacity="0.18" stroke-width="1.5" fill="none"/>
+  <circle cx="600" cy="315" r="260" stroke="#34d399" stroke-opacity="0.10" stroke-width="1" fill="none"/>
+  <circle cx="600" cy="315" r="320" stroke="#34d399" stroke-opacity="0.06" stroke-width="1" fill="none"/>
+
+  <!-- Decorative blobs -->
+  <circle cx="100" cy="100" r="180" fill="#10b981" fill-opacity="0.12" filter="url(#blur-etude-cas-maurer-digitalisation-commerciaux)"/>
+  <circle cx="1100" cy="530" r="160" fill="#34d399" fill-opacity="0.10" filter="url(#blur-etude-cas-maurer-digitalisation-commerciaux)"/>
+
+  <!-- Central icon in a rounded square -->
+  <rect x="480" y="195" width="240" height="240" rx="48" fill="#10b981" fill-opacity="0.15"/>
+  <rect x="490" y="205" width="220" height="220" rx="42" fill="#0f172a" fill-opacity="0.6"/>
+  <rect x="490" y="205" width="220" height="220" rx="42" fill="none" stroke="#34d399" stroke-opacity="0.4" stroke-width="1.5"/>
+
+  <!-- Icon (heroicons outline, scaled/translated to fit 160×160 centered at 600,315) -->
+  <g transform="translate(520, 235) scale(6.67)">
+    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Category label -->
+  <g transform="translate(600, 490)">
+    <rect x="-120" y="-20" width="240" height="40" rx="20" fill="#ffffff" fill-opacity="0.1"/>
+    <text x="0" y="6" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="600" font-size="16" fill="#34d399" letter-spacing="2">ÉTUDE DE CAS</text>
+  </g>
+
+  <!-- customApps logo corner -->
+  <g transform="translate(60, 560)">
+    <rect x="0"  y="0"  width="18" height="18" rx="4" fill="#34d399"/>
+    <rect x="24" y="0"  width="18" height="18" rx="4" fill="#34d399" fill-opacity="0.5"/>
+    <rect x="0"  y="24" width="18" height="18" rx="4" fill="#34d399" fill-opacity="0.5"/>
+    <rect x="24" y="24" width="18" height="18" rx="4" fill="#34d399"/>
+    <text x="54" y="28" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="20" fill="#ffffff" fill-opacity="0.85">customApps</text>
+  </g>
+
+  <!-- Subtle badge bottom-right -->
+  <g transform="translate(1140, 590)" text-anchor="end">
+    <text font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="13" fill="#ffffff" fill-opacity="0.45">blog.customapps.fr</text>
+  </g>
+</svg>

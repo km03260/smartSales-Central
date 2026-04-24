@@ -81,6 +81,8 @@ async function main() {
 
     try {
       const existing = await prisma.blogPost.findUnique({ where: { slug } });
+      // Cover image : convention = /blog/covers/{slug}.svg, servi directement par Astro depuis public/
+      const coverImage = `/blog/covers/${slug}.svg`;
       const payload = {
         slug,
         title: data.title,
@@ -90,6 +92,7 @@ async function main() {
         author: data.author || 'Équipe customApps',
         category: data.category || 'guide',
         tags: Array.isArray(data.tags) ? data.tags : [],
+        coverImage,
         featured: !!data.featured,
         draft: !!data.draft,
       };

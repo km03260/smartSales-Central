@@ -141,6 +141,14 @@ const breadcrumbSchema = {
       </div>
     </header>
 
+    {post.coverImage && (
+      <div class="max-w-5xl mx-auto px-6 py-8">
+        <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10 bg-gray-100 aspect-[1200/630]">
+          <img src={post.coverImage} alt={`Illustration — ${post.title}`} class="absolute inset-0 w-full h-full object-cover" />
+        </div>
+      </div>
+    )}
+
     <div class="max-w-3xl mx-auto px-6 py-8">
       <div class="prose prose-lg prose-gray max-w-none
                   prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-gray-900
@@ -177,19 +185,27 @@ const breadcrumbSchema = {
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {suggested.map((p) => (
-            <a href={`/blog/${p.slug}`} class="card-premium group block bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <div class="flex items-center gap-2 mb-3 flex-wrap">
-                <span class={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[p.category] || CATEGORY_COLORS.guide}`}>
-                  {CATEGORY_LABELS[p.category] || 'Guide'}
-                </span>
-                <time class="text-xs text-gray-400" datetime={new Date(p.publishedAt).toISOString()}>{dateFormat(p.publishedAt)}</time>
+            <a href={`/blog/${p.slug}`} class="card-premium group block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              {p.coverImage && (
+                <div class="relative aspect-[16/9] overflow-hidden bg-gray-100">
+                  <img src={p.coverImage} alt={`Illustration — ${p.title}`}
+                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                </div>
+              )}
+              <div class="p-6">
+                <div class="flex items-center gap-2 mb-3 flex-wrap">
+                  <span class={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[p.category] || CATEGORY_COLORS.guide}`}>
+                    {CATEGORY_LABELS[p.category] || 'Guide'}
+                  </span>
+                  <time class="text-xs text-gray-400" datetime={new Date(p.publishedAt).toISOString()}>{dateFormat(p.publishedAt)}</time>
+                </div>
+                <h3 class="font-bold text-gray-900 text-lg tracking-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                  {p.title}
+                </h3>
+                <p class="text-sm text-gray-500 leading-relaxed line-clamp-2">
+                  {p.description}
+                </p>
               </div>
-              <h3 class="font-bold text-gray-900 text-lg tracking-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                {p.title}
-              </h3>
-              <p class="text-sm text-gray-500 leading-relaxed line-clamp-2">
-                {p.description}
-              </p>
             </a>
           ))}
         </div>
