@@ -250,6 +250,7 @@ router.post('/:id/apk', upload.single('apk'), async (req, res) => {
       data: {
         apkFileName: req.file.filename,
         apkVersion: req.body.version || '',
+        apkReleaseNotes: req.body.releaseNotes || '',
         apkUpdatedAt: new Date(),
       },
     });
@@ -284,7 +285,7 @@ router.delete('/:id/apk', async (req, res) => {
 
     const updated = await prisma.app.update({
       where: { id: app.id },
-      data: { apkFileName: '', apkVersion: '', apkUpdatedAt: null },
+      data: { apkFileName: '', apkVersion: '', apkReleaseNotes: '', apkUpdatedAt: null },
     });
 
     res.json({ success: true, app: updated });

@@ -23,6 +23,7 @@ model App {
   isActive    Boolean  @default(true)
   apkFileName        String   @default("") @db.VarChar(200)
   apkVersion         String   @default("") @db.VarChar(50)
+  apkReleaseNotes    String   @default("") @db.Text  // note de version de l'APK courant (apports de la release)
   apkUpdatedAt       DateTime?
   serviceBundlePath  String   @default("") @db.VarChar(500)  // chemin du ZIP du SyncService (uploads/services/)
   serviceBundleVersion String @default("") @db.VarChar(50)

@@ -24,10 +24,10 @@ export default function Apps() {
 
   useEffect(() => { load(); }, []);
 
-  const handleApkUpload = async (appId, file, version) => {
+  const handleApkUpload = async (appId, file, version, releaseNotes) => {
     if (!file) return;
     setUploadingId(appId);
-    try { await api.uploadApk(appId, file, version); await load(); }
+    try { await api.uploadApk(appId, file, version, releaseNotes); await load(); }
     catch (err) { alert(err.message); }
     finally { setUploadingId(null); }
   };
@@ -71,7 +71,7 @@ export default function Apps() {
             marketingOpen={openMarketingId === app.id}
             onToggleMarketing={() => setOpenMarketingId(openMarketingId === app.id ? null : app.id)}
             onReload={load}
-            onUpload={(file, version) => handleApkUpload(app.id, file, version)}
+            onUpload={(file, version, releaseNotes) => handleApkUpload(app.id, file, version, releaseNotes)}
             onDeleteApk={() => handleApkDelete(app.id)}
             onShowQr={() => setQrPreview(app)}
             onUploadBundle={(file, version) => handleBundleUpload(app.id, file, version)}
@@ -97,6 +97,7 @@ function AppCard({ app, uploading, marketingOpen, onToggleMarketing, onReload, o
   const fileRef = useRef(null);
   const bundleRef = useRef(null);
   const [version, setVersion] = useState('');
+  const [releaseNotes, setReleaseNotes] = useState('');
   const [bundleVersion, setBundleVersion] = useState('');
   const hasApk = !!app.apkFileName;
   const hasBundle = !!app.serviceBundlePath;
@@ -105,7 +106,7 @@ function AppCard({ app, uploading, marketingOpen, onToggleMarketing, onReload, o
   const triggerBundleUpload = () => bundleRef.current?.click();
   const onFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) onUpload(file, version);
+    if (file) onUpload(file, version, releaseNotes);
     e.target.value = '';
   };
   const onBundleChange = (e) => {
@@ -143,36 +144,51 @@ function AppCard({ app, uploading, marketingOpen, onToggleMarketing, onReload, o
 
         {hasApk ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-100 rounded-lg">
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900 truncate">{app.apkFileName}</div>
-                <div className="text-xs text-gray-500">
-                  {app.apkVersion && <span>v{app.apkVersion} · </span>}
-                  {app.apkUpdatedAt && <span>{new Date(app.apkUpdatedAt).toLocaleDateString()}</span>}
+            <div className="p-3 bg-green-50 border border-green-100 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-gray-900 truncate">{app.apkFileName}</div>
+                  <div className="text-xs text-gray-500">
+                    {app.apkVersion && <span>v{app.apkVersion} · </span>}
+                    {app.apkUpdatedAt && <span>{new Date(app.apkUpdatedAt).toLocaleDateString()}</span>}
+                  </div>
                 </div>
+                <button onClick={onShowQr} className="p-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded transition-colors" title="Voir le QR code">
+                  <QrCode size={18} />
+                </button>
+                <a href={app.apkUrl} download className="p-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded transition-colors" title="Télécharger">
+                  <Download size={18} />
+                </a>
+                <button onClick={onDeleteApk} className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded transition-colors" title="Supprimer">
+                  <Trash2 size={18} />
+                </button>
               </div>
-              <button onClick={onShowQr} className="p-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded transition-colors" title="Voir le QR code">
-                <QrCode size={18} />
-              </button>
-              <a href={app.apkUrl} download className="p-2 text-gray-600 hover:text-blue-600 hover:bg-white rounded transition-colors" title="Télécharger">
-                <Download size={18} />
-              </a>
-              <button onClick={onDeleteApk} className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded transition-colors" title="Supprimer">
-                <Trash2 size={18} />
-              </button>
+              {app.apkReleaseNotes && (
+                <div className="mt-2 pt-2 border-t border-green-200 text-xs text-gray-600 whitespace-pre-line">
+                  <span className="font-semibold text-gray-700">Notes de version :</span> {app.apkReleaseNotes}
+                </div>
+              )}
             </div>
 
-            <div className="flex gap-2">
-              <input
-                type="text" value={version} onChange={(e) => setVersion(e.target.value)}
-                placeholder="Nouvelle version (ex: 1.2.3)"
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text" value={version} onChange={(e) => setVersion(e.target.value)}
+                  placeholder="Nouvelle version (ex: 1.2.3)"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button onClick={triggerUpload} disabled={uploading}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors">
+                  <Upload size={16} />
+                  {uploading ? 'Upload...' : 'Remplacer'}
+                </button>
+              </div>
+              <textarea
+                value={releaseNotes} onChange={(e) => setReleaseNotes(e.target.value)}
+                rows={3}
+                placeholder="Notes de version (ce que cette release apporte, une ligne par point)"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
               />
-              <button onClick={triggerUpload} disabled={uploading}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors">
-                <Upload size={16} />
-                {uploading ? 'Upload...' : 'Remplacer'}
-              </button>
             </div>
           </div>
         ) : (
@@ -180,17 +196,25 @@ function AppCard({ app, uploading, marketingOpen, onToggleMarketing, onReload, o
             <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center text-sm text-gray-500">
               Aucun APK uploadé
             </div>
-            <div className="flex gap-2">
-              <input
-                type="text" value={version} onChange={(e) => setVersion(e.target.value)}
-                placeholder="Version (ex: 1.2.3)"
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text" value={version} onChange={(e) => setVersion(e.target.value)}
+                  placeholder="Version (ex: 1.2.3)"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button onClick={triggerUpload} disabled={uploading}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                  <Upload size={16} />
+                  {uploading ? 'Upload...' : 'Uploader APK'}
+                </button>
+              </div>
+              <textarea
+                value={releaseNotes} onChange={(e) => setReleaseNotes(e.target.value)}
+                rows={3}
+                placeholder="Notes de version (ce que cette release apporte, une ligne par point)"
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
               />
-              <button onClick={triggerUpload} disabled={uploading}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
-                <Upload size={16} />
-                {uploading ? 'Upload...' : 'Uploader APK'}
-              </button>
             </div>
           </div>
         )}

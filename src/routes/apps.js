@@ -25,6 +25,7 @@ function appToPublic(app, req) {
     iconSvgPath: app.iconSvgPath,
     order: app.order,
     apkVersion: app.apkVersion || null,
+    apkReleaseNotes: app.apkReleaseNotes || null,
     apkUpdatedAt: app.apkUpdatedAt,
     apkUrl: app.apkFileName ? buildPublicUrl(req, `/uploads/apps/${app.code}/${app.apkFileName}`) : null,
     qrcodeUrl: app.apkFileName ? buildPublicUrl(req, `/uploads/apps/${app.code}/qrcode.svg`) : null,

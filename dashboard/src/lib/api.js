@@ -53,11 +53,12 @@ export const api = {
   createApp: (body) => request('/admin/apps', { method: 'POST', body }),
   updateApp: (id, body) => request(`/admin/apps/${id}`, { method: 'PUT', body }),
   deleteApp: (id) => request(`/admin/apps/${id}`, { method: 'DELETE' }),
-  uploadApk: async (appId, file, version) => {
+  uploadApk: async (appId, file, version, releaseNotes) => {
     const token = localStorage.getItem('admin_token');
     const formData = new FormData();
     formData.append('apk', file);
     if (version) formData.append('version', version);
+    if (releaseNotes) formData.append('releaseNotes', releaseNotes);
     const res = await fetch(`${API_BASE}/admin/apps/${appId}/apk`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
