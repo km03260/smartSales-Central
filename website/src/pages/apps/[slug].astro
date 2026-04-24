@@ -156,7 +156,7 @@ const description = app.description || app.tagline || '';
             <span class="font-display-italic text-gray-500">vous avez besoin.</span>
           </h2>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div id="features-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
           {app.features.map((feature, i) => (
             <div class="reveal card-premium bg-white rounded-2xl p-7 border border-gray-100 shadow-sm" style={`transition-delay: ${i * 70}ms`}>
               <div class={`w-12 h-12 bg-gradient-to-br ${c.from} ${c.to} rounded-xl flex items-center justify-center mb-5 shadow-lg ${c.shadow}`}>
@@ -239,7 +239,7 @@ const description = app.description || app.tagline || '';
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div id="pricing-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {app.pricingPlans.map((plan, i) => (
             <div
               class={`reveal relative bg-white rounded-3xl p-8 ${plan.isFeatured ? `${c.border} ring-4 ${c.ring} shadow-2xl ${c.shadow}` : 'border border-gray-100 shadow-sm'}`}
@@ -308,14 +308,18 @@ const description = app.description || app.tagline || '';
     </div>
   </section>
 
-  {/* Rafraîchir descriptions + APK/QR au runtime */}
-  <script define:vars={{ API_URL, slug: app.slug }}>
+  {/* Rafraîchir descriptions + APK/QR + features + pricing au runtime */}
+  <script define:vars={{ API_URL, slug: app.slug, colorClasses: c }}>
     (async () => {
+      const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+
       try {
         const res = await fetch(`${API_URL}/api/apps/${slug}`, { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
+        const c = colorClasses;
 
+        // ── Hero ──────────────────────────────────────────────────────────
         const name = document.getElementById('app-name');
         const code = document.getElementById('app-code');
         const tagline = document.getElementById('app-tagline');
@@ -323,18 +327,15 @@ const description = app.description || app.tagline || '';
         if (name && data.name) name.textContent = data.name;
         if (code && data.code) code.textContent = data.code;
         if (tagline) {
-          if (data.tagline) {
-            tagline.textContent = data.tagline;
-            tagline.classList.remove('hidden');
-          } else {
-            tagline.classList.add('hidden');
-          }
+          if (data.tagline) { tagline.textContent = data.tagline; tagline.classList.remove('hidden'); }
+          else              { tagline.classList.add('hidden'); }
         }
         if (description) {
           const text = data.longDescription || data.description;
           if (text) description.textContent = text;
         }
 
+        // ── APK / QR / version / notes ───────────────────────────────────
         const qr = document.getElementById('apk-qrcode');
         const link1 = document.getElementById('apk-download');
         const link2 = document.getElementById('apk-download-2');
@@ -347,15 +348,65 @@ const description = app.description || app.tagline || '';
         if (link2 && data.apkUrl) link2.href = data.apkUrl;
         if (version && data.apkVersion) version.textContent = `v${data.apkVersion}`;
         if (versionBadge && data.apkVersion) {
-          versionBadge.innerHTML = `Dernière version : <strong class="text-gray-900">v${data.apkVersion}</strong>`;
+          versionBadge.innerHTML = `Dernière version : <strong class="text-gray-900">v${escapeHtml(data.apkVersion)}</strong>`;
         }
         if (releaseNotes) {
           if (data.apkReleaseNotes) {
             releaseNotes.textContent = data.apkReleaseNotes;
             if (releaseNotesBlock) releaseNotesBlock.classList.remove('hidden');
-          } else {
-            if (releaseNotesBlock) releaseNotesBlock.classList.add('hidden');
+          } else if (releaseNotesBlock) {
+            releaseNotesBlock.classList.add('hidden');
           }
+        }
+
+        // ── Features ─────────────────────────────────────────────────────
+        const featuresGrid = document.getElementById('features-grid');
+        if (featuresGrid && Array.isArray(data.features)) {
+          featuresGrid.innerHTML = data.features.map((f) => `
+            <div class="card-premium bg-white rounded-2xl p-7 border border-gray-100 shadow-sm">
+              <div class="w-12 h-12 bg-gradient-to-br ${c.from} ${c.to} rounded-xl flex items-center justify-center mb-5 shadow-lg ${c.shadow}">
+                ${f.iconSvgPath ? `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${escapeHtml(f.iconSvgPath)}"/></svg>` : ''}
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2 text-lg">${escapeHtml(f.title)}</h3>
+              <p class="text-sm text-gray-500 leading-relaxed">${escapeHtml(f.description || '')}</p>
+            </div>
+          `).join('');
+        }
+
+        // ── Pricing plans ────────────────────────────────────────────────
+        const pricingGrid = document.getElementById('pricing-grid');
+        if (pricingGrid && Array.isArray(data.pricingPlans)) {
+          pricingGrid.innerHTML = data.pricingPlans.map((p) => {
+            const cardClasses = p.isFeatured
+              ? `${c.border} ring-4 ${c.ring} shadow-2xl ${c.shadow}`
+              : 'border border-gray-100 shadow-sm';
+            const badge = p.isFeatured
+              ? `<div class="absolute top-0 right-6 -translate-y-1/2 bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">⭐ Recommandé</div>`
+              : '';
+            const featuresList = (Array.isArray(p.features) ? p.features : []).map((feat) => `
+              <li class="flex items-start gap-2 text-sm text-gray-600">
+                <div class="flex-shrink-0 w-5 h-5 ${c.bg} rounded-full flex items-center justify-center mt-0.5">
+                  <svg class="w-3 h-3 ${c.text}" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                ${escapeHtml(feat)}
+              </li>
+            `).join('');
+            const ctaClass = p.isFeatured
+              ? `block text-center bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg ${c.shadow} transition-all duration-300`
+              : `block text-center glass-strong text-gray-700 px-6 py-3 rounded-full font-semibold hover:bg-white transition-all duration-300`;
+            return `
+              <div class="relative bg-white rounded-3xl p-8 ${cardClasses}">
+                ${badge}
+                <h3 class="font-extrabold text-gray-900 text-2xl mb-2 tracking-tight">${escapeHtml(p.name)}</h3>
+                <div class="flex items-baseline gap-1 mb-6">
+                  <span class="text-5xl font-extrabold text-gray-900 tracking-tight">${escapeHtml(p.price)}</span>
+                  ${p.period ? `<span class="text-gray-500 text-sm">${escapeHtml(p.period)}</span>` : ''}
+                </div>
+                <ul class="space-y-3 mb-8">${featuresList}</ul>
+                <a href="/contact" class="${ctaClass}">${escapeHtml(p.ctaLabel || 'Demander une démo')}</a>
+              </div>
+            `;
+          }).join('');
         }
       } catch {}
     })();
