@@ -68,7 +68,7 @@ const MOCKUP_VARIANT = {
         </h1>
 
         <p class="animate-fade-in-up delay-200 text-lg md:text-xl text-gray-500 max-w-xl mb-10 leading-relaxed">
-          Ventes, achats, expéditions, documents : <strong class="text-gray-900 font-semibold">{apps.length} applications mobiles</strong> qui fonctionnent hors-ligne et se synchronisent en temps réel avec votre ERP.
+          Ventes, achats, expéditions, documents : <strong class="text-gray-900 font-semibold"><span id="apps-count-inline">{apps.length}</span> applications mobiles</strong> qui fonctionnent hors-ligne et se synchronisent en temps réel avec votre ERP.
         </p>
 
         <div class="animate-fade-in-up delay-300 flex flex-col sm:flex-row gap-3">
@@ -110,13 +110,13 @@ const MOCKUP_VARIANT = {
     <div class="max-w-6xl mx-auto px-6 py-12">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         {[
-          { value: `${apps.length}`,   label: 'Applications' },
-          { value: '99.9%', label: 'Disponibilité' },
-          { value: '< 2s',  label: 'Sync. moyenne' },
-          { value: '100%',  label: 'Hors-ligne' },
-        ].map(({ value, label }) => (
+          { id: 'apps-count-stat', value: `${apps.length}`,   label: 'Applications' },
+          { id: null,              value: '99.9%',            label: 'Disponibilité' },
+          { id: null,              value: '< 2s',             label: 'Sync. moyenne' },
+          { id: null,              value: '100%',             label: 'Hors-ligne' },
+        ].map(({ id, value, label }) => (
           <div class="reveal">
-            <div class="text-4xl md:text-5xl font-extrabold text-gradient mb-1 tracking-tight">{value}</div>
+            <div id={id} class="text-4xl md:text-5xl font-extrabold text-gradient mb-1 tracking-tight">{value}</div>
             <div class="text-xs text-gray-500 font-medium uppercase tracking-wider">{label}</div>
           </div>
         ))}
@@ -239,6 +239,13 @@ const MOCKUP_VARIANT = {
           if (description && app.description) description.textContent = app.description;
           if (icon && app.iconSvgPath) icon.setAttribute('d', app.iconSvgPath);
         });
+
+        // Mettre à jour les compteurs d'apps (hero + stats)
+        const count = apps.length;
+        const inline = document.getElementById('apps-count-inline');
+        const stat   = document.getElementById('apps-count-stat');
+        if (inline) inline.textContent = count;
+        if (stat)   stat.textContent   = count;
       } catch {}
     })();
   </script>

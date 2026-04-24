@@ -12,6 +12,7 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -120,7 +121,7 @@ const jsonLd = {
           </div>
           <div>
             <h3 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Applications</h3>
-            <ul class="space-y-3 text-sm text-gray-400">
+            <ul id="footer-apps-list" class="space-y-3 text-sm text-gray-400">
               <li><a href="/apps/custom-sales" class="hover:text-white transition-colors">customSales</a></li>
               <li><a href="/apps/custom-supply" class="hover:text-white transition-colors">customSupply</a></li>
               <li><a href="/apps/custom-shipping" class="hover:text-white transition-colors">customShipping</a></li>
@@ -181,6 +182,24 @@ const jsonLd = {
           });
         }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
         document.querySelectorAll('.reveal, .reveal-scale').forEach(el => observer.observe(el));
+      })();
+    </script>
+
+    <!-- Hydratation du footer : rebuild la liste des apps au runtime pour refléter les modifs admin -->
+    <script define:vars={{ API_URL }}>
+      (async () => {
+        const list = document.getElementById('footer-apps-list');
+        if (!list) return;
+        try {
+          const res = await fetch(`${API_URL}/api/apps`, { cache: 'no-store' });
+          if (!res.ok) return;
+          const apps = await res.json();
+          if (!Array.isArray(apps) || apps.length === 0) return;
+          const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+          list.innerHTML = apps.map((a) => `
+            <li><a href="/apps/${encodeURIComponent(a.slug)}" class="hover:text-white transition-colors">${escapeHtml(a.name)}</a></li>
+          `).join('');
+        } catch {}
       })();
     </script>
   </body>
