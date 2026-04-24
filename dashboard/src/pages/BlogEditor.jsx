@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../lib/api';
-import { ArrowLeft, Save, Trash2, Eye, FileText, Star } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, Star } from 'lucide-react';
+import RichEditor from '../components/RichEditor';
 
 const CATEGORIES = [
   { v: 'guide',          label: 'Guide' },
@@ -20,31 +21,12 @@ function slugify(str) {
     .slice(0, 200);
 }
 
-// Markdown preview très basique (pas de dépendance) — juste pour vérifier la structure
-function previewMarkdown(md) {
-  if (!md) return '<p class="text-gray-400 italic">Aperçu vide</p>';
-  let html = md
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^### (.+)$/gm, '<h3 class="font-bold text-lg mt-4 mb-2">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="font-extrabold text-xl mt-6 mb-3">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="font-extrabold text-2xl mt-6 mb-3">$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code class="bg-gray-100 text-blue-600 px-1 rounded text-sm">$1</code>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 font-semibold">$1</a>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>[\s\S]*?<\/li>)/g, (m) => `<ul class="list-disc pl-5 my-2">${m}</ul>`)
-    .replace(/\n\n/g, '</p><p class="my-3">');
-  return `<p class="my-3">${html}</p>`;
-}
-
 export default function BlogEditor() {
   const { id } = useParams();
   const isNew = !id;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
 
   const [form, setForm] = useState({
     slug: '',
@@ -152,12 +134,6 @@ export default function BlogEditor() {
             </button>
           )}
           <button
-            onClick={() => setShowPreview(!showPreview)}
-            className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <Eye size={16} /> {showPreview ? 'Masquer aperçu' : 'Aperçu'}
-          </button>
-          <button
             onClick={save}
             disabled={saving}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
@@ -168,7 +144,7 @@ export default function BlogEditor() {
         </div>
       </div>
 
-      <div className={`grid gap-6 ${showPreview ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+      <div className="space-y-6">
         {/* Formulaire */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           {/* Titre */}
@@ -291,42 +267,21 @@ export default function BlogEditor() {
             </label>
           </div>
 
-          {/* Contenu markdown */}
+          {/* Contenu HTML (éditeur WYSIWYG) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contenu (markdown) *
+              Contenu *
             </label>
-            <textarea
-              rows={30} value={form.content}
-              onChange={(e) => setForm({ ...form, content: e.target.value })}
-              placeholder="## Titre de section&#10;&#10;Paragraphe avec **gras**, *italique*, et [liens](/apps/custom-sales).&#10;&#10;- Liste à puces&#10;- Deuxième point&#10;&#10;## Autre section..."
-              className="w-full px-3 py-2 text-sm font-mono border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+            <RichEditor
+              value={form.content}
+              onChange={(html) => setForm({ ...form, content: html })}
+              placeholder="Commencez à écrire votre article…"
             />
             <p className="text-xs text-gray-400 mt-1">
-              Markdown standard supporté : #, ##, ###, **gras**, *italique*, [liens](url), listes, tableaux, blockquotes, `code`
+              Barre d'outils : gras, italique, titres H2/H3, listes, citations, liens. Ctrl+B/I pour gras/italique.
             </p>
           </div>
         </div>
-
-        {/* Aperçu */}
-        {showPreview && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-4">
-            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
-              <FileText size={16} className="text-gray-400" />
-              <span className="text-sm font-semibold text-gray-700">Aperçu rapide</span>
-              <span className="text-xs text-gray-400 ml-auto">Rendu simplifié, non final</span>
-            </div>
-            <div className="mb-4">
-              <h1 className="text-2xl font-extrabold text-gray-900 mb-2">{form.title || 'Titre'}</h1>
-              <p className="text-base text-gray-500 mb-4">{form.description}</p>
-              <div className="text-xs text-gray-400 mb-4">
-                Par {form.author} · {new Date(form.publishedAt).toLocaleDateString('fr-FR')}
-              </div>
-            </div>
-            <div className="text-sm text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: previewMarkdown(form.content) }} />
-          </div>
-        )}
       </div>
     </div>
   );

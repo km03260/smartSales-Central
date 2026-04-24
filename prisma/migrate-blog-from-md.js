@@ -8,6 +8,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, basename, extname } from 'node:path';
 import { PrismaClient } from '@prisma/client';
+import { marked } from 'marked';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const blogDir = join(__dirname, '..', 'website', 'src', 'content', 'blog');
@@ -83,11 +84,13 @@ async function main() {
       const existing = await prisma.blogPost.findUnique({ where: { slug } });
       // Cover image : convention = /blog/covers/{slug}.svg, servi directement par Astro depuis public/
       const coverImage = `/blog/covers/${slug}.svg`;
+      // Convertir le markdown en HTML (stockage HTML depuis la v2 de l'éditeur)
+      const htmlContent = marked.parse(body.trim(), { breaks: false, gfm: true });
       const payload = {
         slug,
         title: data.title,
         description: data.description,
-        content: body.trim(),
+        content: htmlContent,
         publishedAt: data.publishedAt || new Date(),
         author: data.author || 'Équipe customApps',
         category: data.category || 'guide',

@@ -35,7 +35,18 @@ if (!post) {
   return new Response(null, { status: 404, statusText: 'Not found' });
 }
 
-const renderedHtml = marked.parse(post.content || '', { breaks: false, gfm: true });
+// Le contenu est désormais stocké en HTML (éditeur RichEditor TipTap).
+// Fallback : si un ancien article est encore en markdown (ne commence pas par un tag HTML),
+// on le convertit au vol via `marked` pour la rétro-compat.
+function resolveContent(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  if (/^<(p|h[1-6]|ul|ol|blockquote|div|strong|em|table|section|article|figure|pre)\b/i.test(s)) {
+    return s;
+  }
+  return marked.parse(s, { breaks: false, gfm: true });
+}
+const renderedHtml = resolveContent(post.content);
 
 const CATEGORY_LABELS = {
   'guide': 'Guide',
