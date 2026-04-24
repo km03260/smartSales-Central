@@ -11,6 +11,34 @@ const COLORS = [
   { value: 'cyan',    label: 'Cyan' },
 ];
 
+// Bibliothèque d'icônes pour les applications (heroicons outline 24x24)
+const ICON_LIBRARY = [
+  { label: 'Courbe croissante',  d: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+  { label: 'Sac de courses',     d: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' },
+  { label: 'Chariot',            d: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' },
+  { label: 'Camion / livraison', d: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
+  { label: 'Colis / boîte',      d: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+  { label: 'Cube 3D',            d: 'M20 7l-8-4-8 4m16 0v10l-8 4m0 0l-8-4V7m8 4v10' },
+  { label: 'Document',           d: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+  { label: 'Classeur',           d: 'M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2' },
+  { label: 'Nuage (cloud)',      d: 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z' },
+  { label: 'Nuage upload',       d: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12' },
+  { label: 'Cadenas',            d: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' },
+  { label: 'Bouclier / sécurité',d: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
+  { label: 'Téléphone',          d: 'M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
+  { label: 'Combiné téléphone',  d: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z' },
+  { label: 'Bâtiment',           d: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+  { label: 'Utilisateurs',       d: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
+  { label: 'Épingle carte',      d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z' },
+  { label: 'Éclair',             d: 'M13 10V3L4 14h7v7l9-11h-7z' },
+  { label: 'Calendrier',         d: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+  { label: 'Porte-documents',    d: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+  { label: 'Caisse entrée',      d: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4' },
+  { label: 'Rouages / config',   d: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+  { label: 'Scan code-barres',   d: 'M4 4h4v4H4V4zm0 12h4v4H4v-4zM12 4h4v4h-4V4zm0 12h4v4h-4v-4zM20 4h0v4h0V4zm0 12h0v4h0v-4zM8 4v0m0 8h0m8-8h0m0 8v0' },
+  { label: 'Graphique barres',   d: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+];
+
 export default function Apps() {
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -330,9 +358,11 @@ function AppMetaEditor({ app, onReload }) {
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-xs font-medium text-gray-600 mb-1">Icône — `d` SVG (lucide / heroicons)</label>
-          <textarea rows={2} value={form.iconSvgPath} onChange={(e) => setForm({ ...form, iconSvgPath: e.target.value })}
-            className="w-full px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <IconPicker
+            value={form.iconSvgPath}
+            onChange={(v) => setForm({ ...form, iconSvgPath: v })}
+            color={form.color}
+          />
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />
@@ -558,6 +588,101 @@ function PlanRow({ plan, onUpdate, onDelete }) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function IconPicker({ value, onChange, color = 'blue' }) {
+  const [showCustom, setShowCustom] = useState(false);
+  const selectedLabel = ICON_LIBRARY.find(i => i.d === value)?.label;
+
+  // Map de classes Tailwind par couleur (statique pour Tailwind purge)
+  const COLOR_GRADIENTS = {
+    blue:    'from-blue-500 to-blue-600',
+    violet:  'from-violet-500 to-violet-600',
+    emerald: 'from-emerald-500 to-emerald-600',
+    orange:  'from-orange-500 to-orange-600',
+    pink:    'from-pink-500 to-pink-600',
+    cyan:    'from-cyan-500 to-cyan-600',
+  };
+  const gradient = COLOR_GRADIENTS[color] || COLOR_GRADIENTS.blue;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-xs font-medium text-gray-600">Icône</label>
+        <button
+          type="button"
+          onClick={() => setShowCustom(!showCustom)}
+          className="text-xs text-gray-500 hover:text-blue-600 underline"
+        >
+          {showCustom ? '← Choisir dans la bibliothèque' : 'Coller un SVG perso →'}
+        </button>
+      </div>
+
+      {/* Preview */}
+      <div className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg mb-2">
+        <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center shadow-lg flex-shrink-0`}>
+          {value ? (
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={value} />
+            </svg>
+          ) : (
+            <span className="text-white text-xs">?</span>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-semibold text-gray-900">
+            {value ? (selectedLabel || 'Icône personnalisée') : 'Aucune icône'}
+          </div>
+          <div className="text-xs text-gray-500">
+            {value ? 'Aperçu dans la couleur de l\'app' : 'Choisis-en une ci-dessous'}
+          </div>
+        </div>
+      </div>
+
+      {!showCustom ? (
+        /* Gallery */
+        <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-3 bg-white border border-gray-200 rounded-lg max-h-48 overflow-y-auto">
+          {ICON_LIBRARY.map((icon) => {
+            const isSelected = icon.d === value;
+            return (
+              <button
+                type="button"
+                key={icon.d}
+                onClick={() => onChange(icon.d)}
+                title={icon.label}
+                className={`aspect-square flex items-center justify-center rounded-lg transition-all ${
+                  isSelected
+                    ? `bg-gradient-to-br ${gradient} shadow-md ring-2 ring-blue-400 ring-offset-1`
+                    : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg
+                  className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-600'}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon.d} />
+                </svg>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        /* Custom path input */
+        <div>
+          <textarea
+            rows={2}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder='Colle ici l&apos;attribut "d" d&apos;un SVG path — ex: M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'
+            className="w-full px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Tu peux récupérer des icônes sur <a href="https://heroicons.com" target="_blank" rel="noreferrer" className="underline hover:text-blue-600">heroicons.com</a> ou <a href="https://lucide.dev" target="_blank" rel="noreferrer" className="underline hover:text-blue-600">lucide.dev</a> (copie juste l&apos;attribut <code className="bg-gray-100 px-1 rounded">d="..."</code>).
+          </p>
+        </div>
+      )}
     </div>
   );
 }
