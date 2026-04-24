@@ -140,13 +140,14 @@ const MOCKUP_VARIANT = {
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div id="apps-catalog" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {apps.map((app, i) => {
           const c = COLOR_CLASSES[app.color] || COLOR_CLASSES.blue;
           const variant = MOCKUP_VARIANT[app.slug] || 'sales';
           return (
             <a
               href={`/apps/${app.slug}`}
+              data-slug={app.slug}
               class={`reveal card-premium group relative overflow-hidden glass-strong rounded-3xl p-8 pt-10 flex flex-col md:flex-row md:items-center gap-6 min-h-[280px]`}
               style={`transition-delay: ${i * 80}ms`}
             >
@@ -154,18 +155,18 @@ const MOCKUP_VARIANT = {
 
               <div class="relative z-10 flex-1 min-w-0">
                 <div class={`inline-flex w-12 h-12 bg-gradient-to-br ${c.from} ${c.to} rounded-xl items-center justify-center mb-4 shadow-lg`}>
-                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg class="w-6 h-6 text-white js-app-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={app.iconSvgPath} />
                   </svg>
                 </div>
 
                 <div class="flex items-center gap-2 mb-2">
-                  <h3 class="text-2xl font-extrabold text-gray-900 tracking-tight">{app.name}</h3>
-                  <span class={`text-[10px] font-mono px-1.5 py-0.5 ${c.bg} ${c.text} rounded`}>{app.code}</span>
+                  <h3 class="js-app-name text-2xl font-extrabold text-gray-900 tracking-tight">{app.name}</h3>
+                  <span class={`js-app-code text-[10px] font-mono px-1.5 py-0.5 ${c.bg} ${c.text} rounded`}>{app.code}</span>
                 </div>
 
-                {app.tagline && <p class={`text-sm font-semibold ${c.text} mb-2`}>{app.tagline}</p>}
-                <p class="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">{app.description}</p>
+                <p class={`js-app-tagline text-sm font-semibold ${c.text} mb-2 ${app.tagline ? '' : 'hidden'}`}>{app.tagline}</p>
+                <p class="js-app-description text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">{app.description}</p>
 
                 <span class={`inline-flex items-center gap-1 text-sm font-semibold ${c.text} group-hover:gap-2 transition-all`}>
                   En savoir plus
@@ -211,6 +212,36 @@ const MOCKUP_VARIANT = {
       </div>
     </div>
   </section>
+
+  <!-- Hydratation runtime du catalogue (reflète les modifs admin sans rebuild) -->
+  <script define:vars={{ API_URL }}>
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/apps`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const apps = await res.json();
+        if (!Array.isArray(apps)) return;
+
+        apps.forEach((app) => {
+          const card = document.querySelector(`#apps-catalog a[data-slug="${app.slug}"]`);
+          if (!card) return;
+          const name = card.querySelector('.js-app-name');
+          const code = card.querySelector('.js-app-code');
+          const tagline = card.querySelector('.js-app-tagline');
+          const description = card.querySelector('.js-app-description');
+          const icon = card.querySelector('.js-app-icon path');
+          if (name && app.name) name.textContent = app.name;
+          if (code && app.code) code.textContent = app.code;
+          if (tagline) {
+            if (app.tagline) { tagline.textContent = app.tagline; tagline.classList.remove('hidden'); }
+            else             { tagline.classList.add('hidden'); }
+          }
+          if (description && app.description) description.textContent = app.description;
+          if (icon && app.iconSvgPath) icon.setAttribute('d', app.iconSvgPath);
+        });
+      } catch {}
+    })();
+  </script>
 
   <!-- CTA -->
   <section class="py-28">

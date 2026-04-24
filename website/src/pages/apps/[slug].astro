@@ -292,7 +292,7 @@ const description = app.description || app.tagline || '';
           <span class="inline-block text-sm font-semibold text-white/70 mb-3 uppercase tracking-wider">Démarrez aujourd'hui</span>
           <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-[1.1]">
             Prêt à essayer<br/>
-            <span class="font-display-italic text-white/80">{app.name} ?</span>
+            <span class="font-display-italic text-white/80"><span id="app-name-cta">{app.name}</span> ?</span>
           </h2>
           <p class="text-lg text-white/70 mb-10 max-w-xl mx-auto">
             Demandez une démonstration gratuite personnalisée sur votre métier et vos données.
@@ -321,11 +321,16 @@ const description = app.description || app.tagline || '';
 
         // ── Hero ──────────────────────────────────────────────────────────
         const name = document.getElementById('app-name');
+        const nameCta = document.getElementById('app-name-cta');
         const code = document.getElementById('app-code');
         const tagline = document.getElementById('app-tagline');
         const description = document.getElementById('app-description');
         if (name && data.name) name.textContent = data.name;
+        if (nameCta && data.name) nameCta.textContent = data.name;
         if (code && data.code) code.textContent = data.code;
+        // Titre du navigateur
+        if (data.name && data.tagline) document.title = `${data.name} — ${data.tagline}`;
+        else if (data.name) document.title = `${data.name} — customApps`;
         if (tagline) {
           if (data.tagline) { tagline.textContent = data.tagline; tagline.classList.remove('hidden'); }
           else              { tagline.classList.add('hidden'); }
