@@ -10,8 +10,8 @@ import Base from '../layouts/Base.astro';
     </div>
     <div class="max-w-6xl mx-auto px-6 py-20 text-center">
       <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Contact</span>
-      <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Contactez-nous</h1>
-      <p class="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">Contactez-nous</h1>
+      <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
         Vous souhaitez une démonstration ou avez des questions ? Nous vous répondons sous 24h.
       </p>
     </div>
@@ -63,8 +63,8 @@ import Base from '../layouts/Base.astro';
         </div>
 
         <!-- Quick benefits -->
-        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-          <h4 class="font-bold text-gray-900 mb-4 text-sm">Ce que vous obtenez :</h4>
+        <div class="bg-gray-50 dark:bg-gray-950 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
+          <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-4 text-sm">Ce que vous obtenez :</h4>
           <ul class="space-y-3">
             {[
               "Démonstration personnalisée de 30 min",
@@ -72,7 +72,7 @@ import Base from '../layouts/Base.astro';
               "Devis sur mesure sous 48h",
               "Accompagnement à la mise en place",
             ].map((item) => (
-              <li class="flex items-start gap-2 text-sm text-gray-600">
+              <li class="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
                 <div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                   <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
@@ -87,45 +87,45 @@ import Base from '../layouts/Base.astro';
 
       <!-- Contact form -->
       <div class="lg:col-span-2">
-        <form id="contact-form" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
+        <form id="contact-form" class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-8 space-y-6">
           <div id="form-message" class="hidden px-4 py-3 rounded-xl text-sm font-medium"></div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Nom *</label>
+              <label for="name" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Nom *</label>
               <input type="text" id="name" name="name" required placeholder="Jean Dupont"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
             <div>
-              <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
+              <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Email *</label>
               <input type="email" id="email" name="email" required placeholder="jean@entreprise.fr"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
             <div>
-              <label for="company" class="block text-sm font-semibold text-gray-700 mb-2">Entreprise</label>
+              <label for="company" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Entreprise</label>
               <input type="text" id="company" name="company" placeholder="Mon Entreprise SAS"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
             <div>
-              <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">Téléphone</label>
+              <label for="phone" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Téléphone</label>
               <input type="tel" id="phone" name="phone" placeholder="06 12 34 56 78"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
           </div>
 
           <div>
-            <label for="type" class="block text-sm font-semibold text-gray-700 mb-2">Type de demande</label>
+            <label for="type" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Type de demande</label>
             <select id="type" name="type"
-              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all">
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all">
               <option value="demo">Demande de démonstration</option>
               <option value="info">Demande d'information</option>
             </select>
           </div>
 
           <div>
-            <label for="message" class="block text-sm font-semibold text-gray-700 mb-2">Message *</label>
+            <label for="message" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Message *</label>
             <textarea id="message" name="message" rows="5" required placeholder="Décrivez votre besoin, le nombre de commerciaux, votre ERP actuel..."
-              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all resize-none"></textarea>
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all resize-none"></textarea>
           </div>
 
           <button type="submit" id="submit-btn"
@@ -133,7 +133,7 @@ import Base from '../layouts/Base.astro';
             Envoyer ma demande
           </button>
 
-          <p class="text-xs text-gray-400 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-500 text-center">
             En soumettant ce formulaire, vous acceptez d'être contacté par notre équipe commerciale.
           </p>
         </form>

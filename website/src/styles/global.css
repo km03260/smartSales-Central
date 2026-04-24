@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Dark mode via classe .dark sur <html> (toggle manuel, cf. Base.astro) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ─── Animations ───────────────────────────────────────────────────────── */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(30px); }
@@ -90,11 +93,18 @@
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   background-color: rgba(255, 255, 255, 0.75);
 }
+.dark .glass {
+  background-color: rgba(15, 23, 42, 0.75);
+}
 .glass-strong {
   backdrop-filter: blur(24px) saturate(200%);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
   background-color: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.6);
+}
+.dark .glass-strong {
+  background-color: rgba(17, 24, 39, 0.75);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 .glass-dark {
   backdrop-filter: blur(20px) saturate(180%);
@@ -234,6 +244,31 @@
   }
 }
 
+/* Compact wrapper : affiche un PhoneMockup à taille réduite dans un emplacement fixe */
+/* Usage : <div class="phone-compact-wrap"><div class="phone-compact-scale"><PhoneMockup .../></div></div> */
+.phone-compact-wrap {
+  position: relative;
+  width: 180px;
+  height: 365px;
+  overflow: hidden;
+  border-radius: 28px;
+}
+.phone-compact-scale {
+  transform: scale(0.565);
+  transform-origin: top left;
+  position: absolute;
+  inset: 0;
+}
+@media (min-width: 768px) {
+  .phone-compact-wrap {
+    width: 200px;
+    height: 405px;
+  }
+  .phone-compact-scale {
+    transform: scale(0.625);
+  }
+}
+
 /* ─── Smooth scroll + font rendering ──────────────────────────────────── */
 html {
   scroll-behavior: smooth;
@@ -241,7 +276,40 @@ html {
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ─── Dark mode : couleurs de base + ajustements globaux ──────────────── */
+html.dark {
+  color-scheme: dark;
+}
+html.dark body {
+  background-color: #0b1220;
+  color: #e5e7eb;
+}
+/* Gradient text ajusté en dark (meilleur contraste) */
+html.dark .text-gradient {
+  background: linear-gradient(135deg, #60a5fa, #c084fc, #60a5fa);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: gradient-shift 6s ease infinite;
+}
+/* Meshes et noise en dark : moins lumineux */
+html.dark .bg-mesh {
+  background-image:
+    radial-gradient(at 20% 20%, rgba(99, 102, 241, 0.12) 0px, transparent 45%),
+    radial-gradient(at 80% 10%, rgba(236, 72, 153, 0.10) 0px, transparent 45%),
+    radial-gradient(at 50% 80%, rgba(59, 130, 246, 0.10) 0px, transparent 50%),
+    radial-gradient(at 90% 70%, rgba(139, 92, 246, 0.10) 0px, transparent 45%);
+}
+html.dark .bg-mesh-soft {
+  background-image:
+    radial-gradient(at 15% 30%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
+    radial-gradient(at 85% 70%, rgba(236, 72, 153, 0.05) 0px, transparent 50%);
+}
+/* Les covers blog font un peu cotonneux en dark — on descend les extrémités blanches */
+html.dark img[src$=".svg"] { opacity: 0.92; }
 
 /* ─── Reduce motion respect ────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
