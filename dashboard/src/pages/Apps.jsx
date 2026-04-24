@@ -287,6 +287,7 @@ function MarketingPanel({ app, onReload }) {
 
 function AppMetaEditor({ app, onReload }) {
   const [form, setForm] = useState({
+    name: app.name || '',
     slug: app.slug || '',
     tagline: app.tagline || '',
     description: app.description || '',
@@ -309,6 +310,7 @@ function AppMetaEditor({ app, onReload }) {
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <h4 className="font-semibold text-gray-900 mb-3 text-sm">Identité & description</h4>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Field label="Nom de l'application" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="customSales" />
         <Field label="Slug (URL)" value={form.slug} onChange={(v) => setForm({ ...form, slug: v })} placeholder="custom-sales" />
         <Field label="Ordre" type="number" value={form.order} onChange={(v) => setForm({ ...form, order: Number(v) || 0 })} />
         <Field label="Tagline (hero)" value={form.tagline} onChange={(v) => setForm({ ...form, tagline: v })} placeholder="Vos commerciaux prennent commande..." />
