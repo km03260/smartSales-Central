@@ -105,7 +105,7 @@ const MOCKUP_VARIANT = {
           <span class="block">le terrain.</span>
         </h1>
 
-        <p class="animate-fade-in-up delay-200 text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-xl mb-10 leading-relaxed">
+        <p class="animate-fade-in-up delay-200 text-lg md:text-xl text-gray-500 dark:text-gray-300 max-w-xl mb-10 leading-relaxed">
           Ventes, achats, expéditions, documents : <strong class="text-gray-900 dark:text-gray-100 font-semibold"><span id="apps-count-inline">{apps.length}</span> applications mobiles</strong> qui fonctionnent hors-ligne et se synchronisent en temps réel avec votre ERP.
         </p>
 
@@ -121,7 +121,7 @@ const MOCKUP_VARIANT = {
         </div>
 
         <!-- Trust strip -->
-        <div class="animate-fade-in-up delay-500 flex items-center gap-6 mt-12 text-sm text-gray-500 dark:text-gray-400">
+        <div class="animate-fade-in-up delay-500 flex items-center gap-6 mt-12 text-sm text-gray-500 dark:text-gray-300">
           <div class="flex items-center gap-2">
             <div class="flex -space-x-2">
               {[0,1,2,3].map((i) => (
@@ -144,7 +144,7 @@ const MOCKUP_VARIANT = {
   </section>
 
   <!-- Marquee / Trust -->
-  <section class="border-y border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+  <section class="border-y border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
     <div class="max-w-6xl mx-auto px-6 py-12">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         {[
@@ -155,7 +155,7 @@ const MOCKUP_VARIANT = {
         ].map(({ id, value, label }) => (
           <div class="reveal">
             <div id={id} class="text-4xl md:text-5xl font-extrabold text-gradient mb-1 tracking-tight">{value}</div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">{label}</div>
+            <div class="text-xs text-gray-500 dark:text-gray-300 font-medium uppercase tracking-wider">{label}</div>
           </div>
         ))}
       </div>
@@ -171,9 +171,9 @@ const MOCKUP_VARIANT = {
         <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">La suite customApps</span>
         <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
           Une application par métier,<br/>
-          <span class="font-display-italic text-gray-500 dark:text-gray-400">un ERP unique.</span>
+          <span class="font-display-italic text-gray-500 dark:text-gray-300">un ERP unique.</span>
         </h2>
-        <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+        <p class="text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
           Chaque app partage la même base technique et la même compatibilité WaveSoft. Déployez celles qui correspondent à vos équipes.
         </p>
       </div>
@@ -204,7 +204,7 @@ const MOCKUP_VARIANT = {
                 </div>
 
                 <p class={`js-app-tagline text-sm font-semibold ${c.text} mb-2 ${app.tagline ? '' : 'hidden'}`}>{app.tagline}</p>
-                <p class="js-app-description text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-3">{app.description}</p>
+                <p class="js-app-description text-sm text-gray-500 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3">{app.description}</p>
 
                 <span class={`inline-flex items-center gap-1 text-sm font-semibold ${c.text} group-hover:gap-2 transition-all`}>
                   En savoir plus
@@ -236,7 +236,7 @@ const MOCKUP_VARIANT = {
         <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Simple</span>
         <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
           Trois étapes<br/>
-          <span class="font-display-italic text-gray-500 dark:text-gray-400">pour démarrer.</span>
+          <span class="font-display-italic text-gray-500 dark:text-gray-300">pour démarrer.</span>
         </h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -266,7 +266,7 @@ const MOCKUP_VARIANT = {
             <div class="absolute -top-2 -right-2 inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl text-white text-xl font-extrabold shadow-xl shadow-blue-500/30">1</div>
           </div>
           <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-2 text-xl">Choisissez vos apps</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-xs mx-auto">Selon vos besoins terrain : ventes, achats, expéditions ou gestion documentaire.</p>
+          <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed max-w-xs mx-auto">Selon vos besoins terrain : ventes, achats, expéditions ou gestion documentaire.</p>
         </div>
 
         {/* Étape 2 — Connecter WaveSoft */}
@@ -317,7 +317,7 @@ const MOCKUP_VARIANT = {
             <div class="absolute -top-2 -right-2 inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl text-white text-xl font-extrabold shadow-xl shadow-blue-500/30">2</div>
           </div>
           <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-2 text-xl">Connectez WaveSoft</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-xs mx-auto">Notre SyncService sécurisé ponte vos apps mobiles avec votre ERP existant.</p>
+          <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed max-w-xs mx-auto">Notre SyncService sécurisé ponte vos apps mobiles avec votre ERP existant.</p>
         </div>
 
         {/* Étape 3 — Déployer sur le terrain */}
@@ -363,7 +363,7 @@ const MOCKUP_VARIANT = {
             <div class="absolute -top-2 -right-2 inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl text-white text-xl font-extrabold shadow-xl shadow-blue-500/30">3</div>
           </div>
           <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-2 text-xl">Déployez sur le terrain</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-xs mx-auto">Vos équipes installent via QR code et travaillent immédiatement, même sans réseau.</p>
+          <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed max-w-xs mx-auto">Vos équipes installent via QR code et travaillent immédiatement, même sans réseau.</p>
         </div>
       </div>
     </div>
@@ -413,28 +413,28 @@ const MOCKUP_VARIANT = {
         <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Questions fréquentes</span>
         <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
           Tout ce que vous<br/>
-          <span class="font-display-italic text-gray-500 dark:text-gray-400">voulez savoir.</span>
+          <span class="font-display-italic text-gray-500 dark:text-gray-300">voulez savoir.</span>
         </h2>
       </div>
 
       <div class="space-y-3">
         {FAQ_ITEMS.map((item, i) => (
-          <details class="reveal group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden" style={`transition-delay: ${i * 50}ms`}>
+          <details class="reveal group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden" style={`transition-delay: ${i * 50}ms`}>
             <summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-colors list-none">
               <h3 class="font-semibold text-gray-900 dark:text-gray-100 text-base md:text-lg pr-4">{item.q}</h3>
-              <svg class="flex-shrink-0 w-5 h-5 text-gray-400 dark:text-gray-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg class="flex-shrink-0 w-5 h-5 text-gray-400 dark:text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
             <div class="px-6 pb-6 -mt-2">
-              <p class="text-gray-500 dark:text-gray-400 leading-relaxed">{item.a}</p>
+              <p class="text-gray-500 dark:text-gray-300 leading-relaxed">{item.a}</p>
             </div>
           </details>
         ))}
       </div>
 
       <div class="text-center mt-10">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-sm text-gray-500 dark:text-gray-300">
           Une autre question ?
           <a href="/contact" class="font-semibold text-blue-600 hover:text-blue-700 transition-colors ml-1">Contactez-nous</a>
         </p>

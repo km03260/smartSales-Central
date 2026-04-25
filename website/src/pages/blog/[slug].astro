@@ -121,11 +121,11 @@ const breadcrumbSchema = {
 
     <header class="max-w-3xl mx-auto px-6 pt-12 md:pt-16 pb-8">
       <nav aria-label="Fil d'ariane" class="mb-6">
-        <ol class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
+        <ol class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-300 flex-wrap">
           <li><a href="/" class="hover:text-gray-900 dark:text-gray-100 transition-colors">Accueil</a></li>
-          <li aria-hidden="true" class="text-gray-300 dark:text-gray-600">/</li>
+          <li aria-hidden="true" class="text-gray-300 dark:text-gray-500">/</li>
           <li><a href="/blog" class="hover:text-gray-900 dark:text-gray-100 transition-colors">Blog</a></li>
-          <li aria-hidden="true" class="text-gray-300 dark:text-gray-600">/</li>
+          <li aria-hidden="true" class="text-gray-300 dark:text-gray-500">/</li>
           <li aria-current="page" class="text-gray-900 dark:text-gray-100 font-medium truncate">{post.title}</li>
         </ol>
       </nav>
@@ -134,17 +134,17 @@ const breadcrumbSchema = {
         <span class={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${CATEGORY_COLORS[post.category] || CATEGORY_COLORS.guide}`}>
           {CATEGORY_LABELS[post.category] || 'Guide'}
         </span>
-        <time class="text-sm text-gray-500 dark:text-gray-400" datetime={new Date(post.publishedAt).toISOString()}>Publié le {dateFormat(post.publishedAt)}</time>
+        <time class="text-sm text-gray-500 dark:text-gray-300" datetime={new Date(post.publishedAt).toISOString()}>Publié le {dateFormat(post.publishedAt)}</time>
       </div>
 
       <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-[1.1] mb-6">
         {post.title}
       </h1>
-      <p class="text-xl text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
+      <p class="text-xl text-gray-500 dark:text-gray-300 leading-relaxed mb-6">
         {post.description}
       </p>
 
-      <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+      <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-300">
         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
           {post.author?.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase() || 'CA'}
         </div>
@@ -161,8 +161,8 @@ const breadcrumbSchema = {
     )}
 
     <div class="max-w-3xl mx-auto px-6 py-8">
-      <div class="prose prose-lg prose-gray max-w-none
-                  prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-gray-900 dark:text-gray-100
+      <div class="prose prose-lg prose-gray dark:prose-invert max-w-none
+                  prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-gray-100
                   prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4
                   prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
                   prose-p:text-gray-600 dark:text-gray-300 prose-p:leading-relaxed
@@ -171,13 +171,13 @@ const breadcrumbSchema = {
                   prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50/50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
                   prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:font-medium prose-code:before:hidden prose-code:after:hidden
                   prose-table:text-sm
-                  prose-th:bg-gray-50 dark:bg-gray-950 prose-th:font-semibold
+                  prose-th:bg-gray-50 dark:bg-gray-900 prose-th:font-semibold
                   prose-ul:my-4 prose-li:text-gray-600 dark:text-gray-300 prose-li:my-1
                   prose-hr:border-gray-200 dark:border-gray-700" set:html={renderedHtml}></div>
     </div>
 
     {post.tags && post.tags.length > 0 && (
-      <div class="max-w-3xl mx-auto px-6 py-8 border-t border-gray-100 dark:border-gray-800">
+      <div class="max-w-3xl mx-auto px-6 py-8 border-t border-gray-100 dark:border-gray-700">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Tags :</span>
           {post.tags.map(tag => (
@@ -196,7 +196,7 @@ const breadcrumbSchema = {
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {suggested.map((p) => (
-            <a href={`/blog/${p.slug}`} class="card-premium group block bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+            <a href={`/blog/${p.slug}`} class="card-premium group block bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
               {p.coverImage && (
                 <div class="relative aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-800">
                   <img src={p.coverImage} alt={`Illustration — ${p.title}`}
@@ -208,12 +208,12 @@ const breadcrumbSchema = {
                   <span class={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${CATEGORY_COLORS[p.category] || CATEGORY_COLORS.guide}`}>
                     {CATEGORY_LABELS[p.category] || 'Guide'}
                   </span>
-                  <time class="text-xs text-gray-400 dark:text-gray-500" datetime={new Date(p.publishedAt).toISOString()}>{dateFormat(p.publishedAt)}</time>
+                  <time class="text-xs text-gray-400 dark:text-gray-400" datetime={new Date(p.publishedAt).toISOString()}>{dateFormat(p.publishedAt)}</time>
                 </div>
                 <h3 class="font-bold text-gray-900 dark:text-gray-100 text-lg tracking-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                   {p.title}
                 </h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2">
+                <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed line-clamp-2">
                   {p.description}
                 </p>
               </div>
@@ -227,9 +227,9 @@ const breadcrumbSchema = {
   <section class="py-24">
     <div class="max-w-3xl mx-auto px-6 text-center">
       <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight mb-4">
-        Envie d'équiper <span class="font-display-italic text-gray-500 dark:text-gray-400">vos équipes terrain</span> ?
+        Envie d'équiper <span class="font-display-italic text-gray-500 dark:text-gray-300">vos équipes terrain</span> ?
       </h2>
-      <p class="text-lg text-gray-500 dark:text-gray-400 mb-8">Demandez une démonstration gratuite de la suite customApps.</p>
+      <p class="text-lg text-gray-500 dark:text-gray-300 mb-8">Demandez une démonstration gratuite de la suite customApps.</p>
       <a href="/contact" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 text-white px-8 py-3.5 rounded-full font-semibold hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5">
         Demander une démo
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>

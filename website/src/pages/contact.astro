@@ -11,7 +11,7 @@ import Base from '../layouts/Base.astro';
     <div class="max-w-6xl mx-auto px-6 py-20 text-center">
       <span class="inline-block text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Contact</span>
       <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">Contactez-nous</h1>
-      <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+      <p class="text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
         Vous souhaitez une démonstration ou avez des questions ? Nous vous répondons sous 24h.
       </p>
     </div>
@@ -63,7 +63,7 @@ import Base from '../layouts/Base.astro';
         </div>
 
         <!-- Quick benefits -->
-        <div class="bg-gray-50 dark:bg-gray-950 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
           <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-4 text-sm">Ce que vous obtenez :</h4>
           <ul class="space-y-3">
             {[
@@ -87,36 +87,36 @@ import Base from '../layouts/Base.astro';
 
       <!-- Contact form -->
       <div class="lg:col-span-2">
-        <form id="contact-form" class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-8 space-y-6">
+        <form id="contact-form" class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-8 space-y-6">
           <div id="form-message" class="hidden px-4 py-3 rounded-xl text-sm font-medium"></div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label for="name" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Nom *</label>
               <input type="text" id="name" name="name" required placeholder="Jean Dupont"
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
             <div>
               <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Email *</label>
               <input type="email" id="email" name="email" required placeholder="jean@entreprise.fr"
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
             <div>
               <label for="company" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Entreprise</label>
               <input type="text" id="company" name="company" placeholder="Mon Entreprise SAS"
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
             <div>
               <label for="phone" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Téléphone</label>
               <input type="tel" id="phone" name="phone" placeholder="06 12 34 56 78"
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all" />
             </div>
           </div>
 
           <div>
             <label for="type" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Type de demande</label>
             <select id="type" name="type"
-              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all">
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all">
               <option value="demo">Demande de démonstration</option>
               <option value="info">Demande d'information</option>
             </select>
@@ -125,7 +125,7 @@ import Base from '../layouts/Base.astro';
           <div>
             <label for="message" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Message *</label>
             <textarea id="message" name="message" rows="5" required placeholder="Décrivez votre besoin, le nombre de commerciaux, votre ERP actuel..."
-              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all resize-none"></textarea>
+              class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white dark:bg-gray-900 transition-all resize-none"></textarea>
           </div>
 
           <button type="submit" id="submit-btn"
@@ -133,7 +133,7 @@ import Base from '../layouts/Base.astro';
             Envoyer ma demande
           </button>
 
-          <p class="text-xs text-gray-400 dark:text-gray-500 text-center">
+          <p class="text-xs text-gray-400 dark:text-gray-400 text-center">
             En soumettant ce formulaire, vous acceptez d'être contacté par notre équipe commerciale.
           </p>
         </form>

@@ -151,11 +151,11 @@ const breadcrumbSchema = {
       <div>
         <!-- Fil d'ariane SEO + accessibilité -->
         <nav aria-label="Fil d'ariane" class="mb-6 animate-fade-in-up">
-          <ol class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+          <ol class="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-300">
             <li><a href="/" class="hover:text-gray-900 dark:text-gray-100 transition-colors">Accueil</a></li>
-            <li aria-hidden="true" class="text-gray-300 dark:text-gray-600">/</li>
+            <li aria-hidden="true" class="text-gray-300 dark:text-gray-500">/</li>
             <li><a href="/#apps" class="hover:text-gray-900 dark:text-gray-100 transition-colors">Applications</a></li>
-            <li aria-hidden="true" class="text-gray-300 dark:text-gray-600">/</li>
+            <li aria-hidden="true" class="text-gray-300 dark:text-gray-500">/</li>
             <li aria-current="page" class="text-gray-900 dark:text-gray-100 font-medium truncate" id="app-breadcrumb">{app.name}</li>
           </ol>
         </nav>
@@ -179,7 +179,7 @@ const breadcrumbSchema = {
           {app.tagline}
         </p>
 
-        <p id="app-description" class="animate-fade-in-up delay-400 text-lg text-gray-500 dark:text-gray-400 leading-relaxed mb-10 max-w-xl">
+        <p id="app-description" class="animate-fade-in-up delay-400 text-lg text-gray-500 dark:text-gray-300 leading-relaxed mb-10 max-w-xl">
           {app.longDescription || app.description}
         </p>
 
@@ -192,7 +192,7 @@ const breadcrumbSchema = {
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              Télécharger l'APK <span id="apk-version" class="text-xs text-gray-400 dark:text-gray-500">{app.apkVersion && `v${app.apkVersion}`}</span>
+              Télécharger l'APK <span id="apk-version" class="text-xs text-gray-400 dark:text-gray-400">{app.apkVersion && `v${app.apkVersion}`}</span>
             </a>
           )}
         </div>
@@ -217,12 +217,12 @@ const breadcrumbSchema = {
           <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Fonctionnalités</span>
           <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
             Les fonctionnalités de<br/>
-            <span class="font-display-italic text-gray-500 dark:text-gray-400" id="app-name-features">{app.name}</span>
+            <span class="font-display-italic text-gray-500 dark:text-gray-300" id="app-name-features">{app.name}</span>
           </h2>
         </div>
         <div id="features-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
           {app.features.map((feature, i) => (
-            <div class="reveal card-premium bg-white dark:bg-gray-900 rounded-2xl p-7 border border-gray-100 dark:border-gray-800 shadow-sm" style={`transition-delay: ${i * 70}ms`}>
+            <div class="reveal card-premium bg-white dark:bg-gray-900 rounded-2xl p-7 border border-gray-100 dark:border-gray-700 shadow-sm" style={`transition-delay: ${i * 70}ms`}>
               <div class={`w-12 h-12 bg-gradient-to-br ${c.from} ${c.to} rounded-xl flex items-center justify-center mb-5 shadow-lg ${c.shadow}`}>
                 {feature.iconSvgPath && (
                   <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -231,7 +231,7 @@ const breadcrumbSchema = {
                 )}
               </div>
               <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-2 text-lg">{feature.title}</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{feature.description}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -251,13 +251,13 @@ const breadcrumbSchema = {
           <div class="text-center md:text-left flex-1">
             <span class={`inline-block text-sm font-semibold ${c.text} mb-2 uppercase tracking-wider`}>Installation</span>
             <h2 class="font-extrabold text-gray-900 dark:text-gray-100 mb-2 text-3xl tracking-tight">
-              Installer <span class="font-display-italic text-gray-500 dark:text-gray-400" id="app-name-install">{app.name}</span> sur Android
+              Installer <span class="font-display-italic text-gray-500 dark:text-gray-300" id="app-name-install">{app.name}</span> sur Android
             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
+            <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed mb-4">
               Scannez le QR code avec votre appareil Android ou téléchargez directement l'APK. Pas de Play Store — installation directe.
             </p>
             {app.apkVersion && (
-              <div class="inline-flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
+              <div class="inline-flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300 mb-4">
                 <span class={`inline-block w-2 h-2 rounded-full ${c.accent}`}></span>
                 <span id="apk-version-badge">Dernière version : <strong class="text-gray-900 dark:text-gray-100">v{app.apkVersion}</strong></span>
               </div>
@@ -295,10 +295,10 @@ const breadcrumbSchema = {
         <div class="reveal text-center mb-16">
           <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Tarifs</span>
           <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
-            Tarifs <span class="font-display-italic text-gray-500 dark:text-gray-400" id="app-name-pricing">{app.name}</span> —<br/>
+            Tarifs <span class="font-display-italic text-gray-500 dark:text-gray-300" id="app-name-pricing">{app.name}</span> —<br/>
             choisissez votre formule.
           </h2>
-          <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p class="text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Tarifs indicatifs HT, facturation mensuelle. Contactez-nous pour un devis personnalisé.
           </p>
         </div>
@@ -306,7 +306,7 @@ const breadcrumbSchema = {
         <div id="pricing-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {app.pricingPlans.map((plan, i) => (
             <div
-              class={`reveal relative bg-white dark:bg-gray-900 rounded-3xl p-8 ${plan.isFeatured ? `${c.border} ring-4 ${c.ring} shadow-2xl ${c.shadow}` : 'border border-gray-100 dark:border-gray-800 shadow-sm'}`}
+              class={`reveal relative bg-white dark:bg-gray-900 rounded-3xl p-8 ${plan.isFeatured ? `${c.border} ring-4 ${c.ring} shadow-2xl ${c.shadow}` : 'border border-gray-100 dark:border-gray-700 shadow-sm'}`}
               style={`transition-delay: ${i * 100}ms`}
             >
               {plan.isFeatured && (
@@ -317,7 +317,7 @@ const breadcrumbSchema = {
               <h3 class="font-extrabold text-gray-900 dark:text-gray-100 text-2xl mb-2 tracking-tight">{plan.name}</h3>
               <div class="flex items-baseline gap-1 mb-6">
                 <span class="text-5xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">{plan.price}</span>
-                {plan.period && <span class="text-gray-500 dark:text-gray-400 text-sm">{plan.period}</span>}
+                {plan.period && <span class="text-gray-500 dark:text-gray-300 text-sm">{plan.period}</span>}
               </div>
               <ul class="space-y-3 mb-8">
                 {(Array.isArray(plan.features) ? plan.features : []).map((feat) => (
@@ -351,7 +351,7 @@ const breadcrumbSchema = {
           <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Complétez avec</span>
           <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             Découvrez aussi<br/>
-            <span class="font-display-italic text-gray-500 dark:text-gray-400">les autres apps de la suite.</span>
+            <span class="font-display-italic text-gray-500 dark:text-gray-300">les autres apps de la suite.</span>
           </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -373,7 +373,7 @@ const breadcrumbSchema = {
                   </div>
                   <h3 class="font-extrabold text-gray-900 dark:text-gray-100 text-lg tracking-tight mb-1">{other.name}</h3>
                   {other.tagline && <p class={`text-xs font-semibold ${oc.text} mb-2`}>{other.tagline}</p>}
-                  <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-3">{other.description}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-300 leading-relaxed line-clamp-2 mb-3">{other.description}</p>
                   <span class={`inline-flex items-center gap-1 text-xs font-semibold ${oc.text} group-hover:gap-2 transition-all`}>
                     Découvrir
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -486,12 +486,12 @@ const breadcrumbSchema = {
         const featuresGrid = document.getElementById('features-grid');
         if (featuresGrid && Array.isArray(data.features)) {
           featuresGrid.innerHTML = data.features.map((f) => `
-            <div class="card-premium bg-white dark:bg-gray-900 rounded-2xl p-7 border border-gray-100 dark:border-gray-800 shadow-sm">
+            <div class="card-premium bg-white dark:bg-gray-900 rounded-2xl p-7 border border-gray-100 dark:border-gray-700 shadow-sm">
               <div class="w-12 h-12 bg-gradient-to-br ${c.from} ${c.to} rounded-xl flex items-center justify-center mb-5 shadow-lg ${c.shadow}">
                 ${f.iconSvgPath ? `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${escapeHtml(f.iconSvgPath)}"/></svg>` : ''}
               </div>
               <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-2 text-lg">${escapeHtml(f.title)}</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">${escapeHtml(f.description || '')}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed">${escapeHtml(f.description || '')}</p>
             </div>
           `).join('');
         }
@@ -502,7 +502,7 @@ const breadcrumbSchema = {
           pricingGrid.innerHTML = data.pricingPlans.map((p) => {
             const cardClasses = p.isFeatured
               ? `${c.border} ring-4 ${c.ring} shadow-2xl ${c.shadow}`
-              : 'border border-gray-100 dark:border-gray-800 shadow-sm';
+              : 'border border-gray-100 dark:border-gray-700 shadow-sm';
             const badge = p.isFeatured
               ? `<div class="absolute top-0 right-6 -translate-y-1/2 bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">⭐ Recommandé</div>`
               : '';
@@ -523,7 +523,7 @@ const breadcrumbSchema = {
                 <h3 class="font-extrabold text-gray-900 dark:text-gray-100 text-2xl mb-2 tracking-tight">${escapeHtml(p.name)}</h3>
                 <div class="flex items-baseline gap-1 mb-6">
                   <span class="text-5xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">${escapeHtml(p.price)}</span>
-                  ${p.period ? `<span class="text-gray-500 dark:text-gray-400 text-sm">${escapeHtml(p.period)}</span>` : ''}
+                  ${p.period ? `<span class="text-gray-500 dark:text-gray-300 text-sm">${escapeHtml(p.period)}</span>` : ''}
                 </div>
                 <ul class="space-y-3 mb-8">${featuresList}</ul>
                 <a href="/contact" class="${ctaClass}">${escapeHtml(p.ctaLabel || 'Demander une démo')}</a>
