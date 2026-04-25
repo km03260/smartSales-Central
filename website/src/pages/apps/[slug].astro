@@ -241,7 +241,7 @@ const breadcrumbSchema = {
 
   {/* Download + QR */}
   {app.qrcodeUrl && (
-    <section class="relative py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <section class="relative py-24 bg-gradient-to-br from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 overflow-hidden">
       <div class="max-w-4xl mx-auto px-6">
         <div class="reveal-scale glass-strong rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 shadow-xl shadow-gray-200/50">
           <div class="flex-shrink-0 relative">
@@ -345,7 +345,7 @@ const breadcrumbSchema = {
 
   {/* Découvrez aussi — cross-linking pour SEO + rétention */}
   {otherApps.length > 0 && (
-    <section class="relative py-24 bg-gray-50/50 overflow-hidden">
+    <section class="relative py-24 bg-gray-50/50 dark:bg-gray-950/50 overflow-hidden">
       <div class="max-w-6xl mx-auto px-6">
         <div class="reveal text-center mb-12">
           <span class={`inline-block text-sm font-semibold ${c.text} mb-3 uppercase tracking-wider`}>Complétez avec</span>
