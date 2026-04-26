@@ -83,52 +83,85 @@ export default function Companies() {
         </form>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
-        {companies.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Aucune entreprise</div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Entreprise</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Contact</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Licences</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Config</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {companies.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <Link to={`/companies/${c.id}`} className="flex items-center gap-3 group">
-                      <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors"><Building2 size={16} className="text-blue-600" /></div>
-                      <div>
-                        <div className="font-semibold text-blue-600 group-hover:text-blue-800 group-hover:underline">{c.name}</div>
-                        <div className="text-sm text-gray-500">{c.legalName}</div>
-                      </div>
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{c.contactEmail}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      c.activeLicenses > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {c.activeLicenses} active{c.activeLicenses > 1 ? 's' : ''}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    {c.hasConfig ? (
-                      <span className="text-green-600 text-sm">Configuré</span>
-                    ) : (
-                      <span className="text-orange-500 text-sm">Non configuré</span>
-                    )}
-                  </td>
+      {companies.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">Aucune entreprise</div>
+      ) : (
+        <>
+          {/* Vue table — desktop ≥md */}
+          <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Entreprise</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Licences</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Config</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {companies.map((c) => (
+                  <tr key={c.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <Link to={`/companies/${c.id}`} className="flex items-center gap-3 group">
+                        <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors"><Building2 size={16} className="text-blue-600" /></div>
+                        <div>
+                          <div className="font-semibold text-blue-600 group-hover:text-blue-800 group-hover:underline">{c.name}</div>
+                          <div className="text-sm text-gray-500">{c.legalName}</div>
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{c.contactEmail}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        c.activeLicenses > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {c.activeLicenses} active{c.activeLicenses > 1 ? 's' : ''}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {c.hasConfig ? (
+                        <span className="text-green-600 text-sm">Configuré</span>
+                      ) : (
+                        <span className="text-orange-500 text-sm">Non configuré</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Vue cards — mobile <md */}
+          <div className="md:hidden space-y-3">
+            {companies.map((c) => (
+              <Link key={c.id} to={`/companies/${c.id}`}
+                className="block bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div className="flex items-start gap-3 mb-2">
+                  <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0"><Building2 size={16} className="text-blue-600" /></div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-blue-600 truncate">{c.name}</div>
+                    <div className="text-xs text-gray-500 truncate">{c.legalName}</div>
+                  </div>
+                  <span className={`flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    c.activeLicenses > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {c.activeLicenses} licence{c.activeLicenses > 1 ? 's' : ''}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500 pl-11">
+                  <a href={`mailto:${c.contactEmail}`} onClick={(e) => e.stopPropagation()} className="text-blue-600 hover:underline truncate">{c.contactEmail}</a>
+                  <span>·</span>
+                  {c.hasConfig ? (
+                    <span className="text-green-600">Configuré</span>
+                  ) : (
+                    <span className="text-orange-500">Non configuré</span>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

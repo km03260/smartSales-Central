@@ -111,39 +111,62 @@ export default function Deployments() {
         </form>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
-        {deployments.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <Server size={40} className="mx-auto mb-3 text-gray-300" />
-            Aucun déploiement
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Nom</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Entreprise</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">URL publique</th>
-                <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Licences</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {deployments.map((d) => (
-                <tr key={d.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm">
-                    <Link to={`/deployments/${d.id}`} className="font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                      {d.name}
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{d.company?.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600 font-mono">{d.publicUrl}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{d.licensesCount}</td>
+      {deployments.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-500">
+          <Server size={40} className="mx-auto mb-3 text-gray-300" />
+          Aucun déploiement
+        </div>
+      ) : (
+        <>
+          {/* Vue table — desktop ≥md */}
+          <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Nom</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Entreprise</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">URL publique</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Licences</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {deployments.map((d) => (
+                  <tr key={d.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm">
+                      <Link to={`/deployments/${d.id}`} className="font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+                        {d.name}
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{d.company?.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-mono">{d.publicUrl}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{d.licensesCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Vue cards — mobile <md */}
+          <div className="md:hidden space-y-3">
+            {deployments.map((d) => (
+              <Link key={d.id} to={`/deployments/${d.id}`}
+                className="block bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div className="flex items-start gap-3 mb-2">
+                  <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0"><Server size={16} className="text-blue-600" /></div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-blue-600 truncate">{d.name}</div>
+                    <div className="text-xs text-gray-500 truncate">{d.company?.name}</div>
+                  </div>
+                  <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700">
+                    {d.licensesCount} licence{d.licensesCount > 1 ? 's' : ''}
+                  </span>
+                </div>
+                <div className="text-xs font-mono text-gray-500 truncate pl-11">{d.publicUrl}</div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

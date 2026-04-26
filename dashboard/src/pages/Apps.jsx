@@ -38,97 +38,147 @@ export default function Apps() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
-        {apps.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <Package size={40} className="mx-auto mb-3 text-gray-300" />
-            Aucune application. Créez-en une pour commencer.
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Application</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Code</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Slug</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Licences</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">APK</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Bundle</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Statut</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {apps.map((app) => (
-                <tr key={app.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <Link to={`/apps/${app.id}`} className="flex items-center gap-3 group">
-                      <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-                        <Package size={16} className="text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-blue-600 group-hover:text-blue-800 group-hover:underline">{app.name}</div>
-                        {app.tagline && (
-                          <div className="text-xs text-gray-500 italic line-clamp-1 max-w-md">« {app.tagline} »</div>
-                        )}
-                      </div>
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-xs font-mono px-2 py-0.5 bg-purple-50 text-purple-700 rounded">{app.code}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    {app.slug && <span className="text-xs font-mono text-gray-500">/apps/{app.slug}</span>}
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      app.totalLicenses > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {app.totalLicenses ?? 0}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    {app.apkFileName ? (
-                      <span className="inline-flex items-center gap-1 text-green-600 text-xs font-medium">
-                        <Check size={14} />
-                        {app.apkVersion ? `v${app.apkVersion}` : 'Présent'}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-gray-400 text-xs">
-                        <AlertCircle size={14} />
-                        Absent
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    {app.serviceBundlePath ? (
-                      <span className="inline-flex items-center gap-1 text-green-600 text-xs font-medium">
-                        <Check size={14} />
-                        {app.serviceBundleVersion ? `v${app.serviceBundleVersion}` : 'Présent'}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-gray-400 text-xs">
-                        <AlertCircle size={14} />
-                        Absent
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    {app.isActive ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                        Active
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
-                        Désactivée
-                      </span>
-                    )}
-                  </td>
+      {apps.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-500">
+          <Package size={40} className="mx-auto mb-3 text-gray-300" />
+          Aucune application. Créez-en une pour commencer.
+        </div>
+      ) : (
+        <>
+          {/* Vue table — desktop ≥md */}
+          <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Application</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Code</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Slug</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Licences</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">APK</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Bundle</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Statut</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {apps.map((app) => (
+                  <tr key={app.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <Link to={`/apps/${app.id}`} className="flex items-center gap-3 group">
+                        <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
+                          <Package size={16} className="text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-blue-600 group-hover:text-blue-800 group-hover:underline">{app.name}</div>
+                          {app.tagline && (
+                            <div className="text-xs text-gray-500 italic line-clamp-1 max-w-md">« {app.tagline} »</div>
+                          )}
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs font-mono px-2 py-0.5 bg-purple-50 text-purple-700 rounded">{app.code}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {app.slug && <span className="text-xs font-mono text-gray-500">/apps/{app.slug}</span>}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        app.totalLicenses > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {app.totalLicenses ?? 0}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {app.apkFileName ? (
+                        <span className="inline-flex items-center gap-1 text-green-600 text-xs font-medium">
+                          <Check size={14} />
+                          {app.apkVersion ? `v${app.apkVersion}` : 'Présent'}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-gray-400 text-xs">
+                          <AlertCircle size={14} />
+                          Absent
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {app.serviceBundlePath ? (
+                        <span className="inline-flex items-center gap-1 text-green-600 text-xs font-medium">
+                          <Check size={14} />
+                          {app.serviceBundleVersion ? `v${app.serviceBundleVersion}` : 'Présent'}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-gray-400 text-xs">
+                          <AlertCircle size={14} />
+                          Absent
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {app.isActive ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                          Désactivée
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Vue cards — mobile <md */}
+          <div className="md:hidden space-y-3">
+            {apps.map((app) => (
+              <Link key={app.id} to={`/apps/${app.id}`}
+                className="block bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div className="flex items-start gap-3 mb-2">
+                  <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                    <Package size={16} className="text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-blue-600">{app.name}</span>
+                      <span className="text-xs font-mono px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded">{app.code}</span>
+                    </div>
+                    {app.tagline && <div className="text-xs text-gray-500 italic line-clamp-2 mt-0.5">« {app.tagline} »</div>}
+                  </div>
+                  <span className={`flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    app.isActive ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                  }`}>
+                    {app.isActive ? 'Active' : 'Désactivée'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500 pl-11">
+                  <span>{app.totalLicenses ?? 0} licence{(app.totalLicenses ?? 0) > 1 ? 's' : ''}</span>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-1">
+                    APK
+                    {app.apkFileName ? (
+                      <span className="text-green-600 font-medium">{app.apkVersion ? `v${app.apkVersion}` : '✓'}</span>
+                    ) : (
+                      <span className="text-gray-400">absent</span>
+                    )}
+                  </span>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-1">
+                    Bundle
+                    {app.serviceBundlePath ? (
+                      <span className="text-green-600 font-medium">{app.serviceBundleVersion ? `v${app.serviceBundleVersion}` : '✓'}</span>
+                    ) : (
+                      <span className="text-gray-400">absent</span>
+                    )}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
 
       {showCreate && (
         <CreateAppModal
