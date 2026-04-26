@@ -429,20 +429,18 @@ function FeaturesEditor({ app, onReload }) {
           <FeatureRow key={f.id} feature={f} onUpdate={(patch) => updateField(f.id, patch)} onDelete={() => remove(f.id)} />
         ))}
       </div>
-      <div className="border-t border-gray-100 pt-3">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+      <div className="border-t border-gray-100 pt-3 space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <input type="text" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} placeholder="Titre"
             className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
           <input type="text" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} placeholder="Description"
             className="md:col-span-2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
-        <div className="flex gap-2">
-          <input type="text" value={draft.iconSvgPath} onChange={(e) => setDraft({ ...draft, iconSvgPath: e.target.value })}
-            placeholder="Icône SVG path (d=...)"
-            className="flex-1 px-3 py-2 text-xs font-mono border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <IconPicker value={draft.iconSvgPath} onChange={(v) => setDraft({ ...draft, iconSvgPath: v })} color="blue" />
+        <div className="flex justify-end">
           <button onClick={add} className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
             <Plus size={14} />
-            Ajouter
+            Ajouter la fonctionnalité
           </button>
         </div>
       </div>
@@ -453,25 +451,57 @@ function FeaturesEditor({ app, onReload }) {
 function FeatureRow({ feature, onUpdate, onDelete }) {
   const [title, setTitle] = useState(feature.title);
   const [description, setDescription] = useState(feature.description);
-  const dirty = title !== feature.title || description !== feature.description;
+  const [iconSvgPath, setIconSvgPath] = useState(feature.iconSvgPath || '');
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const dirty =
+    title !== feature.title ||
+    description !== feature.description ||
+    iconSvgPath !== (feature.iconSvgPath || '');
 
   return (
-    <div className="flex items-start gap-2 p-2 border border-gray-100 rounded-lg">
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titre"
-          className="px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description"
-          className="md:col-span-2 px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      </div>
-      {dirty && (
-        <button onClick={() => onUpdate({ title, description })}
-          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Enregistrer">
-          <Save size={14} />
+    <div className="border border-gray-100 rounded-lg p-2">
+      <div className="flex items-start gap-2">
+        {/* Icon preview cliquable */}
+        <button
+          type="button"
+          onClick={() => setPickerOpen(!pickerOpen)}
+          className="w-9 h-9 flex-shrink-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+          title="Cliquer pour changer l'icône"
+        >
+          {iconSvgPath ? (
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={iconSvgPath} />
+            </svg>
+          ) : (
+            <span className="text-white text-xs">?</span>
+          )}
         </button>
+
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titre"
+            className="px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description"
+            className="md:col-span-2 px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        {dirty && (
+          <button onClick={() => onUpdate({ title, description, iconSvgPath })}
+            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Enregistrer">
+            <Save size={14} />
+          </button>
+        )}
+        <button onClick={onDelete} className="p-1.5 text-red-500 hover:bg-red-50 rounded" title="Supprimer">
+          <Trash2 size={14} />
+        </button>
+      </div>
+
+      {/* Icon picker dépliable */}
+      {pickerOpen && (
+        <div className="mt-2 pt-2 border-t border-gray-100">
+          <IconPicker value={iconSvgPath} onChange={setIconSvgPath} color="blue" />
+        </div>
       )}
-      <button onClick={onDelete} className="p-1.5 text-red-500 hover:bg-red-50 rounded" title="Supprimer">
-        <Trash2 size={14} />
-      </button>
     </div>
   );
 }

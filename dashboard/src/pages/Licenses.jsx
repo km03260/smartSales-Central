@@ -160,53 +160,83 @@ export default function Licenses() {
         </form>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        {licenses.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Aucune licence</div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Clé</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">App</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Entreprise</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Plan</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Appareils</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Expiration</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Statut</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {licenses.map((l) => {
-                const badge = statusBadge(l);
-                return (
-                  <tr key={l.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-mono text-sm">
-                      <Link to={`/licenses/${l.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-semibold">
-                        {l.licenseKey}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                        {l.app?.code}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm">{l.company?.name}</td>
-                    <td className="px-6 py-4 text-sm capitalize">{l.plan}</td>
-                    <td className="px-6 py-4 text-sm">{l.activeDevices}/{l.maxDevices}</td>
-                    <td className="px-6 py-4 text-sm">{new Date(l.expiresAt).toLocaleDateString('fr-FR')}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>
-                        {badge.label}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {licenses.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">Aucune licence</div>
+      ) : (
+        <>
+          {/* Vue table — desktop ≥md */}
+          <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Clé</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">App</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Entreprise</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Plan</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Appareils</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Expiration</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Statut</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {licenses.map((l) => {
+                  const badge = statusBadge(l);
+                  return (
+                    <tr key={l.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-mono text-sm">
+                        <Link to={`/licenses/${l.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-semibold">
+                          {l.licenseKey}
+                        </Link>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                          {l.app?.code}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm">{l.company?.name}</td>
+                      <td className="px-6 py-4 text-sm capitalize">{l.plan}</td>
+                      <td className="px-6 py-4 text-sm">{l.activeDevices}/{l.maxDevices}</td>
+                      <td className="px-6 py-4 text-sm">{new Date(l.expiresAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>
+                          {badge.label}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Vue cards — mobile <md */}
+          <div className="md:hidden space-y-3">
+            {licenses.map((l) => {
+              const badge = statusBadge(l);
+              return (
+                <Link key={l.id} to={`/licenses/${l.id}`}
+                  className="block bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span className="font-mono text-sm font-semibold text-blue-600 break-all">{l.licenseKey}</span>
+                    <span className={`flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-700 mb-2">{l.company?.name}</div>
+                  <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">{l.app?.code}</span>
+                    <span className="capitalize">{l.plan}</span>
+                    <span>·</span>
+                    <span>{l.activeDevices}/{l.maxDevices} appareils</span>
+                    <span>·</span>
+                    <span>Expire le {new Date(l.expiresAt).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

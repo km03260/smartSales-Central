@@ -83,7 +83,7 @@ export default function Companies() {
         </form>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         {companies.length === 0 ? (
           <div className="p-8 text-center text-gray-500">Aucune entreprise</div>
         ) : (

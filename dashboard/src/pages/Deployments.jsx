@@ -111,7 +111,7 @@ export default function Deployments() {
         </form>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
         {deployments.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <Server size={40} className="mx-auto mb-3 text-gray-300" />

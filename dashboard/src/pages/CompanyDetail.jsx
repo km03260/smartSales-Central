@@ -189,7 +189,7 @@ export default function CompanyDetail() {
       )}
 
       {tab === 'licenses' && (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
           {company.licenses?.length === 0 ? (
             <div className="p-8 text-center text-gray-500">Aucune licence</div>
           ) : (
