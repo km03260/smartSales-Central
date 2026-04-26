@@ -7,11 +7,12 @@ import { LayoutDashboard, Building2, KeyRound, MessageSquare, LogOut, Package, S
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/apps', icon: Package, label: 'Applications' },
-  { to: '/blog', icon: FileText, label: 'Blog' },
   { to: '/companies', icon: Building2, label: 'Entreprises' },
   { to: '/licenses', icon: KeyRound, label: 'Licences' },
   { to: '/deployments', icon: Server, label: 'Déploiements' },
+  { divider: true },
   { to: '/contacts', icon: MessageSquare, label: 'Contacts', badgeKey: 'contactsUnread' },
+  { to: '/blog', icon: FileText, label: 'Blog' },
 ];
 
 export default function Layout() {
@@ -55,7 +56,11 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          {navItems.map(({ to, icon: Icon, label, badgeKey }) => {
+          {navItems.map((item, i) => {
+            if (item.divider) {
+              return <div key={`div-${i}`} className="my-2 mx-2 border-t border-gray-200"></div>;
+            }
+            const { to, icon: Icon, label, badgeKey } = item;
             const badge = badgeKey ? badges[badgeKey] : 0;
             return (
               <NavLink
