@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
-import { Plus, Building2, ChevronRight } from 'lucide-react';
+import { Plus, Building2 } from 'lucide-react';
 
 export default function Companies() {
   const [companies, setCompanies] = useState([]);
@@ -94,20 +94,19 @@ export default function Companies() {
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Contact</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Licences</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Config</th>
-                <th className="px-6 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {companies.map((c) => (
                 <tr key={c.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-50 rounded-lg"><Building2 size={16} className="text-blue-600" /></div>
+                    <Link to={`/companies/${c.id}`} className="flex items-center gap-3 group">
+                      <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors"><Building2 size={16} className="text-blue-600" /></div>
                       <div>
-                        <div className="font-medium text-gray-900">{c.name}</div>
+                        <div className="font-semibold text-blue-600 group-hover:text-blue-800 group-hover:underline">{c.name}</div>
                         <div className="text-sm text-gray-500">{c.legalName}</div>
                       </div>
-                    </div>
+                    </Link>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{c.contactEmail}</td>
                   <td className="px-6 py-4">
@@ -123,11 +122,6 @@ export default function Companies() {
                     ) : (
                       <span className="text-orange-500 text-sm">Non configuré</span>
                     )}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link to={`/companies/${c.id}`} className="text-blue-600 hover:text-blue-800">
-                      <ChevronRight size={18} />
-                    </Link>
                   </td>
                 </tr>
               ))}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
-import { Plus, KeyRound, ChevronRight } from 'lucide-react';
+import { Plus, KeyRound } from 'lucide-react';
 
 export default function Licenses() {
   const [licenses, setLicenses] = useState([]);
@@ -174,7 +174,6 @@ export default function Licenses() {
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Appareils</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Expiration</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Statut</th>
-                <th className="px-6 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -182,7 +181,11 @@ export default function Licenses() {
                 const badge = statusBadge(l);
                 return (
                   <tr key={l.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-mono text-sm">{l.licenseKey}</td>
+                    <td className="px-6 py-4 font-mono text-sm">
+                      <Link to={`/licenses/${l.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-semibold">
+                        {l.licenseKey}
+                      </Link>
+                    </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
                         {l.app?.code}
@@ -196,9 +199,6 @@ export default function Licenses() {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>
                         {badge.label}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Link to={`/licenses/${l.id}`} className="text-blue-600 hover:text-blue-800"><ChevronRight size={18} /></Link>
                     </td>
                   </tr>
                 );

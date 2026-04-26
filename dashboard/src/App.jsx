@@ -11,6 +11,7 @@ import Deployments from './pages/Deployments';
 import DeploymentDetail from './pages/DeploymentDetail';
 import Contacts from './pages/Contacts';
 import Apps from './pages/Apps';
+import AppDetail from './pages/AppDetail';
 import Blog from './pages/Blog';
 import BlogEditor from './pages/BlogEditor';
 
@@ -28,6 +29,7 @@ export default function App() {
           <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="apps" element={<Apps />} />
+            <Route path="apps/:id" element={<AppDetail />} />
             <Route path="companies" element={<Companies />} />
             <Route path="companies/:id" element={<CompanyDetail />} />
             <Route path="licenses" element={<Licenses />} />

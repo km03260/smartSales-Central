@@ -50,6 +50,7 @@ export const api = {
 
   // Apps
   getApps: () => request('/admin/apps'),
+  getApp: (id) => request(`/admin/apps/${id}`),
   createApp: (body) => request('/admin/apps', { method: 'POST', body }),
   updateApp: (id, body) => request(`/admin/apps/${id}`, { method: 'PUT', body }),
   deleteApp: (id) => request(`/admin/apps/${id}`, { method: 'DELETE' }),

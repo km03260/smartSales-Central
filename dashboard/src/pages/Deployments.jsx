@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
-import { Plus, Server, ChevronRight } from 'lucide-react';
+import { Plus, Server } from 'lucide-react';
 
 export default function Deployments() {
   const [deployments, setDeployments] = useState([]);
@@ -125,21 +125,19 @@ export default function Deployments() {
                 <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Entreprise</th>
                 <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">URL publique</th>
                 <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3">Licences</th>
-                <th className="px-6 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {deployments.map((d) => (
                 <tr key={d.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{d.name}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <Link to={`/deployments/${d.id}`} className="font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+                      {d.name}
+                    </Link>
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{d.company?.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-600 font-mono">{d.publicUrl}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{d.licensesCount}</td>
-                  <td className="px-6 py-4 text-right">
-                    <Link to={`/deployments/${d.id}`} className="text-blue-600 hover:text-blue-800">
-                      <ChevronRight size={18} />
-                    </Link>
-                  </td>
                 </tr>
               ))}
             </tbody>
