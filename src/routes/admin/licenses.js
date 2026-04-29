@@ -280,6 +280,60 @@ router.put('/:licenseId/devices/:deviceId/owner', async (req, res) => {
 });
 
 /**
+ * PUT /api/admin/licenses/:licenseId/devices/:deviceId/database
+ * Force la bascule de l'appareil sur une instance + base spécifique (admin override).
+ * Body: { instanceKey: string|null, databaseName: string|null }
+ * Si instanceKey est null/absent → reset (l'appareil revient à la sélection libre).
+ * Le mobile lira ces valeurs au prochain heartbeat et basculera automatiquement.
+ */
+router.put('/:licenseId/devices/:deviceId/database', async (req, res) => {
+  try {
+    const { licenseId, deviceId } = req.params;
+    const { instanceKey, databaseName } = req.body;
+
+    // Reset (clear override) si tous deux nuls
+    if (!instanceKey && !databaseName) {
+      await prisma.deviceActivation.updateMany({
+        where: { licenseId, deviceId },
+        data: { currentInstanceKey: null, currentDatabaseName: null },
+      });
+      return res.json({ success: true, cleared: true });
+    }
+
+    // Validation : l'instance + la base doivent appartenir à la licence
+    if (!instanceKey || !databaseName) {
+      return res.status(400).json({ error: 'instanceKey et databaseName requis ensemble' });
+    }
+
+    const instance = await prisma.licenseSqlInstance.findFirst({
+      where: { licenseId, key: instanceKey },
+      include: { databases: true },
+    });
+    if (!instance) {
+      return res.status(404).json({ error: `Instance '${instanceKey}' introuvable pour cette licence` });
+    }
+
+    const dbExists = instance.databases.some(d => d.name === databaseName);
+    if (!dbExists) {
+      return res.status(404).json({ error: `Base '${databaseName}' introuvable dans l'instance '${instanceKey}'` });
+    }
+
+    await prisma.deviceActivation.updateMany({
+      where: { licenseId, deviceId },
+      data: {
+        currentInstanceKey: instanceKey,
+        currentDatabaseName: databaseName,
+      },
+    });
+
+    res.json({ success: true, instanceKey, databaseName });
+  } catch (error) {
+    console.error('[DEVICES:DATABASE]', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+/**
  * POST /api/admin/licenses/:id/block
  * Bloque une licence (l'app mobile sera bloquée au prochain heartbeat).
  */

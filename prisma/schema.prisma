@@ -288,6 +288,11 @@ model DeviceActivation {
   lastHeartbeat DateTime @default(now())
   isActive      Boolean  @default(true)
 
+  // Assignement instance/base SQL imposé par l'admin (override de la sélection mobile)
+  // Renvoyé au mobile au heartbeat, qui s'en sert pour ses headers X-Instance / X-Database.
+  currentInstanceKey  String? @db.VarChar(50)
+  currentDatabaseName String? @db.VarChar(100)
+
   license       License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
 
   @@unique([licenseId, deviceId])

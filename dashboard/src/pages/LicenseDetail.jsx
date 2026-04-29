@@ -306,7 +306,7 @@ export default function LicenseDetail() {
           ) : (
             <div className="space-y-3">
               {license.devices.map((d) => (
-                <DeviceCard key={d.id} device={d} licenseId={id} onDeactivate={handleDeactivateDevice} onUpdate={load} />
+                <DeviceCard key={d.id} device={d} licenseId={id} instances={license.instances || []} onDeactivate={handleDeactivateDevice} onUpdate={load} />
               ))}
             </div>
           )}
@@ -652,10 +652,11 @@ export default function LicenseDetail() {
   );
 }
 
-function DeviceCard({ device: d, licenseId, onDeactivate, onUpdate }) {
+function DeviceCard({ device: d, licenseId, instances = [], onDeactivate, onUpdate }) {
   const [editing, setEditing] = useState(false);
   const [owner, setOwner] = useState(d.owner || '');
   const [saving, setSaving] = useState(false);
+  const [savingDb, setSavingDb] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
@@ -665,6 +666,26 @@ function DeviceCard({ device: d, licenseId, onDeactivate, onUpdate }) {
       onUpdate();
     } catch (err) { alert(err.message); }
     finally { setSaving(false); }
+  };
+
+  // Construit la valeur du select sous forme "instanceKey||databaseName" (ou '' = pas d'override)
+  const currentValue = d.currentInstanceKey && d.currentDatabaseName
+    ? `${d.currentInstanceKey}||${d.currentDatabaseName}`
+    : '';
+
+  const handleDbChange = async (e) => {
+    const value = e.target.value;
+    setSavingDb(true);
+    try {
+      if (!value) {
+        await api.updateDeviceDatabase(licenseId, d.deviceId, { instanceKey: null, databaseName: null });
+      } else {
+        const [instanceKey, databaseName] = value.split('||');
+        await api.updateDeviceDatabase(licenseId, d.deviceId, { instanceKey, databaseName });
+      }
+      onUpdate();
+    } catch (err) { alert(err.message); }
+    finally { setSavingDb(false); }
   };
 
   return (
@@ -686,6 +707,7 @@ function DeviceCard({ device: d, licenseId, onDeactivate, onUpdate }) {
             className="text-xs text-red-500 hover:text-red-700 cursor-pointer">Désactiver</button>
         )}
       </div>
+
       <div className="mt-2 flex items-center gap-2 ml-[30px]">
         <User size={14} className="text-gray-400 flex-shrink-0" />
         {editing ? (
@@ -714,6 +736,34 @@ function DeviceCard({ device: d, licenseId, onDeactivate, onUpdate }) {
           </>
         )}
       </div>
+
+      {/* Bascule de base imposée par l'admin */}
+      {d.isActive && instances.length > 0 && (
+        <div className="mt-2 flex items-center gap-2 ml-[30px]">
+          <Database size={14} className="text-gray-400 flex-shrink-0" />
+          <select
+            value={currentValue}
+            onChange={handleDbChange}
+            disabled={savingDb}
+            className={`flex-1 px-2 py-1 text-xs border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+              currentValue ? 'border-blue-300 bg-blue-50 text-blue-900 font-medium' : 'border-gray-200 bg-white text-gray-700'
+            }`}
+            title="Force ce device sur une base spécifique. La bascule se fait au prochain heartbeat de l'app mobile."
+          >
+            <option value="">— Sélection libre par l'utilisateur —</option>
+            {instances.map((inst) => (
+              <optgroup key={inst.id} label={`${inst.label || inst.key} (${inst.key})`}>
+                {(inst.databases || []).map((db) => (
+                  <option key={db.id} value={`${inst.key}||${db.name}`}>
+                    {db.label || db.name} {db.name !== (db.label || db.name) ? `(${db.name})` : ''}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          {savingDb && <span className="text-xs text-gray-400">…</span>}
+        </div>
+      )}
     </div>
   );
 }

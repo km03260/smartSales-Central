@@ -76,7 +76,7 @@ router.post('/activate', async (req, res) => {
     }
 
     // Enregistrer ou mettre à jour l'appareil
-    await prisma.deviceActivation.upsert({
+    const device = await prisma.deviceActivation.upsert({
       where: { licenseId_deviceId: { licenseId: license.id, deviceId } },
       create: {
         licenseId: license.id,
@@ -142,6 +142,8 @@ router.post('/activate', async (req, res) => {
       appCode: license.app?.code,
       appName: license.app?.name,
       companyConfig,
+      assignedInstance: device?.currentInstanceKey || null,
+      assignedDatabase: device?.currentDatabaseName || null,
     });
   } catch (error) {
     console.error('[ACTIVATE]', error);
@@ -181,13 +183,15 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
       return res.status(403).json({ error: 'Licence invalide ou désactivée' });
     }
 
+    // Récupérer le device pour l'assignement instance/base imposé par l'admin
+    const device = await prisma.deviceActivation.findUnique({
+      where: { licenseId_deviceId: { licenseId, deviceId } },
+      select: { userName: true, currentInstanceKey: true, currentDatabaseName: true },
+    });
+
     // Mettre à jour le heartbeat + ajouter le userName à la liste (sans doublon)
     const updateData = { lastHeartbeat: new Date() };
     if (userName) {
-      const device = await prisma.deviceActivation.findUnique({
-        where: { licenseId_deviceId: { licenseId, deviceId } },
-        select: { userName: true },
-      });
       const existing = device?.userName
         ? device.userName.split(',').map(n => n.trim()).filter(Boolean)
         : [];
@@ -209,7 +213,15 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
       data: { licenseId, deviceId, eventType: 'heartbeat', eventData: {} },
     });
 
-    res.json({ success: true, token, isBlocked: license.isBlocked || false });
+    // L'app mobile utilisera assignedInstance/assignedDatabase pour ses headers X-Instance/X-Database.
+    // null des deux côtés = pas d'override admin, l'app garde sa sélection locale.
+    res.json({
+      success: true,
+      token,
+      isBlocked: license.isBlocked || false,
+      assignedInstance: device?.currentInstanceKey || null,
+      assignedDatabase: device?.currentDatabaseName || null,
+    });
   } catch (error) {
     console.error('[HEARTBEAT]', error);
     res.status(500).json({ error: 'Erreur serveur' });

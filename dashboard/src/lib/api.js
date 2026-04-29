@@ -121,6 +121,8 @@ export const api = {
     request(`/admin/licenses/${licenseId}/devices/${deviceId}/deactivate`, { method: 'POST' }),
   updateDeviceOwner: (licenseId, deviceId, owner) =>
     request(`/admin/licenses/${licenseId}/devices/${deviceId}/owner`, { method: 'PUT', body: { owner } }),
+  updateDeviceDatabase: (licenseId, deviceId, body) =>
+    request(`/admin/licenses/${licenseId}/devices/${deviceId}/database`, { method: 'PUT', body }),
   // Instances SQL d'une licence
   getLicenseInstances: (licenseId) => request(`/admin/licenses/${licenseId}/instances`),
   createLicenseInstance: (licenseId, body) =>
