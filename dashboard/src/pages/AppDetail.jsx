@@ -180,7 +180,13 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
   const hasApk = !!app.apkFileName;
   const hasBundle = !!app.serviceBundlePath;
 
-  const triggerUpload = () => fileRef.current?.click();
+  const versionMissing = !version.trim();
+  const apkUploadDisabled = uploading || versionMissing;
+
+  const triggerUpload = () => {
+    if (versionMissing) return;
+    fileRef.current?.click();
+  };
   const triggerBundleUpload = () => bundleRef.current?.click();
   const onFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -233,14 +239,19 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
             <div className="space-y-2">
               <div className="flex gap-2">
                 <input type="text" value={version} onChange={(e) => setVersion(e.target.value)}
-                  placeholder="Nouvelle version (ex: 1.2.3)"
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button onClick={triggerUpload} disabled={uploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors">
+                  placeholder="Nouvelle version (ex: 1.2.3) — requis"
+                  aria-required="true"
+                  className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${versionMissing ? 'border-orange-300 bg-orange-50/40' : 'border-gray-200'}`} />
+                <button onClick={triggerUpload} disabled={apkUploadDisabled}
+                  title={versionMissing ? 'Saisissez le numéro de version pour pouvoir remplacer' : ''}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                   <Upload size={16} />
                   {uploading ? 'Upload...' : 'Remplacer'}
                 </button>
               </div>
+              {versionMissing && (
+                <p className="text-xs text-orange-600">Le numéro de version est requis pour publier une nouvelle release (sans, les apps mobiles ne détecteront pas la mise à jour).</p>
+              )}
               <textarea value={releaseNotes} onChange={(e) => setReleaseNotes(e.target.value)} rows={3}
                 placeholder="Notes de version (ce que cette release apporte, une ligne par point)"
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" />
@@ -253,14 +264,20 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
             </div>
             <div className="space-y-2">
               <div className="flex gap-2">
-                <input type="text" value={version} onChange={(e) => setVersion(e.target.value)} placeholder="Version (ex: 1.2.3)"
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <button onClick={triggerUpload} disabled={uploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                <input type="text" value={version} onChange={(e) => setVersion(e.target.value)}
+                  placeholder="Version (ex: 1.2.3) — requis"
+                  aria-required="true"
+                  className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${versionMissing ? 'border-orange-300 bg-orange-50/40' : 'border-gray-200'}`} />
+                <button onClick={triggerUpload} disabled={apkUploadDisabled}
+                  title={versionMissing ? 'Saisissez le numéro de version pour pouvoir uploader' : ''}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                   <Upload size={16} />
                   {uploading ? 'Upload...' : 'Uploader APK'}
                 </button>
               </div>
+              {versionMissing && (
+                <p className="text-xs text-orange-600">Le numéro de version est requis pour que les apps mobiles puissent détecter la mise à jour.</p>
+              )}
               <textarea value={releaseNotes} onChange={(e) => setReleaseNotes(e.target.value)} rows={3}
                 placeholder="Notes de version (ce que cette release apporte, une ligne par point)"
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y" />

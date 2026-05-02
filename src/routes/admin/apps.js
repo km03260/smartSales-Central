@@ -223,6 +223,13 @@ router.post('/:id/apk', upload.single('apk'), async (req, res) => {
       return res.status(400).json({ error: 'Fichier APK requis (max 200 MB)' });
     }
 
+    const version = String(req.body.version || '').trim();
+    if (!version) {
+      // Le fichier a déjà été écrit par multer — on le supprime pour ne pas laisser d'orphelin
+      try { rmSync(req.file.path); } catch { /* ignore */ }
+      return res.status(400).json({ error: 'Numéro de version requis (ex : 1.2.3)' });
+    }
+
     const app = req._appRecord;
     const dir = appDir(app.code);
 
@@ -249,7 +256,7 @@ router.post('/:id/apk', upload.single('apk'), async (req, res) => {
       where: { id: app.id },
       data: {
         apkFileName: req.file.filename,
-        apkVersion: req.body.version || '',
+        apkVersion: version,
         apkReleaseNotes: req.body.releaseNotes || '',
         apkUpdatedAt: new Date(),
       },
