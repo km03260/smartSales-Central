@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import {
   ArrowLeft, Ban, RefreshCw, Smartphone, Save, Server, Database, ServerCog,
-  Plus, Trash2, Star, StarOff, Pencil, X, Check, User,
+  Plus, Trash2, Star, StarOff, Pencil, X, Check, User, Info,
 } from 'lucide-react';
 
 export default function LicenseDetail() {
@@ -13,6 +13,7 @@ export default function LicenseDetail() {
   const [renewDate, setRenewDate] = useState('');
   const [saving, setSaving] = useState(false);
   const [deployments, setDeployments] = useState([]);
+  const [activeTab, setActiveTab] = useState('info'); // 'info' | 'instances' | 'devices'
 
   // Instances : ajout / édition
   const [newInst, setNewInst] = useState(null);
@@ -187,6 +188,7 @@ export default function LicenseDetail() {
 
   const isExpired = new Date(license.expiresAt) < new Date();
   const instances = license.instances || [];
+  const activeDevicesCount = license.devices?.filter(d => d.isActive).length ?? 0;
 
   return (
     <div>
@@ -205,8 +207,22 @@ export default function LicenseDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Infos licence */}
+      {/* Tabs */}
+      <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+        <nav className="flex gap-1 min-w-max" aria-label="Onglets">
+          <LicenseTabButton active={activeTab === 'info'} onClick={() => setActiveTab('info')} icon={<Info size={16} />}>
+            Informations
+          </LicenseTabButton>
+          <LicenseTabButton active={activeTab === 'instances'} onClick={() => setActiveTab('instances')} icon={<ServerCog size={16} />}>
+            Instances SQL &amp; bases <span className="ml-1 text-xs text-gray-400">{instances.length}</span>
+          </LicenseTabButton>
+          <LicenseTabButton active={activeTab === 'devices'} onClick={() => setActiveTab('devices')} icon={<Smartphone size={16} />}>
+            Appareils <span className="ml-1 text-xs text-gray-400">{activeDevicesCount}/{license.maxDevices}</span>
+          </LicenseTabButton>
+        </nav>
+      </div>
+
+      {activeTab === 'info' && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Informations</h2>
           <dl className="space-y-3">
@@ -295,26 +311,27 @@ export default function LicenseDetail() {
             </div>
           </div>
         </div>
+      )}
 
-        {/* Appareils */}
+      {activeTab === 'devices' && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Appareils ({license.devices?.filter(d => d.isActive).length}/{license.maxDevices})
+            Appareils ({activeDevicesCount}/{license.maxDevices})
           </h2>
           {license.devices?.length === 0 ? (
             <p className="text-gray-500 text-sm">Aucun appareil activé</p>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
               {license.devices.map((d) => (
                 <DeviceCard key={d.id} device={d} licenseId={id} instances={license.instances || []} onDeactivate={handleDeactivateDevice} onUpdate={load} />
               ))}
             </div>
           )}
         </div>
-      </div>
+      )}
 
-      {/* Instances SQL + bases */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mt-6">
+      {activeTab === 'instances' && (
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <ServerCog size={18} className="text-gray-600" />
@@ -648,7 +665,25 @@ export default function LicenseDetail() {
           </div>
         )}
       </div>
+      )}
     </div>
+  );
+}
+
+function LicenseTabButton({ active, onClick, icon, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+        active
+          ? 'border-blue-600 text-blue-600'
+          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+      }`}
+    >
+      {icon}
+      {children}
+    </button>
   );
 }
 
@@ -689,14 +724,14 @@ function DeviceCard({ device: d, licenseId, instances = [], onDeactivate, onUpda
   };
 
   return (
-    <div className={`p-3 rounded-lg ${d.isActive ? 'bg-gray-50' : 'bg-gray-100 opacity-50'}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Smartphone size={18} className={d.isActive ? 'text-blue-600' : 'text-gray-400'} />
-          <div>
-            <div className="text-sm font-medium text-gray-900">{d.deviceName || 'Appareil'}</div>
-            {d.userName && <div className="text-xs text-blue-600 font-medium">{d.userName}</div>}
-            <div className="text-xs text-gray-500 font-mono">{d.deviceId}</div>
+    <div className={`p-3 rounded-lg flex flex-col h-full ${d.isActive ? 'bg-gray-50' : 'bg-gray-100 opacity-50'}`}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
+          <Smartphone size={18} className={`flex-shrink-0 mt-0.5 ${d.isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium text-gray-900 truncate">{d.deviceName || 'Appareil'}</div>
+            {d.userName && <div className="text-xs text-blue-600 font-medium truncate">{d.userName}</div>}
+            <div className="text-xs text-gray-500 font-mono break-all">{d.deviceId}</div>
             <div className="text-xs text-gray-400">
               {d.platform} &mdash; Dernier contact : {new Date(d.lastHeartbeat).toLocaleString('fr-FR')}
             </div>
@@ -704,7 +739,7 @@ function DeviceCard({ device: d, licenseId, instances = [], onDeactivate, onUpda
         </div>
         {d.isActive && (
           <button onClick={() => onDeactivate(d.deviceId)}
-            className="text-xs text-red-500 hover:text-red-700 cursor-pointer">Désactiver</button>
+            className="text-xs text-red-500 hover:text-red-700 cursor-pointer flex-shrink-0">Désactiver</button>
         )}
       </div>
 
