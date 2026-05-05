@@ -187,14 +187,12 @@ const breadcrumbSchema = {
           <a href="/contact" class={`inline-flex items-center justify-center gap-2 bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white px-6 py-3.5 rounded-full font-semibold hover:shadow-xl ${c.shadow} transition-all duration-300 hover:-translate-y-0.5`}>
             Demander une démo gratuite
           </a>
-          {app.apkUrl && (
-            <a id="apk-download" href={app.apkUrl} class="group inline-flex items-center justify-center gap-2 glass-strong text-gray-700 dark:text-gray-200 px-6 py-3.5 rounded-full font-semibold hover:bg-white dark:bg-gray-900 transition-all duration-300 hover:-translate-y-0.5">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Télécharger l'APK <span id="apk-version" class="text-xs text-gray-400 dark:text-gray-400">{app.apkVersion && `v${app.apkVersion}`}</span>
-            </a>
-          )}
+          <a id="apk-download" href={app.apkUrl || '#'} class={`group inline-flex items-center justify-center gap-2 glass-strong text-gray-700 dark:text-gray-200 px-6 py-3.5 rounded-full font-semibold hover:bg-white dark:bg-gray-900 transition-all duration-300 hover:-translate-y-0.5 ${app.apkUrl ? '' : 'hidden'}`}>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Télécharger l'APK <span id="apk-version" class="text-xs text-gray-400 dark:text-gray-400">{app.apkVersion ? `v${app.apkVersion}` : ''}</span>
+          </a>
         </div>
       </div>
 
@@ -239,54 +237,48 @@ const breadcrumbSchema = {
     </section>
   )}
 
-  {/* Download + QR */}
-  {app.qrcodeUrl && (
-    <section class="relative py-24 bg-gradient-to-br from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 overflow-hidden">
-      <div class="max-w-4xl mx-auto px-6">
-        <div class="reveal-scale glass-strong rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 shadow-xl shadow-gray-200/50">
-          <div class="flex-shrink-0 relative">
-            <div class={`absolute inset-0 bg-gradient-to-br ${c.bgSoft} to-transparent rounded-2xl blur-xl`}></div>
-            <img id="apk-qrcode" src={app.qrcodeUrl} alt={`QR Code - Télécharger ${app.name}`} class="relative w-40 h-40 bg-white dark:bg-gray-900 p-3 rounded-2xl shadow-lg" />
-          </div>
-          <div class="text-center md:text-left flex-1">
-            <span class={`inline-block text-sm font-semibold ${c.text} mb-2 uppercase tracking-wider`}>Installation</span>
-            <h2 class="font-extrabold text-gray-900 dark:text-gray-100 mb-2 text-3xl tracking-tight">
-              Installer <span class="font-display-italic text-gray-500 dark:text-gray-300" id="app-name-install">{app.name}</span> sur Android
-            </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed mb-4">
-              Scannez le QR code avec votre appareil Android ou téléchargez directement l'APK. Pas de Play Store — installation directe.
-            </p>
-            {app.apkVersion && (
-              <div class="inline-flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300 mb-4">
-                <span class={`inline-block w-2 h-2 rounded-full ${c.accent}`}></span>
-                <span id="apk-version-badge">Dernière version : <strong class="text-gray-900 dark:text-gray-100">v{app.apkVersion}</strong></span>
-              </div>
-            )}
-            {app.apkUrl && (
-              <a id="apk-download-2" href={app.apkUrl} class={`inline-flex items-center gap-2 bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:shadow-lg ${c.shadow} transition-all duration-300 hover:-translate-y-0.5`}>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Télécharger l'APK
-              </a>
-            )}
-          </div>
+  {/* Download + QR — toujours rendu, masqué si pas d'APK au build, révélé par le script runtime */}
+  <section id="apk-section" class={`relative py-24 bg-gradient-to-br from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 overflow-hidden ${app.qrcodeUrl ? '' : 'hidden'}`}>
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="reveal-scale glass-strong rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 shadow-xl shadow-gray-200/50">
+        <div class="flex-shrink-0 relative">
+          <div class={`absolute inset-0 bg-gradient-to-br ${c.bgSoft} to-transparent rounded-2xl blur-xl`}></div>
+          <img id="apk-qrcode" src={app.qrcodeUrl || ''} alt={`QR Code - Télécharger ${app.name}`} class="relative w-40 h-40 bg-white dark:bg-gray-900 p-3 rounded-2xl shadow-lg" />
         </div>
-
-        {/* Notes de version */}
-        <div id="apk-release-notes-block" class={`mt-6 rounded-2xl ${c.bg} border ${c.border} p-6 ${app.apkReleaseNotes ? '' : 'hidden'}`}>
-          <div class="flex items-center gap-2 mb-3">
-            <div class={`w-8 h-8 rounded-lg bg-gradient-to-br ${c.from} ${c.to} flex items-center justify-center`}>
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            </div>
-            <h4 class="font-bold text-gray-900 dark:text-gray-100 text-sm">Nouveautés de cette version</h4>
-            {app.apkVersion && <span class={`text-xs font-mono ${c.text} ml-auto`}>v{app.apkVersion}</span>}
+        <div class="text-center md:text-left flex-1">
+          <span class={`inline-block text-sm font-semibold ${c.text} mb-2 uppercase tracking-wider`}>Installation</span>
+          <h2 class="font-extrabold text-gray-900 dark:text-gray-100 mb-2 text-3xl tracking-tight">
+            Installer <span class="font-display-italic text-gray-500 dark:text-gray-300" id="app-name-install">{app.name}</span> sur Android
+          </h2>
+          <p class="text-sm text-gray-500 dark:text-gray-300 leading-relaxed mb-4">
+            Scannez le QR code avec votre appareil Android ou téléchargez directement l'APK. Pas de Play Store — installation directe.
+          </p>
+          <div id="apk-version-wrap" class={`inline-flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300 mb-4 ${app.apkVersion ? '' : 'hidden'}`}>
+            <span class={`inline-block w-2 h-2 rounded-full ${c.accent}`}></span>
+            <span id="apk-version-badge">Dernière version : <strong class="text-gray-900 dark:text-gray-100">v{app.apkVersion || ''}</strong></span>
           </div>
-          <p id="apk-release-notes" class="text-sm text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-line">{app.apkReleaseNotes}</p>
+          <a id="apk-download-2" href={app.apkUrl || '#'} class={`inline-flex items-center gap-2 bg-gradient-to-r ${c.fromDark} ${c.toDark} text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:shadow-lg ${c.shadow} transition-all duration-300 hover:-translate-y-0.5 ${app.apkUrl ? '' : 'hidden'}`}>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Télécharger l'APK
+          </a>
         </div>
       </div>
-    </section>
-  )}
+
+      {/* Notes de version */}
+      <div id="apk-release-notes-block" class={`mt-6 rounded-2xl ${c.bg} border ${c.border} p-6 ${app.apkReleaseNotes ? '' : 'hidden'}`}>
+        <div class="flex items-center gap-2 mb-3">
+          <div class={`w-8 h-8 rounded-lg bg-gradient-to-br ${c.from} ${c.to} flex items-center justify-center`}>
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          </div>
+          <h4 class="font-bold text-gray-900 dark:text-gray-100 text-sm">Nouveautés de cette version</h4>
+          <span id="apk-release-notes-version" class={`text-xs font-mono ${c.text} ml-auto ${app.apkVersion ? '' : 'hidden'}`}>{app.apkVersion ? `v${app.apkVersion}` : ''}</span>
+        </div>
+        <p id="apk-release-notes" class="text-sm text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-line">{app.apkReleaseNotes || ''}</p>
+      </div>
+    </div>
+  </section>
 
   {/* Pricing */}
   {app.pricingPlans && app.pricingPlans.length > 0 && (
@@ -459,28 +451,47 @@ const breadcrumbSchema = {
         }
 
         // ── APK / QR / version / notes ───────────────────────────────────
+        // Sections rendues unconditionally au build : on toggle .hidden au runtime
+        // selon ce que l'API renvoie maintenant (le build a pu être fait avant l'upload APK).
+        const apkSection = document.getElementById('apk-section');
         const qr = document.getElementById('apk-qrcode');
         const link1 = document.getElementById('apk-download');
         const link2 = document.getElementById('apk-download-2');
         const version = document.getElementById('apk-version');
+        const versionWrap = document.getElementById('apk-version-wrap');
         const versionBadge = document.getElementById('apk-version-badge');
         const releaseNotes = document.getElementById('apk-release-notes');
         const releaseNotesBlock = document.getElementById('apk-release-notes-block');
+        const releaseNotesVersion = document.getElementById('apk-release-notes-version');
+
+        // Section QR : visible si l'API renvoie un qrcodeUrl
+        if (apkSection) apkSection.classList.toggle('hidden', !data.qrcodeUrl);
         if (qr && data.qrcodeUrl) qr.src = data.qrcodeUrl;
-        if (link1 && data.apkUrl) link1.href = data.apkUrl;
-        if (link2 && data.apkUrl) link2.href = data.apkUrl;
-        if (version && data.apkVersion) version.textContent = `v${data.apkVersion}`;
+
+        // Liens de téléchargement (hero + section)
+        if (link1) {
+          if (data.apkUrl) { link1.href = data.apkUrl; link1.classList.remove('hidden'); }
+          else             { link1.classList.add('hidden'); }
+        }
+        if (link2) {
+          if (data.apkUrl) { link2.href = data.apkUrl; link2.classList.remove('hidden'); }
+          else             { link2.classList.add('hidden'); }
+        }
+
+        // Numéros de version (hero + badge + notes header)
+        if (version) version.textContent = data.apkVersion ? `v${data.apkVersion}` : '';
+        if (versionWrap) versionWrap.classList.toggle('hidden', !data.apkVersion);
         if (versionBadge && data.apkVersion) {
           versionBadge.innerHTML = `Dernière version : <strong class="text-gray-900 dark:text-gray-100">v${escapeHtml(data.apkVersion)}</strong>`;
         }
-        if (releaseNotes) {
-          if (data.apkReleaseNotes) {
-            releaseNotes.textContent = data.apkReleaseNotes;
-            if (releaseNotesBlock) releaseNotesBlock.classList.remove('hidden');
-          } else if (releaseNotesBlock) {
-            releaseNotesBlock.classList.add('hidden');
-          }
+        if (releaseNotesVersion) {
+          if (data.apkVersion) { releaseNotesVersion.textContent = `v${data.apkVersion}`; releaseNotesVersion.classList.remove('hidden'); }
+          else                 { releaseNotesVersion.classList.add('hidden'); }
         }
+
+        // Notes de version
+        if (releaseNotes) releaseNotes.textContent = data.apkReleaseNotes || '';
+        if (releaseNotesBlock) releaseNotesBlock.classList.toggle('hidden', !data.apkReleaseNotes);
 
         // ── Features ─────────────────────────────────────────────────────
         const featuresGrid = document.getElementById('features-grid');
