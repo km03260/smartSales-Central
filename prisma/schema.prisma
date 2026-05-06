@@ -166,6 +166,14 @@ model SyncServiceDeployment {
   retryAttempts          Int      @default(3)
   histoPiece             Int      @default(-1)
 
+  // Paramètres "Invendus" — propose au commercial les articles que le client
+  // achetait régulièrement (≥ invendusMinAvgPerMonth fois/mois sur les
+  // invendusNbMonthHisto derniers mois) mais qu'il n'a pas commandés depuis
+  // invendusNbMonthCA mois.
+  invendusNbMonthCA      Int      @default(1)
+  invendusNbMonthHisto   Int      @default(3)
+  invendusMinAvgPerMonth Float    @default(1)
+
   // Mot de passe admin mobile (protège le changement de base dans Préférences)
   // Vide = pas de protection. Propagé aux apps via le JWT de licence.
   mobileAdminPassword    String   @default("") @db.VarChar(100)

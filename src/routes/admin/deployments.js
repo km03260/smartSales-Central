@@ -20,6 +20,7 @@ const DEPLOYMENT_FIELDS = [
   'kestrelUrl', 'certPath', 'certPassword',
   'ediOutputFolder', 'ediSeparator',
   'batchSize', 'timeoutSeconds', 'retryAttempts', 'histoPiece',
+  'invendusNbMonthCA', 'invendusNbMonthHisto', 'invendusMinAvgPerMonth',
   'mobileAdminPassword',
 ];
 
@@ -115,6 +116,12 @@ function buildAppsettings(deployment) {
       TimeoutSeconds: deployment.timeoutSeconds ?? 300,
       RetryAttempts: deployment.retryAttempts ?? 3,
       HistoPiece: deployment.histoPiece ?? -1,
+    },
+    Invendus: {
+      _Comment: "Calcul des articles 'invendus' proposés au commercial. Un article apparaît si le client l'a commandé en moyenne >= MinAvgPerMonth fois/mois sur les NbMonthHisto derniers mois précédents, MAIS pas dans les NbMonthCA derniers mois.",
+      NbMonthCA: deployment.invendusNbMonthCA ?? 1,
+      NbMonthHisto: deployment.invendusNbMonthHisto ?? 3,
+      MinAvgPerMonth: deployment.invendusMinAvgPerMonth ?? 1,
     },
     WaveSoft: {
       OutputFolder: deployment.ediOutputFolder || 'C:\\DATA_Wavesoft\\AutomateIE',

@@ -9,6 +9,7 @@ const DEPLOYMENT_FIELDS = [
   'kestrelUrl', 'certPath', 'certPassword',
   'ediOutputFolder', 'ediSeparator',
   'batchSize', 'timeoutSeconds', 'retryAttempts', 'histoPiece',
+  'invendusNbMonthCA', 'invendusNbMonthHisto', 'invendusMinAvgPerMonth',
   'mobileAdminPassword',
 ];
 
@@ -341,6 +342,37 @@ export default function DeploymentDetail() {
               HistoPiece <span className="text-gray-400">(années, -1 = tout)</span>
             </label>
             <input type="number" {...bind('histoPiece', { number: true })}
+              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+          </div>
+
+          {/* Invendus settings */}
+          <div className="md:col-span-2 pt-3 border-t border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase tracking-wide">
+              Articles invendus
+            </h3>
+            <p className="text-xs text-gray-500 mb-2">
+              Onglet "Invendus" du panier mobile. Un article y apparaît si le client l'a commandé en moyenne ≥ <em>MinAvgPerMonth</em> fois/mois sur les <em>NbMonthHisto</em> derniers mois précédents, mais pas dans les <em>NbMonthCA</em> derniers mois.
+            </p>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">
+              NbMonthCA <span className="text-gray-400">(période sans achat, en mois)</span>
+            </label>
+            <input type="number" min="1" {...bind('invendusNbMonthCA', { number: true })}
+              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">
+              NbMonthHisto <span className="text-gray-400">(période historique, en mois)</span>
+            </label>
+            <input type="number" min="1" {...bind('invendusNbMonthHisto', { number: true })}
+              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">
+              MinAvgPerMonth <span className="text-gray-400">(seuil d'achats/mois)</span>
+            </label>
+            <input type="number" step="0.1" min="0.1" {...bind('invendusMinAvgPerMonth', { number: true })}
               className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
           </div>
         </div>
