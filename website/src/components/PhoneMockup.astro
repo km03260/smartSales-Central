@@ -20,7 +20,19 @@ const t = THEMES[variant];
 
 <div class={`phone-frame phone-frame-md animate-float ${className}`}>
   <div class="phone-screen">
-    {/* Status bar */}
+    {/* Capture d'écran réelle pour customSales — remplit tout l'écran (status bar incluse) */}
+    {variant === 'sales' && (
+      <img
+        src="/im/customSales.webp"
+        alt="Capture d'écran customSales — fiche client avec encours, devis et commandes"
+        class="absolute inset-0 w-full h-full object-cover object-top"
+        loading="lazy"
+        decoding="async"
+      />
+    )}
+
+    {/* Status bar (uniquement pour les variantes sans screenshot réel) */}
+    {variant !== 'sales' && (
     <div class="flex items-center justify-between px-6 pt-8 pb-2 text-xs font-semibold text-gray-900 dark:text-gray-100">
       <span>9:41</span>
       <div class="flex items-center gap-1">
@@ -29,61 +41,9 @@ const t = THEMES[variant];
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
       </div>
     </div>
-
-    {/* App-specific content */}
-    {variant === 'sales' && (
-      <div class="px-4 pt-2">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <div class="text-[10px] text-gray-400 dark:text-gray-400 uppercase tracking-wider">Bonjour, Julien</div>
-            <div class="font-bold text-gray-900 dark:text-gray-100 text-lg">Tournée du jour</div>
-          </div>
-          <div class={`w-10 h-10 rounded-full bg-gradient-to-br ${t.from} ${t.to} flex items-center justify-center text-white font-bold text-sm`}>JD</div>
-        </div>
-
-        <div class={`${t.soft} rounded-xl p-3 mb-3 border ${t.border}`}>
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-[10px] text-gray-500 dark:text-gray-300">Objectif mensuel</div>
-              <div class={`font-bold ${t.accent} text-lg`}>78%</div>
-            </div>
-            <div class="text-right">
-              <div class="text-[10px] text-gray-500 dark:text-gray-300">CA du mois</div>
-              <div class="font-bold text-gray-900 dark:text-gray-100">14 230 €</div>
-            </div>
-          </div>
-          <div class="w-full bg-white/60 rounded-full h-1.5 mt-2 overflow-hidden">
-            <div class={`h-full bg-gradient-to-r ${t.from} ${t.to} rounded-full`} style="width: 78%"></div>
-          </div>
-        </div>
-
-        <div class="text-[10px] font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-2">Clients à visiter</div>
-        <div class="space-y-2">
-          {[
-            { name: 'Garage Durand', addr: '63 Clermont', status: '10:30', color: 'bg-green-100 text-green-700' },
-            { name: 'Carrosserie Pro', addr: '15 Aurillac', status: '14:00', color: 'bg-blue-100 text-blue-700' },
-            { name: 'Auto Service 43', addr: '43 Le Puy',  status: '16:30', color: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300' },
-          ].map((c) => (
-            <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl p-2.5 flex items-center gap-2.5">
-              <div class={`w-8 h-8 rounded-lg bg-gradient-to-br ${t.from} ${t.to} flex items-center justify-center text-white text-[10px] font-bold`}>
-                {c.name.slice(0, 2).toUpperCase()}
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="font-semibold text-gray-900 dark:text-gray-100 text-xs truncate">{c.name}</div>
-                <div class="text-[10px] text-gray-500 dark:text-gray-300 truncate">{c.addr}</div>
-              </div>
-              <span class={`${c.color} text-[10px] font-semibold px-2 py-0.5 rounded-full`}>{c.status}</span>
-            </div>
-          ))}
-        </div>
-
-        <div class={`fixed-like mt-4 bg-gradient-to-r ${t.from} ${t.to} text-white rounded-xl p-3 flex items-center justify-center gap-2 text-xs font-semibold shadow-lg`}>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Nouvelle commande
-        </div>
-      </div>
     )}
 
+    {/* App-specific content (mockups SVG pour les variantes sans capture) */}
     {variant === 'supply' && (
       <div class="px-4 pt-2">
         <div class="mb-3">
