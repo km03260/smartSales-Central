@@ -178,6 +178,14 @@ model SyncServiceDeployment {
   // Vide = pas de protection. Propagé aux apps via le JWT de licence.
   mobileAdminPassword    String   @default("") @db.VarChar(100)
 
+  // Patterns d'artcodes "articles divers" (saisie désignation+prix+PR par
+  // commercial dans le panier). Sémantique SQL LIKE : 'XXX' (exact), 'XXX%'
+  // (préfixe), '%XXX' (suffixe), '%XXX%' (contient). Séparateurs admis côté
+  // mobile : virgule, point-virgule, espace.
+  // Exemple : "OUTIL% MECA PNEU CARROSSERIE BATTERIE"
+  // Vide = aucun article divers (le commercial ne peut saisir aucune ligne libre).
+  diversArtcodePatterns  String   @default("") @db.VarChar(500)
+
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 

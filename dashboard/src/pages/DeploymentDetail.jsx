@@ -11,6 +11,7 @@ const DEPLOYMENT_FIELDS = [
   'batchSize', 'timeoutSeconds', 'retryAttempts', 'histoPiece',
   'invendusNbMonthCA', 'invendusNbMonthHisto', 'invendusMinAvgPerMonth',
   'mobileAdminPassword',
+  'diversArtcodePatterns',
 ];
 
 export default function DeploymentDetail() {
@@ -214,6 +215,24 @@ export default function DeploymentDetail() {
             <p className="text-xs text-gray-500 mt-1">
               Protège le changement de dossier de travail dans l'app mobile (Préférences).
               Propagé aux apps dans le JWT de licence. Vide = changement libre.
+            </p>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">
+              Patterns articles "divers" <span className="text-gray-400 font-normal">— vide = aucun</span>
+            </label>
+            <input {...bind('diversArtcodePatterns')}
+              placeholder="ex: OUTIL% MECA PNEU CARROSSERIE BATTERIE"
+              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm font-mono" />
+            <p className="text-xs text-gray-500 mt-1">
+              Codes article où le commercial saisit lui-même désignation, prix de vente et prix de revient dans le panier.
+              Séparateurs : virgule, point-virgule, espace. Sémantique SQL LIKE :
+              {' '}<code className="bg-gray-100 px-1 rounded">CODE</code> = exact,
+              {' '}<code className="bg-gray-100 px-1 rounded">CODE%</code> = préfixe,
+              {' '}<code className="bg-gray-100 px-1 rounded">%CODE</code> = suffixe,
+              {' '}<code className="bg-gray-100 px-1 rounded">%CODE%</code> = contient.
+              Vide = le commercial ne peut saisir aucune ligne libre.
             </p>
           </div>
 

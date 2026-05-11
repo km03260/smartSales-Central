@@ -22,6 +22,7 @@ const DEPLOYMENT_FIELDS = [
   'batchSize', 'timeoutSeconds', 'retryAttempts', 'histoPiece',
   'invendusNbMonthCA', 'invendusNbMonthHisto', 'invendusMinAvgPerMonth',
   'mobileAdminPassword',
+  'diversArtcodePatterns',
 ];
 
 function pickDeployment(body) {
