@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
-import { ArrowLeft, Save, Download, Trash2, KeyRound, RefreshCw, ShieldCheck, Plus, X } from 'lucide-react';
+import { ArrowLeft, Save, Download, Trash2, KeyRound, RefreshCw, ShieldCheck, Plus, X, Info, Database, Cog, BookOpen } from 'lucide-react';
 
 const DEPLOYMENT_FIELDS = [
   'name', 'publicUrl', 'localUrl', 'apiKey',
@@ -10,7 +10,6 @@ const DEPLOYMENT_FIELDS = [
   'ediOutputFolder', 'ediSeparator',
   'batchSize', 'timeoutSeconds', 'retryAttempts', 'histoPiece',
   'invendusNbMonthCA', 'invendusNbMonthHisto', 'invendusMinAvgPerMonth',
-  'mobileAdminPassword',
   'diversArtcodePatterns',
 ];
 
@@ -26,6 +25,7 @@ export default function DeploymentDetail() {
   const [certValidityYears, setCertValidityYears] = useState(10);
   const [generatingCert, setGeneratingCert] = useState(false);
   const [downloadingCert, setDownloadingCert] = useState(false);
+  const [activeTab, setActiveTab] = useState('identity'); // identity | sql | sync | licenses | guide
 
   const load = () => api.getDeployment(id).then((d) => {
     setDeployment(d);
@@ -168,247 +168,254 @@ export default function DeploymentDetail() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Configuration partagée</h2>
-        <p className="text-xs text-gray-500 mb-4">
-          Ces valeurs s'appliquent à tout le SyncService. Les licences associées peuvent surcharger la connexion SQL
-          si leur base tourne sur une instance différente, et définissent leur propre Tircode « Clients divers ».
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-          {/* Identité */}
-          <div className="md:col-span-2">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Identité</h3>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Nom</label>
-            <input {...bind('name')} className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">URL publique</label>
-            <input {...bind('publicUrl')} placeholder="https://213.56.180.33"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">URL locale</label>
-            <input {...bind('localUrl')} placeholder="https://10.0.6.22"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Clé API (X-API-Key)</label>
-            <div className="flex gap-2">
-              <input {...bind('apiKey')} className="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-sm font-mono" />
-              <button type="button" onClick={handleRegenerateApiKey}
-                title="Regénérer une nouvelle clé aléatoire"
-                className="flex items-center gap-1 px-2 py-1.5 border border-gray-300 rounded-lg text-xs text-gray-700 hover:bg-gray-50 cursor-pointer">
-                <RefreshCw size={12} /> Regénérer
-              </button>
-            </div>
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-xs text-gray-500 mb-1">
-              Mot de passe admin mobile <span className="text-gray-400 font-normal">— optionnel</span>
-            </label>
-            <input {...bind('mobileAdminPassword')}
-              placeholder="Laisser vide pour désactiver la protection"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm font-mono" />
-            <p className="text-xs text-gray-500 mt-1">
-              Protège le changement de dossier de travail dans l'app mobile (Préférences).
-              Propagé aux apps dans le JWT de licence. Vide = changement libre.
-            </p>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-xs text-gray-500 mb-1">
-              Patterns articles "divers" <span className="text-gray-400 font-normal">— vide = aucun</span>
-            </label>
-            <input {...bind('diversArtcodePatterns')}
-              placeholder="ex: OUTIL% MECA PNEU CARROSSERIE BATTERIE"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm font-mono" />
-            <p className="text-xs text-gray-500 mt-1">
-              Codes article où le commercial saisit lui-même désignation, prix de vente et prix de revient dans le panier.
-              Séparateurs : virgule, point-virgule, espace. Sémantique SQL LIKE :
-              {' '}<code className="bg-gray-100 px-1 rounded">CODE</code> = exact,
-              {' '}<code className="bg-gray-100 px-1 rounded">CODE%</code> = préfixe,
-              {' '}<code className="bg-gray-100 px-1 rounded">%CODE</code> = suffixe,
-              {' '}<code className="bg-gray-100 px-1 rounded">%CODE%</code> = contient.
-              Vide = le commercial ne peut saisir aucune ligne libre.
-            </p>
-          </div>
-
-          {/* SQL Server par défaut */}
-          <div className="md:col-span-2 pt-3 border-t border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
-              SQL Server (connexion par défaut)
-            </h3>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Serveur (host / IP)</label>
-            <input {...bind('sqlHost')} placeholder="localhost ou 10.0.6.22"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Utilisateur SQL</label>
-            <input {...bind('sqlUser')} className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Mot de passe SQL</label>
-            <input type="password" {...bind('sqlPassword')}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div className="flex items-center gap-2">
-            <input id="tsc" type="checkbox" {...bind('trustServerCertificate', { bool: true })}
-              className="rounded border-gray-300" />
-            <label htmlFor="tsc" className="text-sm text-gray-700">TrustServerCertificate</label>
-          </div>
-
-          {/* HTTPS */}
-          <div className="md:col-span-2 pt-3 border-t border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">HTTPS (Kestrel)</h3>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">URL d'écoute</label>
-            <input {...bind('kestrelUrl')} placeholder="https://*:443"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Chemin du certificat .pfx</label>
-            <input {...bind('certPath')} placeholder="certificate.pfx"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-xs text-gray-500 mb-1">Mot de passe du certificat</label>
-            <input type="password" {...bind('certPassword')}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-
-          {/* Certificat auto-signé */}
-          <div className="md:col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <ShieldCheck size={16} className="text-gray-700" />
-                  <span className="text-sm font-semibold text-gray-900">Certificat auto-signé</span>
-                </div>
-                {deployment.certPfxBase64 || deployment.certHostnames ? (
-                  <div className="text-xs text-gray-600 space-y-0.5">
-                    <div>
-                      <span className="text-gray-500">Hostnames :</span>{' '}
-                      <span className="font-mono">{deployment.certHostnames || '—'}</span>
-                    </div>
-                    {deployment.certValidUntil && (
-                      <div>
-                        <span className="text-gray-500">Valide jusqu'au :</span>{' '}
-                        {new Date(deployment.certValidUntil).toLocaleDateString('fr-FR')}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-500">Aucun certificat généré. Clique sur « Générer » ci-contre pour créer un certificat auto-signé.</p>
-                )}
-              </div>
-              <div className="flex flex-col gap-2 shrink-0">
-                <button type="button" onClick={openCertModal}
-                  className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 cursor-pointer">
-                  <ShieldCheck size={12} /> {deployment.certHostnames ? 'Regénérer' : 'Générer'}
-                </button>
-                {deployment.certHostnames && (
-                  <button type="button" onClick={handleDownloadCertificate} disabled={downloadingCert}
-                    className="flex items-center gap-1.5 bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-gray-800 disabled:opacity-50 cursor-pointer">
-                    <Download size={12} /> {downloadingCert ? '...' : 'Télécharger .pfx'}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* EDI */}
-          <div className="md:col-span-2 pt-3 border-t border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">WaveSoft EDI</h3>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Dossier de sortie EDI</label>
-            <input {...bind('ediOutputFolder')} placeholder="C:\DATA_Wavesoft\AutomateIE"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">Séparateur EDI</label>
-            <input {...bind('ediSeparator')} placeholder=";"
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-
-          {/* Sync settings */}
-          <div className="md:col-span-2 pt-3 border-t border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Paramètres de synchronisation</h3>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">BatchSize</label>
-            <input type="number" {...bind('batchSize', { number: true })}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">TimeoutSeconds</label>
-            <input type="number" {...bind('timeoutSeconds', { number: true })}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">RetryAttempts</label>
-            <input type="number" {...bind('retryAttempts', { number: true })}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">
-              HistoPiece <span className="text-gray-400">(années, -1 = tout)</span>
-            </label>
-            <input type="number" {...bind('histoPiece', { number: true })}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-
-          {/* Invendus settings */}
-          <div className="md:col-span-2 pt-3 border-t border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase tracking-wide">
-              Articles invendus
-            </h3>
-            <p className="text-xs text-gray-500 mb-2">
-              Onglet "Invendus" du panier mobile. Un article y apparaît si le client l'a commandé en moyenne ≥ <em>MinAvgPerMonth</em> fois/mois sur les <em>NbMonthHisto</em> derniers mois précédents, mais pas dans les <em>NbMonthCA</em> derniers mois.
-            </p>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">
-              NbMonthCA <span className="text-gray-400">(période sans achat, en mois)</span>
-            </label>
-            <input type="number" min="1" {...bind('invendusNbMonthCA', { number: true })}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">
-              NbMonthHisto <span className="text-gray-400">(période historique, en mois)</span>
-            </label>
-            <input type="number" min="1" {...bind('invendusNbMonthHisto', { number: true })}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-500 mb-1">
-              MinAvgPerMonth <span className="text-gray-400">(seuil d'achats/mois)</span>
-            </label>
-            <input type="number" step="0.1" min="0.1" {...bind('invendusMinAvgPerMonth', { number: true })}
-              className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
-          <button onClick={handleSave} disabled={saving}
-            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer">
-            <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
-          </button>
-          <button onClick={handleDelete}
-            className="flex items-center gap-2 text-red-600 hover:text-red-800 text-sm font-medium ml-auto cursor-pointer">
-            <Trash2 size={14} /> Supprimer
-          </button>
-        </div>
+      {/* Tabs */}
+      <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+        <nav className="flex gap-1 min-w-max" aria-label="Onglets">
+          <DeploymentTabButton active={activeTab === 'identity'} onClick={() => setActiveTab('identity')} icon={<Info size={16} />}>
+            Identité
+          </DeploymentTabButton>
+          <DeploymentTabButton active={activeTab === 'sql'} onClick={() => setActiveTab('sql')} icon={<Database size={16} />}>
+            SQL &amp; sécurité
+          </DeploymentTabButton>
+          <DeploymentTabButton active={activeTab === 'sync'} onClick={() => setActiveTab('sync')} icon={<Cog size={16} />}>
+            Sync &amp; EDI
+          </DeploymentTabButton>
+          <DeploymentTabButton active={activeTab === 'licenses'} onClick={() => setActiveTab('licenses')} icon={<KeyRound size={16} />}>
+            Licences <span className="ml-1 text-xs text-gray-400">{deployment.licenses?.length || 0}</span>
+          </DeploymentTabButton>
+          <DeploymentTabButton active={activeTab === 'guide'} onClick={() => setActiveTab('guide')} icon={<BookOpen size={16} />}>
+            Guide
+          </DeploymentTabButton>
+        </nav>
       </div>
 
-      {/* Licences associées */}
+      {/* Onglet : Identité */}
+      {activeTab === 'identity' && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <p className="text-xs text-gray-500 mb-4">
+            Identité du déploiement et clé d'authentification utilisée par les apps mobiles.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Nom</label>
+              <input {...bind('name')} className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">URL publique</label>
+              <input {...bind('publicUrl')} placeholder="https://213.56.180.33"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">URL locale</label>
+              <input {...bind('localUrl')} placeholder="https://10.0.6.22"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Clé API (X-API-Key)</label>
+              <div className="flex gap-2">
+                <input {...bind('apiKey')} className="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-sm font-mono" />
+                <button type="button" onClick={handleRegenerateApiKey}
+                  title="Regénérer une nouvelle clé aléatoire"
+                  className="flex items-center gap-1 px-2 py-1.5 border border-gray-300 rounded-lg text-xs text-gray-700 hover:bg-gray-50 cursor-pointer">
+                  <RefreshCw size={12} /> Regénérer
+                </button>
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs text-gray-500 mb-1">
+                Patterns articles "divers" <span className="text-gray-400 font-normal">— vide = aucun</span>
+              </label>
+              <input {...bind('diversArtcodePatterns')}
+                placeholder="ex: OUTIL% MECA PNEU CARROSSERIE BATTERIE"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm font-mono" />
+              <p className="text-xs text-gray-500 mt-1">
+                Codes article où le commercial saisit lui-même désignation, prix de vente et prix de revient dans le panier.
+                Séparateurs : virgule, point-virgule, espace. Sémantique SQL LIKE :
+                {' '}<code className="bg-gray-100 px-1 rounded">CODE</code> = exact,
+                {' '}<code className="bg-gray-100 px-1 rounded">CODE%</code> = préfixe,
+                {' '}<code className="bg-gray-100 px-1 rounded">%CODE</code> = suffixe,
+                {' '}<code className="bg-gray-100 px-1 rounded">%CODE%</code> = contient.
+                Vide = le commercial ne peut saisir aucune ligne libre.
+              </p>
+            </div>
+          </div>
+          <SaveBar saving={saving} onSave={handleSave} onDelete={handleDelete} />
+        </div>
+      )}
+
+      {/* Onglet : SQL & sécurité */}
+      {activeTab === 'sql' && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <p className="text-xs text-gray-500 mb-4">
+            Connexion SQL par défaut (héritée par toutes les bases sans override) + endpoint HTTPS du SyncService.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">SQL Server (connexion par défaut)</h3>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Serveur (host / IP)</label>
+              <input {...bind('sqlHost')} placeholder="localhost ou 10.0.6.22"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Utilisateur SQL</label>
+              <input {...bind('sqlUser')} className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Mot de passe SQL</label>
+              <input type="password" {...bind('sqlPassword')}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div className="flex items-center gap-2">
+              <input id="tsc" type="checkbox" {...bind('trustServerCertificate', { bool: true })}
+                className="rounded border-gray-300" />
+              <label htmlFor="tsc" className="text-sm text-gray-700">TrustServerCertificate</label>
+            </div>
+
+            <div className="md:col-span-2 pt-3 border-t border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">HTTPS (Kestrel)</h3>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">URL d'écoute</label>
+              <input {...bind('kestrelUrl')} placeholder="https://*:443"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Chemin du certificat .pfx</label>
+              <input {...bind('certPath')} placeholder="certificate.pfx"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs text-gray-500 mb-1">Mot de passe du certificat</label>
+              <input type="password" {...bind('certPassword')}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+
+            <div className="md:col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <ShieldCheck size={16} className="text-gray-700" />
+                    <span className="text-sm font-semibold text-gray-900">Certificat auto-signé</span>
+                  </div>
+                  {deployment.certPfxBase64 || deployment.certHostnames ? (
+                    <div className="text-xs text-gray-600 space-y-0.5">
+                      <div>
+                        <span className="text-gray-500">Hostnames :</span>{' '}
+                        <span className="font-mono">{deployment.certHostnames || '—'}</span>
+                      </div>
+                      {deployment.certValidUntil && (
+                        <div>
+                          <span className="text-gray-500">Valide jusqu'au :</span>{' '}
+                          {new Date(deployment.certValidUntil).toLocaleDateString('fr-FR')}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500">Aucun certificat généré. Clique sur « Générer » ci-contre pour créer un certificat auto-signé.</p>
+                  )}
+                </div>
+                <div className="flex flex-col gap-2 shrink-0">
+                  <button type="button" onClick={openCertModal}
+                    className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 cursor-pointer">
+                    <ShieldCheck size={12} /> {deployment.certHostnames ? 'Regénérer' : 'Générer'}
+                  </button>
+                  {deployment.certHostnames && (
+                    <button type="button" onClick={handleDownloadCertificate} disabled={downloadingCert}
+                      className="flex items-center gap-1.5 bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-gray-800 disabled:opacity-50 cursor-pointer">
+                      <Download size={12} /> {downloadingCert ? '...' : 'Télécharger .pfx'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <SaveBar saving={saving} onSave={handleSave} onDelete={handleDelete} />
+        </div>
+      )}
+
+      {/* Onglet : Sync & EDI */}
+      {activeTab === 'sync' && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <p className="text-xs text-gray-500 mb-4">
+            Paramètres du moteur de synchronisation et de la génération EDI WaveSoft.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">WaveSoft EDI</h3>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Dossier de sortie EDI</label>
+              <input {...bind('ediOutputFolder')} placeholder="C:\DATA_Wavesoft\AutomateIE"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Séparateur EDI</label>
+              <input {...bind('ediSeparator')} placeholder=";"
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+
+            <div className="md:col-span-2 pt-3 border-t border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Paramètres de synchronisation</h3>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">BatchSize</label>
+              <input type="number" {...bind('batchSize', { number: true })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">TimeoutSeconds</label>
+              <input type="number" {...bind('timeoutSeconds', { number: true })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">RetryAttempts</label>
+              <input type="number" {...bind('retryAttempts', { number: true })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">
+                HistoPiece <span className="text-gray-400">(années, -1 = tout)</span>
+              </label>
+              <input type="number" {...bind('histoPiece', { number: true })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+
+            <div className="md:col-span-2 pt-3 border-t border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-700 mb-1 uppercase tracking-wide">Articles invendus</h3>
+              <p className="text-xs text-gray-500 mb-2">
+                Onglet "Invendus" du panier mobile. Un article y apparaît si le client l'a commandé en moyenne ≥ <em>MinAvgPerMonth</em> fois/mois sur les <em>NbMonthHisto</em> derniers mois précédents, mais pas dans les <em>NbMonthCA</em> derniers mois.
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">
+                NbMonthCA <span className="text-gray-400">(période sans achat, en mois)</span>
+              </label>
+              <input type="number" min="1" {...bind('invendusNbMonthCA', { number: true })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">
+                NbMonthHisto <span className="text-gray-400">(période historique, en mois)</span>
+              </label>
+              <input type="number" min="1" {...bind('invendusNbMonthHisto', { number: true })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">
+                MinAvgPerMonth <span className="text-gray-400">(seuil d'achats/mois)</span>
+              </label>
+              <input type="number" step="0.1" min="0.1" {...bind('invendusMinAvgPerMonth', { number: true })}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm" />
+            </div>
+          </div>
+          <SaveBar saving={saving} onSave={handleSave} onDelete={handleDelete} />
+        </div>
+      )}
+
+      {/* Onglet : Licences associées */}
+      {activeTab === 'licenses' && (
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Licences / bases associées</h2>
         {(deployment.licenses?.length || 0) === 0 ? (
@@ -483,8 +490,11 @@ export default function DeploymentDetail() {
         )}
       </div>
 
-      {/* Guide d'installation / désinstallation */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mt-6">
+      )}
+
+      {/* Onglet : Guide d'installation / désinstallation */}
+      {activeTab === 'guide' && (
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Guide d'installation</h2>
 
         <div className="prose prose-sm max-w-none text-gray-700">
@@ -551,6 +561,7 @@ export default function DeploymentDetail() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Modal génération certificat */}
       {certModalOpen && (
@@ -636,6 +647,38 @@ export default function DeploymentDetail() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function DeploymentTabButton({ active, onClick, icon, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+        active
+          ? 'border-blue-600 text-blue-600'
+          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+      }`}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+function SaveBar({ saving, onSave, onDelete }) {
+  return (
+    <div className="flex items-center gap-3 mt-5 pt-4 border-t border-gray-100">
+      <button onClick={onSave} disabled={saving}
+        className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer">
+        <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
+      </button>
+      <button onClick={onDelete}
+        className="flex items-center gap-2 text-red-600 hover:text-red-800 text-sm font-medium ml-auto cursor-pointer">
+        <Trash2 size={14} /> Supprimer
+      </button>
     </div>
   );
 }
