@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
  */
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, remember } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email et mot de passe requis' });
@@ -26,6 +26,9 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
 
+    // Durée du token : 30 jours si "Se souvenir de moi" coché, 24h sinon
+    const expiresIn = remember === true ? '30d' : '24h';
+
     const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET);
     const token = await new SignJWT({
       id: user.id,
@@ -34,12 +37,13 @@ router.post('/login', async (req, res) => {
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('24h')
+      .setExpirationTime(expiresIn)
       .sign(secret);
 
     res.json({
       token,
       user: { id: user.id, email: user.email, role: user.role },
+      expiresIn,
     });
   } catch (error) {
     console.error('[AUTH]', error);
