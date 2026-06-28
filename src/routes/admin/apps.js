@@ -229,6 +229,17 @@ router.post('/:id/apk', upload.single('apk'), async (req, res) => {
       try { rmSync(req.file.path); } catch { /* ignore */ }
       return res.status(400).json({ error: 'Numéro de version requis (ex : 1.2.3)' });
     }
+    // buildNumber Android (= versionCode dans app.json côté Expo). Optionnel.
+    // Utilisé en fallback à la comparaison de version string côté mobile :
+    // si le dev bumpe seulement versionCode sans toucher au string version,
+    // le mobile détecte quand même la MAJ via Application.nativeBuildVersion.
+    // 0 si non fourni → pas de comparaison de buildNumber côté mobile.
+    const buildNumberRaw = String(req.body.buildNumber || '').trim();
+    const buildNumber = buildNumberRaw ? parseInt(buildNumberRaw, 10) : 0;
+    if (buildNumberRaw && (isNaN(buildNumber) || buildNumber < 0)) {
+      try { rmSync(req.file.path); } catch { /* ignore */ }
+      return res.status(400).json({ error: 'buildNumber invalide (entier positif attendu, ex : 121)' });
+    }
 
     const app = req._appRecord;
     const dir = appDir(app.code);
@@ -257,6 +268,7 @@ router.post('/:id/apk', upload.single('apk'), async (req, res) => {
       data: {
         apkFileName: req.file.filename,
         apkVersion: version,
+        apkBuildNumber: buildNumber,
         apkReleaseNotes: req.body.releaseNotes || '',
         apkUpdatedAt: new Date(),
       },
@@ -292,7 +304,7 @@ router.delete('/:id/apk', async (req, res) => {
 
     const updated = await prisma.app.update({
       where: { id: app.id },
-      data: { apkFileName: '', apkVersion: '', apkReleaseNotes: '', apkUpdatedAt: null },
+      data: { apkFileName: '', apkVersion: '', apkBuildNumber: 0, apkReleaseNotes: '', apkUpdatedAt: null },
     });
 
     res.json({ success: true, app: updated });

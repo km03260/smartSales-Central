@@ -103,6 +103,10 @@ export async function signLicenseToken(license, company, appCode) {
     isBlocked: license.isBlocked || false,
     // Infos de mise à jour de l'app mobile
     appLatestVersion: app?.apkVersion || '',
+    // versionCode Android (build number) — sert de fallback côté mobile si le
+    // string version reste inchangé entre 2 releases mais que versionCode bouge.
+    // 0 = pas de comparaison de buildNumber (legacy / non renseigné).
+    appLatestBuildNumber: app?.apkBuildNumber || 0,
     appApkUrl: buildApkPublicUrl(app),
   })
     .setProtectedHeader({ alg: 'RS256' })

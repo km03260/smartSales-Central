@@ -56,10 +56,10 @@ export default function AppDetail() {
 
   useEffect(() => { load(); }, [id]);
 
-  const handleApkUpload = async (file, version, releaseNotes) => {
+  const handleApkUpload = async (file, version, releaseNotes, buildNumber) => {
     if (!file) return;
     setUploading(true);
-    try { await api.uploadApk(id, file, version, releaseNotes); await load(); }
+    try { await api.uploadApk(id, file, version, releaseNotes, buildNumber); await load(); }
     catch (err) { alert(err.message); }
     finally { setUploading(false); }
   };
@@ -175,6 +175,7 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
   const fileRef = useRef(null);
   const bundleRef = useRef(null);
   const [version, setVersion] = useState('');
+  const [buildNumber, setBuildNumber] = useState('');
   const [releaseNotes, setReleaseNotes] = useState('');
   const [bundleVersion, setBundleVersion] = useState('');
   const hasApk = !!app.apkFileName;
@@ -190,7 +191,7 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
   const triggerBundleUpload = () => bundleRef.current?.click();
   const onFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) onUploadApk(file, version, releaseNotes);
+    if (file) onUploadApk(file, version, releaseNotes, buildNumber);
     e.target.value = '';
   };
   const onBundleChange = (e) => {
@@ -215,7 +216,9 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-gray-900 truncate">{app.apkFileName}</div>
                   <div className="text-xs text-gray-500">
-                    {app.apkVersion && <span>v{app.apkVersion} · </span>}
+                    {app.apkVersion && <span>v{app.apkVersion}</span>}
+                    {app.apkBuildNumber > 0 && <span> (build {app.apkBuildNumber})</span>}
+                    {(app.apkVersion || app.apkBuildNumber > 0) && app.apkUpdatedAt && <span> · </span>}
                     {app.apkUpdatedAt && <span>{new Date(app.apkUpdatedAt).toLocaleDateString()}</span>}
                   </div>
                 </div>
@@ -242,6 +245,10 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
                   placeholder="Nouvelle version (ex: 1.2.3) — requis"
                   aria-required="true"
                   className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${versionMissing ? 'border-orange-300 bg-orange-50/40' : 'border-gray-200'}`} />
+                <input type="number" min="1" value={buildNumber} onChange={(e) => setBuildNumber(e.target.value)}
+                  placeholder="versionCode (ex: 122)"
+                  title="Build number Android = versionCode dans app.json. Sert de fallback si le string version est identique entre 2 releases."
+                  className="w-44 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 <button onClick={triggerUpload} disabled={apkUploadDisabled}
                   title={versionMissing ? 'Saisissez le numéro de version pour pouvoir remplacer' : ''}
                   className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
@@ -251,6 +258,9 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
               </div>
               {versionMissing && (
                 <p className="text-xs text-orange-600">Le numéro de version est requis pour publier une nouvelle release (sans, les apps mobiles ne détecteront pas la mise à jour).</p>
+              )}
+              {app.apkBuildNumber > 0 && (
+                <p className="text-xs text-gray-500">Build actuel : <code className="font-mono">{app.apkBuildNumber}</code>. Le nouveau buildNumber doit être strictement supérieur pour que la MAJ soit détectée par fallback.</p>
               )}
               <textarea value={releaseNotes} onChange={(e) => setReleaseNotes(e.target.value)} rows={3}
                 placeholder="Notes de version (ce que cette release apporte, une ligne par point)"
@@ -268,6 +278,10 @@ function AppTab({ app, uploading, onUploadApk, onDeleteApk, onShowQr, onUploadBu
                   placeholder="Version (ex: 1.2.3) — requis"
                   aria-required="true"
                   className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${versionMissing ? 'border-orange-300 bg-orange-50/40' : 'border-gray-200'}`} />
+                <input type="number" min="1" value={buildNumber} onChange={(e) => setBuildNumber(e.target.value)}
+                  placeholder="versionCode (ex: 122)"
+                  title="Build number Android = versionCode dans app.json. Sert de fallback si le string version est identique entre 2 releases."
+                  className="w-44 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 <button onClick={triggerUpload} disabled={apkUploadDisabled}
                   title={versionMissing ? 'Saisissez le numéro de version pour pouvoir uploader' : ''}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">

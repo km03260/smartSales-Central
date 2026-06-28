@@ -23,6 +23,12 @@ model App {
   isActive    Boolean  @default(true)
   apkFileName        String   @default("") @db.VarChar(200)
   apkVersion         String   @default("") @db.VarChar(50)
+  // versionCode Android (incrément monotone, distinct du string apkVersion).
+  // Sert de fallback à la détection de MAJ mobile : si le dev bumpe seulement
+  // versionCode sans toucher au string version (ex: "1.5.0" reste "1.5.0" mais
+  // versionCode 120 → 121), la comparaison string échoue mais celle du
+  // buildNumber détecte la nouveauté. Côté mobile : Application.nativeBuildVersion.
+  apkBuildNumber     Int      @default(0)
   apkReleaseNotes    String   @default("") @db.Text  // note de version de l'APK courant (apports de la release)
   apkUpdatedAt       DateTime?
   serviceBundlePath  String   @default("") @db.VarChar(500)  // chemin du ZIP du SyncService (uploads/services/)
