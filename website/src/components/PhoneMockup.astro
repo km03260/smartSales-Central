@@ -20,7 +20,7 @@ const t = THEMES[variant];
 
 <div class={`phone-frame phone-frame-md animate-float ${className}`}>
   <div class="phone-screen">
-    {/* Capture d'écran réelle pour customSales — remplit tout l'écran (status bar incluse) */}
+    {/* Captures d'écran réelles — remplissent tout l'écran (status bar Android incluse) */}
     {variant === 'sales' && (
       <img
         src="/im/customSales.webp"
@@ -30,9 +30,18 @@ const t = THEMES[variant];
         decoding="async"
       />
     )}
+    {variant === 'supply' && (
+      <img
+        src="/im/customSupplies.webp"
+        alt="Capture d'écran customSupplies — panier de commande fournisseur avec plafond franco"
+        class="absolute inset-0 w-full h-full object-cover object-top"
+        loading="lazy"
+        decoding="async"
+      />
+    )}
 
-    {/* Status bar (uniquement pour les variantes sans screenshot réel) */}
-    {variant !== 'sales' && (
+    {/* Status bar factice (uniquement pour les variantes sans capture réelle) */}
+    {variant !== 'sales' && variant !== 'supply' && (
     <div class="flex items-center justify-between px-6 pt-8 pb-2 text-xs font-semibold text-gray-900 dark:text-gray-100">
       <span>9:41</span>
       <div class="flex items-center gap-1">
@@ -41,60 +50,6 @@ const t = THEMES[variant];
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
       </div>
     </div>
-    )}
-
-    {/* App-specific content (mockups SVG pour les variantes sans capture) */}
-    {variant === 'supply' && (
-      <div class="px-4 pt-2">
-        <div class="mb-3">
-          <div class="text-[10px] text-gray-400 dark:text-gray-400 uppercase tracking-wider">Approvisionnements</div>
-          <div class="font-bold text-gray-900 dark:text-gray-100 text-lg">Commandes en cours</div>
-        </div>
-
-        <div class="flex gap-1.5 mb-3">
-          {[
-            { label: 'À valider', count: 3, active: true },
-            { label: 'Envoyées', count: 12, active: false },
-            { label: 'Reçues',   count: 8,  active: false },
-          ].map((tab) => (
-            <div class={tab.active
-              ? `flex-1 bg-gradient-to-br ${t.from} ${t.to} text-white rounded-lg py-1.5 text-center`
-              : 'flex-1 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-300 rounded-lg py-1.5 text-center'}>
-              <div class="text-[9px] font-medium opacity-80">{tab.label}</div>
-              <div class="text-sm font-bold">{tab.count}</div>
-            </div>
-          ))}
-        </div>
-
-        <div class="space-y-2">
-          {[
-            { supplier: 'Matériaux SA', ref: 'CMD-2304', amount: '2 480 €', items: 12, status: 'urgent' },
-            { supplier: 'Outillage Pro', ref: 'CMD-2303', amount: '890 €',   items: 5,  status: 'normal' },
-            { supplier: 'Fixations+',    ref: 'CMD-2302', amount: '345 €',   items: 8,  status: 'normal' },
-          ].map((o) => (
-            <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl p-2.5">
-              <div class="flex items-center justify-between mb-1">
-                <span class="font-semibold text-gray-900 dark:text-gray-100 text-xs">{o.supplier}</span>
-                {o.status === 'urgent' && <span class="text-[9px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">URGENT</span>}
-              </div>
-              <div class="flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-300">
-                <span>{o.ref} · {o.items} articles</span>
-                <span class="font-bold text-gray-900 dark:text-gray-100">{o.amount}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div class={`${t.soft} border ${t.border} rounded-xl p-3 mt-3 flex items-center gap-2.5`}>
-          <div class={`w-8 h-8 rounded-lg bg-gradient-to-br ${t.from} ${t.to} flex items-center justify-center flex-shrink-0`}>
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm0 12h4v4H4v-4zM12 4h4v4h-4V4zm0 12h4v4h-4v-4z"/></svg>
-          </div>
-          <div class="flex-1">
-            <div class="text-[10px] text-gray-500 dark:text-gray-300">Prêt à scanner</div>
-            <div class={`text-xs font-semibold ${t.accent}`}>Réception marchandise</div>
-          </div>
-        </div>
-      </div>
     )}
 
     {variant === 'shipping' && (
