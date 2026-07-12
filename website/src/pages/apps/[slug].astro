@@ -5,16 +5,18 @@ import PhoneMockup from '../../components/PhoneMockup.astro';
 const API_URL = import.meta.env.PUBLIC_API_URL || 'https://api.customapps.fr';
 
 const FALLBACK_APPS = [
-  { code: 'SS', slug: 'custom-sales',     name: 'customSales',    color: 'blue' },
-  { code: 'SP', slug: 'custom-supply',    name: 'customSupply',   color: 'emerald' },
-  { code: 'SH', slug: 'custom-shipping',  name: 'customShipping', color: 'orange' },
-  { code: 'FS', slug: 'custom-file-sync', name: 'customFileSync', color: 'violet' },
+  { code: 'SS', slug: 'custom-sales',     name: 'customSales',     color: 'blue' },
+  { code: 'SP', slug: 'custom-supplies',  name: 'customSupplies',  color: 'emerald' },
+  { code: 'SH', slug: 'custom-shipping',  name: 'customShipping',  color: 'orange' },
+  { code: 'CL', slug: 'custom-locations', name: 'customLocations', color: 'cyan' },
+  { code: 'FS', slug: 'custom-file-sync', name: 'customFileSync',  color: 'violet' },
 ];
 
 const MOCKUP_VARIANT = {
   'custom-sales':     'sales',
   'custom-supplies':  'supply',
   'custom-shipping':  'shipping',
+  'custom-locations': 'sales', // TODO: variante dédiée quand tu auras une capture customLocations.webp
   'custom-file-sync': 'fileSync',
 };
 
@@ -31,8 +33,9 @@ export async function getStaticPaths() {
   } catch {}
   return [
     { params: { slug: 'custom-sales' },     props: { app: null } },
-    { params: { slug: 'custom-supply' },    props: { app: null } },
+    { params: { slug: 'custom-supplies' },  props: { app: null } },
     { params: { slug: 'custom-shipping' },  props: { app: null } },
+    { params: { slug: 'custom-locations' }, props: { app: null } },
     { params: { slug: 'custom-file-sync' }, props: { app: null } },
   ];
 }
