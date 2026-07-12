@@ -1,18 +1,19 @@
 ---
-// Mockup mobile stylisé — simule l'UI de chacune des 4 apps customApps.
-// 4 variants : 'sales' (SS), 'supply' (SP), 'shipping' (SH), 'fileSync' (FS).
+// Mockup mobile stylisé — simule l'UI de chacune des 5 apps customApps.
+// Variants : 'sales' (SS), 'supply' (SP), 'shipping' (SH), 'locations' (CL), 'fileSync' (FS).
 interface Props {
-  variant: 'sales' | 'supply' | 'shipping' | 'fileSync';
+  variant: 'sales' | 'supply' | 'shipping' | 'locations' | 'fileSync';
   class?: string;
 }
 
 const { variant, class: className = '' } = Astro.props;
 
 const THEMES = {
-  sales:    { from: 'from-blue-500',    to: 'to-blue-600',    accent: 'text-blue-600',    soft: 'bg-blue-50',    border: 'border-blue-100' },
-  supply:   { from: 'from-emerald-500', to: 'to-emerald-600', accent: 'text-emerald-600', soft: 'bg-emerald-50', border: 'border-emerald-100' },
-  shipping: { from: 'from-orange-500',  to: 'to-orange-600',  accent: 'text-orange-600',  soft: 'bg-orange-50',  border: 'border-orange-100' },
-  fileSync: { from: 'from-violet-500',  to: 'to-violet-600',  accent: 'text-violet-600',  soft: 'bg-violet-50',  border: 'border-violet-100' },
+  sales:     { from: 'from-blue-500',    to: 'to-blue-600',    accent: 'text-blue-600',    soft: 'bg-blue-50',    border: 'border-blue-100' },
+  supply:    { from: 'from-emerald-500', to: 'to-emerald-600', accent: 'text-emerald-600', soft: 'bg-emerald-50', border: 'border-emerald-100' },
+  shipping:  { from: 'from-orange-500',  to: 'to-orange-600',  accent: 'text-orange-600',  soft: 'bg-orange-50',  border: 'border-orange-100' },
+  locations: { from: 'from-teal-500',    to: 'to-teal-600',    accent: 'text-teal-600',    soft: 'bg-teal-50',    border: 'border-teal-100' },
+  fileSync:  { from: 'from-violet-500',  to: 'to-violet-600',  accent: 'text-violet-600',  soft: 'bg-violet-50',  border: 'border-violet-100' },
 };
 
 const t = THEMES[variant];
@@ -39,9 +40,18 @@ const t = THEMES[variant];
         decoding="async"
       />
     )}
+    {variant === 'locations' && (
+      <img
+        src="/im/customLocations.jpeg"
+        alt="Capture d'écran customLocations — saisie d'emplacement d'entrepôt par scan (rack, colonne, étage, position)"
+        class="absolute inset-0 w-full h-full object-cover object-top"
+        loading="lazy"
+        decoding="async"
+      />
+    )}
 
     {/* Status bar factice (uniquement pour les variantes sans capture réelle) */}
-    {variant !== 'sales' && variant !== 'supply' && (
+    {variant !== 'sales' && variant !== 'supply' && variant !== 'locations' && (
     <div class="flex items-center justify-between px-6 pt-8 pb-2 text-xs font-semibold text-gray-900 dark:text-gray-100">
       <span>9:41</span>
       <div class="flex items-center gap-1">
