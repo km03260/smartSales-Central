@@ -133,7 +133,19 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { deploymentId, maxDevices, features, plan, expiresAt, isActive } = req.body;
+    const { deploymentId, maxDevices, features, plan, expiresAt, isActive, specialZones } = req.body;
+
+    // Zones spéciales (customLocations) : tableau [{ code, label }] assaini, ou null.
+    let normalizedZones;
+    if (specialZones !== undefined) {
+      normalizedZones = Array.isArray(specialZones)
+        ? specialZones
+            .map((z) => ({ code: String(z?.code ?? '').trim(), label: String(z?.label ?? '').trim() }))
+            .filter((z) => z.code.length > 0)
+            .slice(0, 10)
+        : null;
+      if (normalizedZones && normalizedZones.length === 0) normalizedZones = null;
+    }
 
     if (deploymentId !== undefined) {
       if (!deploymentId) {
@@ -153,6 +165,7 @@ router.put('/:id', async (req, res) => {
         ...(deploymentId !== undefined && { deploymentId }),
         ...(maxDevices !== undefined && { maxDevices }),
         ...(features !== undefined && { features }),
+        ...(specialZones !== undefined && { specialZones: normalizedZones }),
         ...(plan !== undefined && { plan }),
         ...(expiresAt !== undefined && { expiresAt: new Date(expiresAt) }),
         ...(isActive !== undefined && { isActive }),

@@ -112,6 +112,10 @@ model License {
   licenseKey     String   @unique @db.VarChar(20)           // {APP_CODE}-XXXX-XXXX-XXXX
   maxDevices     Int      @default(5)                       // Global à la licence (toutes bases confondues)
   features       Json     // ["orders","quotations","invoices","stats"]
+  // Config app-spécifique (customLocations) : zones spéciales d'emplacement,
+  // tableau [{ code, label }] (ex. [{"code":"970","label":"Labo"}]). null/vide →
+  // l'app mobile applique ses zones par défaut. Livré dans le JWT de licence.
+  specialZones   Json?
   plan           String   @default("professional") @db.VarChar(50)
   startsAt       DateTime @default(now())
   expiresAt      DateTime

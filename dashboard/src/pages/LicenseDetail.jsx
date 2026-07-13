@@ -32,6 +32,7 @@ export default function LicenseDetail() {
     setEditForm({
       deploymentId: data.deploymentId || '',
       maxDevices: data.maxDevices,
+      specialZones: Array.isArray(data.specialZones) ? data.specialZones : [],
     });
     if (data.companyId) {
       api.getDeployments(data.companyId).then(setDeployments).catch(console.error);
@@ -262,6 +263,49 @@ export default function LicenseDetail() {
                 <input type="number" value={editForm.maxDevices} onChange={(e) => setEditForm({ ...editForm, maxDevices: Number(e.target.value) })}
                   className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
+
+              {/* Zones spéciales : app customLocations uniquement. Vide → l'app applique ses zones par défaut. */}
+              {/location/i.test(license.app?.name || '') && (
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    Zones spéciales d'emplacement (customLocations)
+                  </label>
+                  <p className="text-[11px] text-gray-400 mb-2">
+                    Rack à saisie libre (produits non codifiés). Vide = zones par défaut de l'app. Le préfixe « R » est ajouté par l'app.
+                  </p>
+                  <div className="space-y-2">
+                    {(editForm.specialZones || []).map((z, i) => (
+                      <div key={i} className="flex gap-2 items-center">
+                        <input value={z.code} placeholder="Code (ex. 970)"
+                          onChange={(e) => {
+                            const zones = [...editForm.specialZones];
+                            zones[i] = { ...zones[i], code: e.target.value.replace(/[^A-Za-z0-9-]/g, '') };
+                            setEditForm({ ...editForm, specialZones: zones });
+                          }}
+                          className="w-28 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <input value={z.label} placeholder="Libellé (ex. Labo)"
+                          onChange={(e) => {
+                            const zones = [...editForm.specialZones];
+                            zones[i] = { ...zones[i], label: e.target.value };
+                            setEditForm({ ...editForm, specialZones: zones });
+                          }}
+                          className="flex-1 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <button type="button"
+                          onClick={() => setEditForm({ ...editForm, specialZones: editForm.specialZones.filter((_, j) => j !== i) })}
+                          className="text-red-500 hover:text-red-700 px-2 py-1.5 cursor-pointer">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button"
+                      onClick={() => setEditForm({ ...editForm, specialZones: [...(editForm.specialZones || []), { code: '', label: '' }] })}
+                      className="text-xs text-blue-600 hover:text-blue-800 cursor-pointer">
+                      + Ajouter une zone
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <button onClick={handleSaveEdit} disabled={saving}
                 className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 cursor-pointer w-full justify-center">
                 <Save size={14} /> {saving ? 'Enregistrement...' : 'Enregistrer'}

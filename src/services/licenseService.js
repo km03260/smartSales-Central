@@ -99,6 +99,9 @@ export async function signLicenseToken(license, company, appCode) {
     diversArtcodePatterns: deployment.diversArtcodePatterns || '',
     maxDevices: license.maxDevices,
     features: license.features,
+    // Zones spéciales d'emplacement (customLocations). null si non configuré →
+    // l'app applique ses zones par défaut. Format : [{ code, label }].
+    specialZones: license.specialZones || null,
     plan: license.plan,
     isBlocked: license.isBlocked || false,
     // Infos de mise à jour de l'app mobile
