@@ -204,6 +204,32 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
+/* ─── Dark mode : remonte les accents blue/violet trop foncés ─────────────
+   Blue-600 (#2563EB) et violet-600 (#7C3AED) manquent de contraste sur
+   fond sombre. On les fait ressortir avec la variante 400/300, sauf
+   quand ils sont associés à un fond blue/violet clair (badges type
+   `bg-blue-50 text-blue-700`) où le texte foncé reste voulu.
+   ---------------------------------------------------------------------- */
+.dark :not([class*="bg-blue-"]).text-blue-600,
+.dark :not([class*="bg-blue-"]) .text-blue-600  { color: var(--color-blue-400); }
+.dark :not([class*="bg-blue-"]).text-blue-700,
+.dark :not([class*="bg-blue-"]) .text-blue-700  { color: var(--color-blue-300); }
+.dark :not([class*="bg-violet-"]).text-violet-600,
+.dark :not([class*="bg-violet-"]) .text-violet-600 { color: var(--color-violet-400); }
+.dark :not([class*="bg-violet-"]).text-violet-700,
+.dark :not([class*="bg-violet-"]) .text-violet-700 { color: var(--color-violet-300); }
+
+/* Idem pour les hover states (nav links, boutons secondaires) */
+.dark :not([class*="bg-blue-"]).hover\:text-blue-600:hover,
+.dark :not([class*="bg-blue-"]) .hover\:text-blue-600:hover  { color: var(--color-blue-400); }
+.dark :not([class*="bg-blue-"]).hover\:text-blue-700:hover,
+.dark :not([class*="bg-blue-"]) .hover\:text-blue-700:hover  { color: var(--color-blue-300); }
+.dark :not([class*="bg-violet-"]).hover\:text-violet-600:hover,
+.dark :not([class*="bg-violet-"]) .hover\:text-violet-600:hover { color: var(--color-violet-400); }
+
+/* Idem pour group-hover (titres d'articles blog qui deviennent bleus au survol) */
+.dark [class*="group"]:hover .group-hover\:text-blue-600 { color: var(--color-blue-400); }
+
 /* ─── Phone mockup frame ──────────────────────────────────────────────── */
 .phone-frame {
   position: relative;
