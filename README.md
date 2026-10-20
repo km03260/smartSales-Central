@@ -171,7 +171,9 @@ npx prisma migrate dev --name description_changement
 
 ### Publics (app mobile)
 - `POST /api/licenses/activate` — activer une licence
-- `POST /api/licenses/heartbeat` — rafraîchir le token
+- `POST /api/licenses/heartbeat` — rafraîchir le token. Refus `403` avec `code` :
+  `LICENSE_INACTIVE` (licence désactivée/révoquée) ou `DEVICE_DEACTIVATED` (appareil désactivé
+  dans l'onglet Appareils — plus de token rafraîchi ; une nouvelle activation le réactive)
 - `GET  /api/licenses/config` — récupérer la config branding
 
 ### Publics (site vitrine)

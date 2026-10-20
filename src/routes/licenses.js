@@ -179,15 +179,22 @@ router.post('/heartbeat', licenseAuth, async (req, res) => {
       },
     });
 
+    // `code` : motif explicite, sur lequel l'app mobile repasse à l'écran d'activation.
     if (!license || !license.isActive) {
-      return res.status(403).json({ error: 'Licence invalide ou désactivée' });
+      return res.status(403).json({ error: 'Licence invalide ou désactivée', code: 'LICENSE_INACTIVE' });
     }
 
     // Récupérer le device pour l'assignement instance/base imposé par l'admin
     const device = await prisma.deviceActivation.findUnique({
       where: { licenseId_deviceId: { licenseId, deviceId } },
-      select: { userName: true, currentInstanceKey: true, currentDatabaseName: true },
+      select: { userName: true, currentInstanceKey: true, currentDatabaseName: true, isActive: true },
     });
+
+    // Appareil désactivé par l'admin (onglet Appareils) : plus de JWT rafraîchi. L'app
+    // doit redemander la clé ; une nouvelle activation (/activate) le réactive.
+    if (device && !device.isActive) {
+      return res.status(403).json({ error: 'Appareil désactivé', code: 'DEVICE_DEACTIVATED' });
+    }
 
     // Mettre à jour le heartbeat + ajouter le userName à la liste (sans doublon)
     const updateData = { lastHeartbeat: new Date() };
