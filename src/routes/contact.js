@@ -8,14 +8,14 @@ const prisma = new PrismaClient();
 /**
  * POST /api/contact
  * Formulaire de contact depuis le site vitrine.
- * Body: { name, email, company?, phone?, message, type? }
+ * Body: { name, email, company?, phone, message, type? }
  */
 router.post('/', async (req, res) => {
   try {
     const { name, email, company, phone, message, type } = req.body;
 
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: 'name, email et message requis' });
+    if (!name || !email || !phone || !message) {
+      return res.status(400).json({ error: 'name, email, phone et message requis' });
     }
 
     const contact = await prisma.contactRequest.create({
